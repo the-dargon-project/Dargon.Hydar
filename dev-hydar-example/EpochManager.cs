@@ -1,11 +1,9 @@
 using Dargon.Courier.Identities;
 using Dargon.Courier.Messaging;
-using System;
-using System.Linq;
-using Dargon.Courier.PortableObjects;
-using ImpromptuInterface;
 using ItzWarty;
 using ItzWarty.Collections;
+using System;
+using System.Linq;
 using SCG = System.Collections.Generic;
 
 namespace Dargon.Hydar {
@@ -450,6 +448,8 @@ namespace Dargon.Hydar {
          public override void HandleTick() {
 
          }
+
+         public override string ToString() => $"[Cohort Rank {Rank} of {Participants.Count}]";
       }
    }
 }
