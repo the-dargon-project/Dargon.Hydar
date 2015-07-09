@@ -339,10 +339,12 @@ namespace Dargon.Hydar {
             if (nominee.CompareTo(message.Payload.Nominee) < 0) {
                PhaseManager.Transition(PhaseFactory.ElectionFollower(message.Payload.Nominee));
             } else if (nominee.Equals(message.Payload.Nominee)) {
-               if (!message.Payload.Followers.Contains(LocalIdentifier)) {
-                  Messenger.Vote(nominee);
-               } else {
-                  PhaseManager.Transition(PhaseFactory.ElectionFollower(nominee, true));
+               if (message.SenderId.Equals(message.Payload.Nominee)) {
+                  if (!message.Payload.Followers.Contains(LocalIdentifier)) {
+                     Messenger.Vote(nominee);
+                  } else if (!acknowledged) {
+                     PhaseManager.Transition(PhaseFactory.ElectionFollower(nominee, true));
+                  }
                }
             } else {
                Messenger.Vote(nominee);
