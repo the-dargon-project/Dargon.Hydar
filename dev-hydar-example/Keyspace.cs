@@ -15,6 +15,7 @@ namespace Dargon.Hydar {
          this.redundancy = redundancy;
       }
 
+      public int BlockCount => blockCount;
       public int HashesPerBlock => (int)(kTwoPow32 / blockCount);
 
       public int HashToBlock(int hash) {
@@ -22,8 +23,8 @@ namespace Dargon.Hydar {
       }
 
       public PartitionBlockInterval GetPartitionRange(int partitionId, int nodeCount) {
-         int startBlockInclusive = (int)((((long)blockCount) * partitionId) / nodeCount);
-         int endBlockExclusive = (int)((((long)blockCount) * (partitionId + 1)) / nodeCount);
+         uint startBlockInclusive = (uint)((((long)blockCount) * partitionId) / nodeCount);
+         uint endBlockExclusive = (uint)((((long)blockCount) * (partitionId + 1)) / nodeCount);
          return new PartitionBlockInterval(startBlockInclusive, endBlockExclusive);
       }
 
@@ -33,7 +34,7 @@ namespace Dargon.Hydar {
          }
          if (nodeCount == redundancy) {
             // Trivial Case (Optimize to prevent wraps)
-            return new[] { new PartitionBlockInterval(0, blockCount) };
+            return new[] { new PartitionBlockInterval(0, (uint)blockCount) };
          } else if (nodeRank + redundancy <= nodeCount) {
             // Nonwrapping case, Not End
             var startBlockInclusive = GetPartitionRange(nodeRank, nodeCount).StartBlockInclusive;
@@ -44,7 +45,7 @@ namespace Dargon.Hydar {
             var lowPartitionRange = GetPartitionRange(nodeRank, nodeCount);
             var highPartitionRange = GetPartitionRange((nodeRank + redundancy) % nodeCount, nodeCount);
             return new[] {
-               new PartitionBlockInterval(lowPartitionRange.StartBlockInclusive, blockCount),
+               new PartitionBlockInterval(lowPartitionRange.StartBlockInclusive, (uint)blockCount),
                new PartitionBlockInterval(0, highPartitionRange.StartBlockInclusive)
             };
          }

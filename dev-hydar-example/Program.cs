@@ -3,6 +3,7 @@ using ItzWarty.Collections;
 using ItzWarty.Pooling;
 using ItzWarty.Threading;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using Dargon.Courier.Identities;
 using Dargon.Courier.Messaging;
@@ -16,6 +17,8 @@ using ItzWarty.Networking;
 namespace Dargon.Hydar {
    public static class Program {
       public static void Main() {
+         Console.Title = "PID " + Process.GetCurrentProcess().Id;
+
          // ItzWarty.Commons
          ICollectionFactory collectionFactory = new CollectionFactory();
          ObjectPoolFactory objectPoolFactory = new DefaultObjectPoolFactory(collectionFactory);
@@ -40,6 +43,9 @@ namespace Dargon.Hydar {
             x.RegisterPortableObjectType(100002, typeof(LeaderHeartbeatDto));
             x.RegisterPortableObjectType(100003, typeof(CacheNeedDto));
             x.RegisterPortableObjectType(100004, typeof(PartitionBlockInterval));
+            x.RegisterPortableObjectType(100005, typeof(OutsiderAnnounceDto));
+            x.RegisterPortableObjectType(100006, typeof(RepartitionSignalDto));
+            x.RegisterPortableObjectType(100007, typeof(RepartitionCompletionDto));
          });
          var pofSerializer = new PofSerializer(pofContext);
 
@@ -86,6 +92,10 @@ namespace Dargon.Hydar {
 
          messageRouter.RegisterPayloadHandler<ElectionVoteDto>(epochPhaseManager.Dispatch);
          messageRouter.RegisterPayloadHandler<LeaderHeartbeatDto>(epochPhaseManager.Dispatch);
+         messageRouter.RegisterPayloadHandler<CacheNeedDto>(epochPhaseManager.Dispatch);
+         messageRouter.RegisterPayloadHandler<OutsiderAnnounceDto>(epochPhaseManager.Dispatch);
+         messageRouter.RegisterPayloadHandler<RepartitionSignalDto>(epochPhaseManager.Dispatch);
+         messageRouter.RegisterPayloadHandler<RepartitionCompletionDto>(epochPhaseManager.Dispatch);
 
          new Thread(() => {
             while(true) {
@@ -165,6 +175,21 @@ namespace Dargon.Hydar {
       public void Deserialize(IPofReader reader) {
          Blocks = reader.ReadArray<PartitionBlockInterval>(0);
       }
+   }
+
+   public class OutsiderAnnounceDto : IPortableObject {
+      public void Serialize(IPofWriter writer) { }
+      public void Deserialize(IPofReader reader) { }
+   }
+
+   public class RepartitionSignalDto : IPortableObject {
+      public void Serialize(IPofWriter writer) { }
+      public void Deserialize(IPofReader reader) { }
+   }
+
+   public class RepartitionCompletionDto : IPortableObject {
+      public void Serialize(IPofWriter writer) { }
+      public void Deserialize(IPofReader reader) { }
    }
 
    public enum Role {
