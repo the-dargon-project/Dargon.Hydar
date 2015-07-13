@@ -83,11 +83,11 @@ namespace Dargon.Hydar {
          };
 //         messageRouter.RegisterPayloadHandler<ElectionVoteDto>();
          var keyspace = new Keyspace(1024, 1);
-         var cacheEpochManager = new EpochManager<int, string>(endpoint, messageSender, cacheConfiguration);
+         var cacheRoot = new CacheRoot<int, string>(endpoint, messageSender, cacheConfiguration);
          var cacheContext = new CacheContext<int, string>(cacheConfiguration);
-         var epochMessageSender = new EpochManager<int, string>.EpochMessageSender(messageSender);
-         var epochPhaseManager = new EpochManager<int, string>.PhaseManagerImpl();
-         var epochPhaseFactory = new EpochManager<int, string>.PhaseFactory(receivedMessageFactory, identifier, keyspace, cacheEpochManager, epochPhaseManager, epochMessageSender);
+         var epochMessageSender = new CacheRoot<int, string>.EpochMessageSender(messageSender);
+         var epochPhaseManager = new CacheRoot<int, string>.PhaseManagerImpl();
+         var epochPhaseFactory = new CacheRoot<int, string>.PhaseFactory(receivedMessageFactory, identifier, keyspace, cacheRoot, epochPhaseManager, epochMessageSender);
          epochPhaseManager.Transition(epochPhaseFactory.Oblivious());
 
          messageRouter.RegisterPayloadHandler<ElectionVoteDto>(epochPhaseManager.Dispatch);

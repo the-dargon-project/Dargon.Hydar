@@ -66,7 +66,7 @@
   <ItemGroup>
     <Compile Include="EpochState.cs" />
     <Compile Include="PartitionBlockInterval.cs" />
-    <Compile Include="EpochManager.cs" />
+    <Compile Include="CacheRoot.cs" />
     <Compile Include="ClusterClient.cs" />
     <Compile Include="Keyspace.cs" />
     <Compile Include="Program.cs" />

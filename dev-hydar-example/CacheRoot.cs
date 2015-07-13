@@ -8,12 +8,12 @@ using System.Linq;
 using SCG = System.Collections.Generic;
 
 namespace Dargon.Hydar {
-   public class EpochManager<TKey, TValue> {
+   public class CacheRoot<TKey, TValue> {
       private readonly CourierEndpointImpl endpoint;
       private readonly MessageSenderImpl messageSender;
       private readonly CacheConfiguration cacheConfiguration;
 
-      public EpochManager(CourierEndpointImpl endpoint, MessageSenderImpl messageSender, CacheConfiguration cacheConfiguration) {
+      public CacheRoot(CourierEndpointImpl endpoint, MessageSenderImpl messageSender, CacheConfiguration cacheConfiguration) {
          this.endpoint = endpoint;
          this.messageSender = messageSender;
          this.cacheConfiguration = cacheConfiguration;
@@ -205,15 +205,15 @@ namespace Dargon.Hydar {
          // Stuff for constructed phases' properties
          private readonly Guid localIdentifier;
          private readonly Keyspace keyspace;
-         private readonly EpochManager<TKey, TValue> epochManager;
+         private readonly CacheRoot<TKey, TValue> cacheRoot;
          private readonly PhaseManager phaseManager;
          private readonly EpochMessageSender epochMessageSender;
 
-         public PhaseFactory(ReceivedMessageFactory receivedMessageFactory, Guid localIdentifier, Keyspace keyspace, EpochManager<TKey, TValue> epochManager, PhaseManager phaseManager, EpochMessageSender epochMessageSender) {
+         public PhaseFactory(ReceivedMessageFactory receivedMessageFactory, Guid localIdentifier, Keyspace keyspace, CacheRoot<TKey, TValue> cacheRoot, PhaseManager phaseManager, EpochMessageSender epochMessageSender) {
             this.receivedMessageFactory = receivedMessageFactory;
             this.localIdentifier = localIdentifier;
             this.keyspace = keyspace;
-            this.epochManager = epochManager;
+            this.cacheRoot = cacheRoot;
             this.phaseManager = phaseManager;
             this.epochMessageSender = epochMessageSender;
          }
@@ -302,7 +302,7 @@ namespace Dargon.Hydar {
 
          private PhaseBase Initialize(PhaseBase phase) {
             phase.LocalIdentifier = localIdentifier;
-            phase.EpochManager = epochManager;
+            phase.CacheRoot = cacheRoot;
             phase.PhaseManager = phaseManager;
             phase.PhaseFactory = this;
             phase.Router = new MessageRouterImpl(receivedMessageFactory);
@@ -317,36 +317,17 @@ namespace Dargon.Hydar {
          }
 
          public PhaseFactory WithPhaseManager(PhaseManager phaseManagerOverride) {
-            return new PhaseFactory(receivedMessageFactory, localIdentifier, keyspace, epochManager, phaseManagerOverride, epochMessageSender);
+            return new PhaseFactory(receivedMessageFactory, localIdentifier, keyspace, cacheRoot, phaseManagerOverride, epochMessageSender);
          }
 
          public PhaseFactory WithMessenger(EpochMessageSender epochMessageSenderOverride) {
-            return new PhaseFactory(receivedMessageFactory, localIdentifier, keyspace, epochManager, phaseManager, epochMessageSenderOverride);
+            return new PhaseFactory(receivedMessageFactory, localIdentifier, keyspace, cacheRoot, phaseManager, epochMessageSenderOverride);
          }
       }
 
-//      public class Router {
-//         private readonly Dictionary<Type, Action<object>> handlersByType;
-//
-//         public Router() : this(new Dictionary<Type, Action<object>>()) {
-//         }
-//
-//         public Router(Dictionary<Type, Action<object>> handlersByType) {
-//            this.handlersByType = handlersByType;
-//         }
-//
-//         public void Route(object o) {
-//            handlersByType[o.GetType()](o);
-//         }
-//
-//         public void RegisterHandler<T>(Action<T> handler) {
-//            handlersByType.Add(typeof(T), x => handler((T)x));
-//         }
-//      }
-
       public abstract class PhaseBase {
          public Guid LocalIdentifier { get; set; }
-         public EpochManager<TKey, TValue> EpochManager { get; set; } 
+         public CacheRoot<TKey, TValue> CacheRoot { get; set; } 
          public PhaseManager PhaseManager { get; set; }
          public PhaseFactory PhaseFactory { get; set; }
          public MessageRouter Router { get; set; }
