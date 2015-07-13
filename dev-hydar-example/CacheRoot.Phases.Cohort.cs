@@ -48,9 +48,8 @@ namespace Dargon.Hydar {
 
          private void HandleNeed(IReceivedMessage<CacheNeedDto> message) {
             var neededBlocks = PartitionBlockInterval.ToUidSet(message.Payload.Blocks);
-            Console.WriteLine("Received Need: " + neededBlocks);
             var haveBlocks = BlockTable.IntersectNeed(neededBlocks);
-            Console.WriteLine("Have: " + haveBlocks);
+            Console.WriteLine("Received Need: " + neededBlocks + " and have " + haveBlocks);
          }
 
          private void SendNeed() {

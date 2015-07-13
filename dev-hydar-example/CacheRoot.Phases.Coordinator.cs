@@ -32,7 +32,6 @@ namespace Dargon.Hydar {
 
          public override void HandleEntered() {
             Messenger.RepartitionSignal();
-            SendHeartBeat();
          }
 
          public override void HandleTick() {
@@ -59,7 +58,9 @@ namespace Dargon.Hydar {
 
          public override void HandleEntered() { }
 
-         public override void HandleTick() { }
+         public override void HandleTick() {
+            SendHeartBeat();
+         }
 
          public override string ToString() => "[CoordinatorPartitioned]";
       }
