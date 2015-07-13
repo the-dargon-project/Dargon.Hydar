@@ -195,4 +195,10 @@ namespace Dargon.Hydar {
    public enum Role {
       Cohort = 1
    }
+
+   public enum CohortPartitioningState {
+      RepartitioningStarted,
+      RepartitioningCompleting,
+      Partitioned
+   }
 }
