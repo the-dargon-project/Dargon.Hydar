@@ -85,21 +85,21 @@ namespace Dargon.Hydar {
          var keyspace = new Keyspace(1024, 1);
          var cacheRoot = new CacheRoot<int, string>(endpoint, messageSender, cacheConfiguration);
          var cacheContext = new CacheContext<int, string>(cacheConfiguration);
-         var epochMessageSender = new CacheRoot<int, string>.EpochMessageSender(messageSender);
-         var epochPhaseManager = new CacheRoot<int, string>.PhaseManagerImpl();
-         var epochPhaseFactory = new CacheRoot<int, string>.PhaseFactory(receivedMessageFactory, identifier, keyspace, cacheRoot, epochPhaseManager, epochMessageSender);
-         epochPhaseManager.Transition(epochPhaseFactory.Oblivious());
+         var messenger = new CacheRoot<int, string>.Messenger(messageSender);
+         var phaseManager = new CacheRoot<int, string>.PhaseManagerImpl();
+         var phaseFactory = new CacheRoot<int, string>.PhaseFactory(receivedMessageFactory, identifier, keyspace, cacheRoot, phaseManager, messenger);
+         phaseManager.Transition(phaseFactory.Oblivious());
 
-         messageRouter.RegisterPayloadHandler<ElectionVoteDto>(epochPhaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<LeaderHeartbeatDto>(epochPhaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<CacheNeedDto>(epochPhaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<OutsiderAnnounceDto>(epochPhaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<RepartitionSignalDto>(epochPhaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<RepartitionCompletionDto>(epochPhaseManager.Dispatch);
+         messageRouter.RegisterPayloadHandler<ElectionVoteDto>(phaseManager.Dispatch);
+         messageRouter.RegisterPayloadHandler<LeaderHeartbeatDto>(phaseManager.Dispatch);
+         messageRouter.RegisterPayloadHandler<CacheNeedDto>(phaseManager.Dispatch);
+         messageRouter.RegisterPayloadHandler<OutsiderAnnounceDto>(phaseManager.Dispatch);
+         messageRouter.RegisterPayloadHandler<RepartitionSignalDto>(phaseManager.Dispatch);
+         messageRouter.RegisterPayloadHandler<RepartitionCompletionDto>(phaseManager.Dispatch);
 
          new Thread(() => {
             while(true) {
-               epochPhaseManager.HandleTick();
+               phaseManager.HandleTick();
                Thread.Sleep(100);
             }
          }).Start();
