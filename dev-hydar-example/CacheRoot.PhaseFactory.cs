@@ -110,8 +110,8 @@ namespace Dargon.Hydar {
             return Initialize(new CohortRepartitioningPhase(ticksToMaturity, neededBlocks), cohortState);
          }
 
-         public PhaseBase CohortPartitioned(EpochState epochState) {
-            return Initialize(new CohortPartitionedPhase(), epochState);
+         public PhaseBase CohortRepartitioningCompleted(EpochState epochState) {
+            return Initialize(new CohortRepartitioningCompletedPhase(), epochState);
          }
 
          private PhaseBase Initialize(PhaseBase phase) {

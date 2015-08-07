@@ -67,17 +67,17 @@ namespace Dargon.Hydar {
                PhaseManager.Transition(PhaseFactory.CohortRepartitioning(nextTicksToMaturity, neededBlocks, CohortState));
             } else {
                BlockTable.BlahBlahEmptyBlocks(neededBlocks);
-               PhaseManager.Transition(PhaseFactory.CohortPartitioned(EpochState));
+               PhaseManager.Transition(PhaseFactory.CohortRepartitioningCompleted(EpochState));
             }
          }
 
          public override string ToString() => $"[CohortPartitioning Rank {Rank} TTM {ticksToMaturity}]";
       }
 
-      public class CohortPartitionedPhase : CohortPhaseBase {
-         public CohortPartitionedPhase() { }
+      public class CohortRepartitioningCompletedPhase : CohortPhaseBase {
+         public CohortRepartitioningCompletedPhase() { }
 
-         public override CohortPartitioningState PartitioningState => CohortPartitioningState.Partitioned;
+         public override CohortPartitioningState PartitioningState => CohortPartitioningState.RepartitioningCompleting;
 
          public override void Initialize() {
 

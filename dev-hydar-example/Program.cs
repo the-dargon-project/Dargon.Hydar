@@ -44,7 +44,7 @@ namespace Dargon.Hydar {
             x.RegisterPortableObjectType(100003, typeof(CacheNeedDto));
             x.RegisterPortableObjectType(100004, typeof(PartitionBlockInterval));
             x.RegisterPortableObjectType(100005, typeof(OutsiderAnnounceDto));
-            x.RegisterPortableObjectType(100006, typeof(RepartitionSignalDto));
+            x.RegisterPortableObjectType(100006, typeof(LeaderRepartitionSignalDto));
             x.RegisterPortableObjectType(100007, typeof(RepartitionCompletionDto));
          });
          var pofSerializer = new PofSerializer(pofContext);
@@ -94,7 +94,7 @@ namespace Dargon.Hydar {
          messageRouter.RegisterPayloadHandler<LeaderHeartbeatDto>(phaseManager.Dispatch);
          messageRouter.RegisterPayloadHandler<CacheNeedDto>(phaseManager.Dispatch);
          messageRouter.RegisterPayloadHandler<OutsiderAnnounceDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<RepartitionSignalDto>(phaseManager.Dispatch);
+         messageRouter.RegisterPayloadHandler<LeaderRepartitionSignalDto>(phaseManager.Dispatch);
          messageRouter.RegisterPayloadHandler<RepartitionCompletionDto>(phaseManager.Dispatch);
 
          new Thread(() => {
@@ -182,7 +182,7 @@ namespace Dargon.Hydar {
       public void Deserialize(IPofReader reader) { }
    }
 
-   public class RepartitionSignalDto : IPortableObject {
+   public class LeaderRepartitionSignalDto : IPortableObject {
       public void Serialize(IPofWriter writer) { }
       public void Deserialize(IPofReader reader) { }
    }

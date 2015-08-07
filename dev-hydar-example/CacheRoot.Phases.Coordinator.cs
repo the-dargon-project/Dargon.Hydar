@@ -1,6 +1,8 @@
 ﻿using Dargon.Courier.Messaging;
 using ItzWarty.Collections;
 using System;
+using System.Linq;
+using ItzWarty;
 
 namespace Dargon.Hydar {
    public partial class CacheRoot<TKey, TValue> {
@@ -31,12 +33,12 @@ namespace Dargon.Hydar {
          }
 
          public override void HandleEntered() {
-            Messenger.RepartitionSignal();
+            Messenger.LeaderRepartitionSignal();
          }
 
          public override void HandleTick() {
             SubPhaseHost.HandleTick();
-            Messenger.RepartitionSignal();
+            Messenger.LeaderRepartitionSignal();
             SendHeartBeat();
          }
 
@@ -54,12 +56,22 @@ namespace Dargon.Hydar {
       }
 
       public class CoordinatorPartitionedPhase : CoordinatorPhaseBase {
-         public override void Initialize() { }
+         public override void Initialize() {
+            Router.RegisterPayloadHandler<OutsiderAnnounceDto>(HandleOutsiderAnnounce);
+         }
 
          public override void HandleEntered() { }
 
          public override void HandleTick() {
             SendHeartBeat();
+         }
+
+         private void HandleOutsiderAnnounce(IReceivedMessage<OutsiderAnnounceDto> x) {
+            SendHeartBeat();
+            var nextParticipants = new HashSet<Guid>(Participants.Concat(x.SenderId).ToArray());
+            var nextCount = nextParticipants.Count;
+            Console.WriteLine("NEXT " + nextCount);
+            //            PhaseManager.Transition(PhaseFactory.CoordinatorRepartition(nextParticipants, LeaderState));
          }
 
          public override string ToString() => "[CoordinatorPartitioned]";

@@ -33,8 +33,8 @@ namespace Dargon.Hydar {
             messageSender.SendBroadcast(new OutsiderAnnounceDto());
          }
 
-         public void RepartitionSignal() {
-            messageSender.SendBroadcast(new RepartitionSignalDto());
+         public void LeaderRepartitionSignal() {
+            messageSender.SendBroadcast(new LeaderRepartitionSignalDto());
          }
 
          public void RepartitionCompletion() {
