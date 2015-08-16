@@ -60,8 +60,10 @@ namespace Dargon.Hydar {
             return Initialize(new ElectionFollowerPhase(nominee, acknowledged));
          }
 
-         public PhaseBase CoordinatorInitial(IReadOnlySet<Guid> participants) {
+         public PhaseBase CoordinatorRepartitionInitial(IReadOnlySet<Guid> participants) {
+            var epochId = Guid.NewGuid();
             var leaderState = new LeaderState {
+               EpochId = epochId,
                Leader = localIdentifier,
                Participants = participants.ToArray().With(Array.Sort),
                Keyspace = keyspace,
@@ -71,7 +73,7 @@ namespace Dargon.Hydar {
             leaderState.SubPhaseHost.Transition(
                this.WithPhaseManager(leaderState.SubPhaseHost)
                    .WithMessenger(new Messenger(new SubphasedMessageSender(localIdentifier, messenger.__MessageSender, phaseManager)))
-                   .CohortRepartitionInitial(localIdentifier, new HashSet<Guid>(participants))
+                   .CohortRepartitionInitial(epochId, localIdentifier, new HashSet<Guid>(participants))
             );
             var coordinatorInitialPhase = Initialize(new CoordinatorInitialPhase(), leaderState);
             var coordinatorMessenger = new Messenger(new SubphasedMessageSender(localIdentifier, messenger.__MessageSender, leaderState.SubPhaseHost));
@@ -84,6 +86,10 @@ namespace Dargon.Hydar {
             return Initialize(new CoordinatorRepartitionPhase(remainingCohorts), leaderState);
          }
 
+         public PhaseBase CoordinatorPartitioningCompleting(IReadOnlySet<Guid> remainingCohorts, LeaderState leaderState) {
+            return Initialize(new CoordinatorPartitioningCompletingPhase(remainingCohorts), leaderState);
+         }
+
          public PhaseBase CoordinatorPartitioned(LeaderState leaderState) {
             return Initialize(new CoordinatorPartitionedPhase(), leaderState);
          }
@@ -92,8 +98,9 @@ namespace Dargon.Hydar {
             return Initialize(new OutsiderPhase());
          }
 
-         public PhaseBase CohortRepartitionInitial(Guid leader, IReadOnlySet<Guid> participants) {
+         public PhaseBase CohortRepartitionInitial(Guid epochId, Guid leader, IReadOnlySet<Guid> participants) {
             var cohortState = new CohortState {
+               EpochId = epochId,
                Leader = leader,
                Participants = participants.ToArray().With(Array.Sort),
                Keyspace = keyspace,
@@ -112,6 +119,10 @@ namespace Dargon.Hydar {
 
          public PhaseBase CohortRepartitioningCompleted(EpochState epochState) {
             return Initialize(new CohortRepartitioningCompletedPhase(), epochState);
+         }
+
+         public PhaseBase CohortPartitioned(EpochState epochState) {
+            return Initialize(new CohortPartitionedPhase(), epochState);
          }
 
          private PhaseBase Initialize(PhaseBase phase) {

@@ -45,7 +45,9 @@ namespace Dargon.Hydar {
             x.RegisterPortableObjectType(100004, typeof(PartitionBlockInterval));
             x.RegisterPortableObjectType(100005, typeof(OutsiderAnnounceDto));
             x.RegisterPortableObjectType(100006, typeof(LeaderRepartitionSignalDto));
-            x.RegisterPortableObjectType(100007, typeof(RepartitionCompletionDto));
+            x.RegisterPortableObjectType(100007, typeof(CohortRepartitionCompletionDto));
+            x.RegisterPortableObjectType(100008, typeof(CohortHeartbeatDto));
+            x.RegisterPortableObjectType(100009, typeof(LeaderRepartitionCompletingDto));
          });
          var pofSerializer = new PofSerializer(pofContext);
 
@@ -95,7 +97,9 @@ namespace Dargon.Hydar {
          messageRouter.RegisterPayloadHandler<CacheNeedDto>(phaseManager.Dispatch);
          messageRouter.RegisterPayloadHandler<OutsiderAnnounceDto>(phaseManager.Dispatch);
          messageRouter.RegisterPayloadHandler<LeaderRepartitionSignalDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<RepartitionCompletionDto>(phaseManager.Dispatch);
+         messageRouter.RegisterPayloadHandler<CohortRepartitionCompletionDto>(phaseManager.Dispatch);
+         messageRouter.RegisterPayloadHandler<LeaderRepartitionCompletingDto>(phaseManager.Dispatch);
+         messageRouter.RegisterPayloadHandler<CohortHeartbeatDto>(phaseManager.Dispatch);
 
          new Thread(() => {
             while(true) {
@@ -140,21 +144,21 @@ namespace Dargon.Hydar {
    public class LeaderHeartbeatDto : IPortableObject {
       public LeaderHeartbeatDto() { }
 
-      public LeaderHeartbeatDto(Guid id, IReadOnlySet<Guid> participants) {
-         this.Id = id;
+      public LeaderHeartbeatDto(Guid epochId, IReadOnlySet<Guid> participants) {
+         this.EpochId = epochId;
          this.Participants = participants;
       }
 
-      public Guid Id { get; set; }
+      public Guid EpochId { get; set; }
       public IReadOnlySet<Guid> Participants { get; set; }
 
       public void Serialize(IPofWriter writer) {
-         writer.WriteGuid(0, Id);
+         writer.WriteGuid(0, EpochId);
          writer.WriteCollection(1, Participants);
       }
 
       public void Deserialize(IPofReader reader) {
-         Id = reader.ReadGuid(0);
+         EpochId = reader.ReadGuid(0);
          Participants = reader.ReadCollection<Guid, HashSet<Guid>>(1);
       }
    }
@@ -183,11 +187,40 @@ namespace Dargon.Hydar {
    }
 
    public class LeaderRepartitionSignalDto : IPortableObject {
+      private Guid epochId;
+      private IReadOnlySet<Guid> participants;
+
+      public LeaderRepartitionSignalDto() { }
+
+      public LeaderRepartitionSignalDto(Guid epochId, IReadOnlySet<Guid> participants) {
+         this.epochId = epochId;
+         this.participants = participants;
+      }
+
+      public Guid EpochId => epochId;
+      public IReadOnlySet<Guid> Participants => participants;
+
+      public void Serialize(IPofWriter writer) {
+         writer.WriteGuid(0, epochId);
+         writer.WriteCollection(1, participants);
+      }
+      public void Deserialize(IPofReader reader) {
+         epochId = reader.ReadGuid(0);
+         participants = reader.ReadCollection<Guid, HashSet<Guid>>(1);
+      }
+   }
+
+   public class CohortRepartitionCompletionDto : IPortableObject {
       public void Serialize(IPofWriter writer) { }
       public void Deserialize(IPofReader reader) { }
    }
 
-   public class RepartitionCompletionDto : IPortableObject {
+   public class LeaderRepartitionCompletingDto : IPortableObject {
+      public void Serialize(IPofWriter writer) { }
+      public void Deserialize(IPofReader reader) { }
+   }
+
+   public class CohortHeartbeatDto : IPortableObject {
       public void Serialize(IPofWriter writer) { }
       public void Deserialize(IPofReader reader) { }
    }

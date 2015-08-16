@@ -75,20 +75,47 @@ namespace Dargon.Hydar {
       }
 
       public class CohortRepartitioningCompletedPhase : CohortPhaseBase {
-         public CohortRepartitioningCompletedPhase() { }
-
          public override CohortPartitioningState PartitioningState => CohortPartitioningState.RepartitioningCompleting;
 
          public override void Initialize() {
-
+            Router.RegisterPayloadHandler<LeaderRepartitionCompletingDto>(HandleLeaderRepartitionCompleting);
          }
 
+
          public override void HandleEntered() {
-            Messenger.RepartitionCompletion();
+            Messenger.CohortRepartitionCompletion();
          }
 
          public override void HandleTick() {
-            Messenger.RepartitionCompletion();
+            Messenger.CohortRepartitionCompletion();
+         }
+
+         private void HandleLeaderRepartitionCompleting(IReceivedMessage<LeaderRepartitionCompletingDto> x) {
+            PhaseManager.Transition(PhaseFactory.CohortPartitioned(EpochState));
+         }
+
+         public override string ToString() => $"[CohortRepartitioningCompleted Rank {Rank} of {Participants.Count}]";
+      }
+
+      public class CohortPartitionedPhase : CohortPhaseBase {
+         public override CohortPartitioningState PartitioningState => CohortPartitioningState.Partitioned;
+
+         public override void Initialize() {
+            Router.RegisterPayloadHandler<LeaderRepartitionSignalDto>(HandleLeaderRepartitionSignal);
+         }
+
+         public override void HandleEntered() {
+            SendCohortHeartBeat();
+         }
+
+         public override void HandleTick() {
+            SendCohortHeartBeat();
+         }
+
+         private void HandleLeaderRepartitionSignal(IReceivedMessage<LeaderRepartitionSignalDto> x) {
+            if (!x.Payload.EpochId.Equals(EpochId)) {
+               PhaseManager.Transition(PhaseFactory.CohortRepartitionInitial(x.Payload.EpochId, Leader, x.Payload.Participants));
+            }
          }
 
          public override string ToString() => $"[CohortPartitioned Rank {Rank} of {Participants.Count}]";

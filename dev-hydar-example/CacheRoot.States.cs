@@ -4,6 +4,7 @@ using System;
 namespace Dargon.Hydar {
    public partial class CacheRoot<TKey, TValue> {
       public class EpochState {
+         public Guid EpochId { get; set; }
          public Guid Leader { get; set; }
 
          /// <summary>This array is ordered.</summary>

@@ -1,6 +1,7 @@
 ﻿using Dargon.Courier.Messaging;
 using ItzWarty.Collections;
 using System;
+using System.Collections.Generic;
 
 namespace Dargon.Hydar {
    public partial class CacheRoot<TKey, TValue> {
@@ -33,12 +34,20 @@ namespace Dargon.Hydar {
             messageSender.SendBroadcast(new OutsiderAnnounceDto());
          }
 
-         public void LeaderRepartitionSignal() {
-            messageSender.SendBroadcast(new LeaderRepartitionSignalDto());
+         public void LeaderRepartitionSignal(Guid epochId, IReadOnlySet<Guid> participants) {
+            messageSender.SendBroadcast(new LeaderRepartitionSignalDto(epochId, participants));
          }
 
-         public void RepartitionCompletion() {
-            messageSender.SendBroadcast(new RepartitionCompletionDto());
+         public void CohortRepartitionCompletion() {
+            messageSender.SendBroadcast(new CohortRepartitionCompletionDto());
+         }
+
+         public void LeaderRepartitionCompleting() {
+            messageSender.SendBroadcast(new LeaderRepartitionCompletingDto());
+         }
+
+         public void CohortHeartBeat(Guid leaderId, Guid localIdentifier) {
+            messageSender.SendUnreliableUnicast(leaderId, new CohortHeartbeatDto());
          }
 
          public Messenger WithMessageSender(MessageSender ms) => new Messenger(ms);

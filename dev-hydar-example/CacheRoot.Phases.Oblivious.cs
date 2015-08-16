@@ -28,7 +28,7 @@ namespace Dargon.Hydar {
 
          private void HandleLeaderHeartBeat(IReceivedMessage<LeaderHeartbeatDto> message) {
             if (message.Payload.Participants.Contains(LocalIdentifier)) {
-               PhaseManager.Transition(PhaseFactory.CohortRepartitionInitial(message.Payload.Id, message.Payload.Participants));
+               PhaseManager.Transition(PhaseFactory.CohortRepartitionInitial(message.Payload.EpochId, message.SenderId, message.Payload.Participants));
             } else {
                PhaseManager.Transition(PhaseFactory.Outsider());
             }

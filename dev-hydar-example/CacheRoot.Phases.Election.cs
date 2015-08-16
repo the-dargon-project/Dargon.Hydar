@@ -40,7 +40,7 @@ namespace Dargon.Hydar {
          public override void HandleTick() {
             var nextTicksToVictory = ticksToVictory - 1;
             if (nextTicksToVictory == 0) {
-               PhaseManager.Transition(PhaseFactory.CoordinatorInitial(followers));
+               PhaseManager.Transition(PhaseFactory.CoordinatorRepartitionInitial(followers));
             } else {
                PhaseManager.Transition(PhaseFactory.ElectionCandidate(nextTicksToVictory, followers));
             }
@@ -81,7 +81,7 @@ namespace Dargon.Hydar {
 
          private void HandleLeaderHeartBeat(IReceivedMessage<LeaderHeartbeatDto> message) {
             if (message.Payload.Participants.Contains(LocalIdentifier)) {
-               PhaseManager.Transition(PhaseFactory.CohortRepartitionInitial(message.Payload.Id, message.Payload.Participants));
+               PhaseManager.Transition(PhaseFactory.CohortRepartitionInitial(message.Payload.EpochId, message.SenderId, message.Payload.Participants));
             } else {
                PhaseManager.Transition(PhaseFactory.Outsider());
             }

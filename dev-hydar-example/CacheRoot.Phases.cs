@@ -21,6 +21,7 @@ namespace Dargon.Hydar {
       }
 
       public abstract class EpochPhaseBase : PhaseBase {
+         public Guid EpochId => EpochState.EpochId;
          public Guid Leader => EpochState.Leader;
          public SCG.IReadOnlyList<Guid> Participants => EpochState.Participants;
          public Keyspace Keyspace => EpochState.Keyspace;
@@ -42,8 +43,8 @@ namespace Dargon.Hydar {
          public SubPhaseHost SubPhaseHost => LeaderState.SubPhaseHost;
          public IReadOnlySet<Guid> PendingOutsiders => LeaderState.PendingOutsiders;
 
-         protected void SendHeartBeat() {
-            Messenger.LeaderHeartBeat(LocalIdentifier, new SortedSet<Guid>(Participants));
+         protected void SendLeaderHeartBeat() {
+            Messenger.LeaderHeartBeat(EpochId, new SortedSet<Guid>(Participants));
          }
 
          public override void Dispatch<TPayload>(IReceivedMessage<TPayload> message) {
@@ -57,6 +58,10 @@ namespace Dargon.Hydar {
          public BlockTable BlockTable => CohortState.BlockTable;
 
          public abstract CohortPartitioningState PartitioningState { get; }
+
+         protected void SendCohortHeartBeat() {
+            Messenger.CohortHeartBeat(Leader, LocalIdentifier);
+         }
       }
    }
 }

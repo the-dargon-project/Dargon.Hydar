@@ -10,7 +10,7 @@ namespace Dargon.Hydar {
          public override void Initialize() { }
 
          public override void HandleEntered() {
-            SendHeartBeat();
+            SendLeaderHeartBeat();
             PhaseManager.Transition(PhaseFactory.CoordinatorRepartition(new HashSet<Guid>(Participants), LeaderState));
          }
 
@@ -29,30 +29,64 @@ namespace Dargon.Hydar {
          }
 
          public override void Initialize() {
-            Router.RegisterPayloadHandler<RepartitionCompletionDto>(HandleRepartitionCompletion);
+            Router.RegisterPayloadHandler<CohortRepartitionCompletionDto>(HandleRepartitionCompletion);
          }
 
          public override void HandleEntered() {
-            Messenger.LeaderRepartitionSignal();
+            Messenger.LeaderRepartitionSignal(EpochId, new HashSet<Guid>(Participants));
          }
 
          public override void HandleTick() {
             SubPhaseHost.HandleTick();
-            Messenger.LeaderRepartitionSignal();
-            SendHeartBeat();
+            Messenger.LeaderRepartitionSignal(EpochId, new HashSet<Guid>(Participants));
+            SendLeaderHeartBeat();
          }
 
-         private void HandleRepartitionCompletion(IReceivedMessage<RepartitionCompletionDto> message) {
+         private void HandleRepartitionCompletion(IReceivedMessage<CohortRepartitionCompletionDto> message) {
             var nextRemainingCohorts = new HashSet<Guid>(remainingCohorts);
             nextRemainingCohorts.Remove(message.SenderId);
             if (nextRemainingCohorts.Count != 0) {
                PhaseManager.Transition(PhaseFactory.CoordinatorRepartition(nextRemainingCohorts, LeaderState));
             } else {
-               PhaseManager.Transition(PhaseFactory.CoordinatorPartitioned(LeaderState));
+               PhaseManager.Transition(PhaseFactory.CoordinatorPartitioningCompleting(new HashSet<Guid>(Participants), LeaderState));
             }
          }
 
          public override string ToString() => $"[CoordinatorRepartition ({remainingCohorts.Count} remaining)]";
+      }
+
+      public class CoordinatorPartitioningCompletingPhase : CoordinatorPhaseBase {
+         private readonly IReadOnlySet<Guid> untransitionedCohortsRemaining;
+
+         public CoordinatorPartitioningCompletingPhase(IReadOnlySet<Guid> untransitionedCohortsRemaining) {
+            this.untransitionedCohortsRemaining = untransitionedCohortsRemaining;
+         }
+
+         public override void Initialize() {
+            Router.RegisterPayloadHandler<CohortHeartbeatDto>(HandleCohortHeartbeat);
+         }
+
+         public override void HandleEntered() {
+            Messenger.LeaderRepartitionCompleting();
+            SendLeaderHeartBeat();
+         }
+
+         public override void HandleTick() {
+            Messenger.LeaderRepartitionCompleting();
+            SendLeaderHeartBeat();
+         }
+
+         private void HandleCohortHeartbeat(IReceivedMessage<CohortHeartbeatDto> message) {
+            var nextCohortsRemaining = new HashSet<Guid>(untransitionedCohortsRemaining);
+            nextCohortsRemaining.Remove(message.SenderId);
+            if (nextCohortsRemaining.Any()) {
+               PhaseManager.Transition(PhaseFactory.CoordinatorPartitioningCompleting(nextCohortsRemaining, LeaderState));
+            } else {
+               PhaseManager.Transition(PhaseFactory.CoordinatorPartitioned(LeaderState));
+            }
+         }
+
+         public override string ToString() => $"[CoordinatorPartitioningCompletingPhase {untransitionedCohortsRemaining.Count}]";
       }
 
       public class CoordinatorPartitionedPhase : CoordinatorPhaseBase {
@@ -63,15 +97,13 @@ namespace Dargon.Hydar {
          public override void HandleEntered() { }
 
          public override void HandleTick() {
-            SendHeartBeat();
+            SendLeaderHeartBeat();
          }
 
          private void HandleOutsiderAnnounce(IReceivedMessage<OutsiderAnnounceDto> x) {
-            SendHeartBeat();
+            SendLeaderHeartBeat();
             var nextParticipants = new HashSet<Guid>(Participants.Concat(x.SenderId).ToArray());
-            var nextCount = nextParticipants.Count;
-            Console.WriteLine("NEXT " + nextCount);
-            //            PhaseManager.Transition(PhaseFactory.CoordinatorRepartition(nextParticipants, LeaderState));
+            PhaseManager.Transition(PhaseFactory.CoordinatorRepartitionInitial(nextParticipants));
          }
 
          public override string ToString() => "[CoordinatorPartitioned]";
