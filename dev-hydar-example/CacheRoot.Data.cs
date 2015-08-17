@@ -26,7 +26,7 @@ namespace Dargon.Hydar {
       public class BlockTable {
          private readonly Keyspace keyspace;
          private readonly SCG.IReadOnlyList<Block> blocks;
-         private IUniqueIdentificationSet haveBlocks = new UniqueIdentificationSet(false);
+         private readonly IUniqueIdentificationSet haveBlocks = new UniqueIdentificationSet(false);
 
          public BlockTable(Keyspace keyspace, SCG.IReadOnlyList<Block> blocks) {
             this.keyspace = keyspace;
@@ -34,12 +34,12 @@ namespace Dargon.Hydar {
          }
 
          public void BlahBlahEmptyBlocks(IUniqueIdentificationSet set) {
-            haveBlocks = haveBlocks.Merge(set);
             set.__Access(segments => {
                foreach (var segment in segments) {
                   for (var blockId = segment.low; blockId <= segment.high; blockId++) {
                      blocks[(int)blockId].BlahBlahEmpty();
                   }
+                  haveBlocks.GiveRange(segment.low, segment.high);
                }
             });
          }

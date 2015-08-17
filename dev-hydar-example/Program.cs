@@ -48,6 +48,7 @@ namespace Dargon.Hydar {
             x.RegisterPortableObjectType(100007, typeof(CohortRepartitionCompletionDto));
             x.RegisterPortableObjectType(100008, typeof(CohortHeartbeatDto));
             x.RegisterPortableObjectType(100009, typeof(LeaderRepartitionCompletingDto));
+            x.RegisterPortableObjectType(100010, typeof(CacheHaveDto));
          });
          var pofSerializer = new PofSerializer(pofContext);
 
@@ -95,6 +96,7 @@ namespace Dargon.Hydar {
          messageRouter.RegisterPayloadHandler<ElectionVoteDto>(phaseManager.Dispatch);
          messageRouter.RegisterPayloadHandler<LeaderHeartbeatDto>(phaseManager.Dispatch);
          messageRouter.RegisterPayloadHandler<CacheNeedDto>(phaseManager.Dispatch);
+         messageRouter.RegisterPayloadHandler<CacheHaveDto>(phaseManager.Dispatch);
          messageRouter.RegisterPayloadHandler<OutsiderAnnounceDto>(phaseManager.Dispatch);
          messageRouter.RegisterPayloadHandler<LeaderRepartitionSignalDto>(phaseManager.Dispatch);
          messageRouter.RegisterPayloadHandler<CohortRepartitionCompletionDto>(phaseManager.Dispatch);
@@ -167,6 +169,24 @@ namespace Dargon.Hydar {
       public CacheNeedDto() { }
 
       public CacheNeedDto(PartitionBlockInterval[] blocks) {
+         Blocks = blocks;
+      }
+
+      public PartitionBlockInterval[] Blocks { get; set; }
+
+      public void Serialize(IPofWriter writer) {
+         writer.WriteCollection(0, Blocks);
+      }
+
+      public void Deserialize(IPofReader reader) {
+         Blocks = reader.ReadArray<PartitionBlockInterval>(0);
+      }
+   }
+
+   public class CacheHaveDto : IPortableObject {
+      public CacheHaveDto() { }
+
+      public CacheHaveDto(PartitionBlockInterval[] blocks) {
          Blocks = blocks;
       }
 

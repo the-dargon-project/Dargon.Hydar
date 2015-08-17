@@ -12,11 +12,8 @@ namespace Dargon.Hydar {
          public override void Initialize() { }
 
          public override void HandleEntered() {
-            var neededBlocks = new UniqueIdentificationSet(false);
             var neededBlockRanges = Keyspace.GetNodePartitionRanges(Rank, Participants.Count);
-            neededBlockRanges.ForEach(x => {
-               neededBlocks.GiveRange(x.StartBlockInclusive, x.EndBlockExclusive - 1);
-            });
+            var neededBlocks = IntervalConverter.ConvertToUidSet(neededBlockRanges);
             PhaseManager.Transition(PhaseFactory.CohortRepartitioning(neededBlocks, CohortState));
          }
 
@@ -40,6 +37,7 @@ namespace Dargon.Hydar {
 
          public override void Initialize() {
             Router.RegisterPayloadHandler<CacheNeedDto>(HandleNeed);
+            Router.RegisterPayloadHandler<CacheHaveDto>(HandleHave);
          }
 
          public override void HandleEntered() {
@@ -49,16 +47,26 @@ namespace Dargon.Hydar {
          private void HandleNeed(IReceivedMessage<CacheNeedDto> message) {
             var neededBlocks = PartitionBlockInterval.ToUidSet(message.Payload.Blocks);
             var haveBlocks = BlockTable.IntersectNeed(neededBlocks);
-            Console.WriteLine("Received Need: " + neededBlocks + " and have " + haveBlocks);
+            var haveIntervals = IntervalConverter.ConvertToPartitionBlockIntervals(haveBlocks);
+            if (haveIntervals.Any()) {
+               Console.WriteLine("Received Need: " + neededBlocks + " and have intersection " + haveBlocks + ".");
+               Messenger.CacheHave(haveIntervals);
+            } else {
+               Console.WriteLine("Received Need: " + neededBlocks + " and have no matches.");
+            }
          }
 
          private void SendNeed() {
-            PartitionBlockInterval[] intervals = null;
-            neededBlocks.__Access(segments => {
-               intervals = segments.Select(segment => new PartitionBlockInterval(segment.low, segment.high + 1)).ToArray();
-            });
-            Messenger.Need(intervals);
+            var intervals = IntervalConverter.ConvertToPartitionBlockIntervals(neededBlocks);
+            Messenger.CacheNeed(intervals);
             Console.WriteLine("Sent Need " + intervals.Select(x => x.ToString()).Join(", "));
+         }
+
+         private void HandleHave(IReceivedMessage<CacheHaveDto> message) {
+            Console.WriteLine("Received have: " + message.Payload.Blocks.Select(x => x.ToString()).Join(", "));
+            var remoteHaveBlocks = IntervalConverter.ConvertToUidSet(message.Payload.Blocks);
+            var availableBlocks = remoteHaveBlocks.Intersect(neededBlocks);
+            Console.WriteLine("Need: " + neededBlocks + ", Available: " + availableBlocks);
          }
 
          public override void HandleTick() {
@@ -114,7 +122,7 @@ namespace Dargon.Hydar {
 
          private void HandleLeaderRepartitionSignal(IReceivedMessage<LeaderRepartitionSignalDto> x) {
             if (!x.Payload.EpochId.Equals(EpochId)) {
-               PhaseManager.Transition(PhaseFactory.CohortRepartitionInitial(x.Payload.EpochId, Leader, x.Payload.Participants));
+               PhaseManager.Transition(PhaseFactory.CohortRepartitionInitial(x.Payload.EpochId, Leader, x.Payload.Participants, CohortState));
             }
          }
 

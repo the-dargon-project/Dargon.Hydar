@@ -76,6 +76,7 @@
     <Compile Include="CacheRoot.Phases.Oblivious.cs" />
     <Compile Include="CacheRoot.States.cs" />
     <Compile Include="CacheRoot.Subphase.Host.cs" />
+    <Compile Include="PartitionBlockIntervalConverter.cs" />
     <Compile Include="_Unused\EpochState.cs" />
     <Compile Include="PartitionBlockInterval.cs" />
     <Compile Include="CacheRoot.cs" />

@@ -100,12 +100,17 @@ namespace Dargon.Hydar {
 
          public PhaseBase CohortRepartitionInitial(Guid epochId, Guid leader, IReadOnlySet<Guid> participants) {
             var cohortState = new CohortState {
-               EpochId = epochId,
-               Leader = leader,
-               Participants = participants.ToArray().With(Array.Sort),
                Keyspace = keyspace,
-               BlockTable = new BlockTable(keyspace, Util.Generate(keyspace.BlockCount, blockId => new Block(blockId)))
+               BlockTable = new BlockTable(keyspace, Util.Generate(keyspace.BlockCount, blockId => new Block(blockId))),
+               IntervalConverter = new PartitionBlockIntervalConverterImpl()
             };
+            return CohortRepartitionInitial(epochId, leader, participants, cohortState);
+         }
+
+         public PhaseBase CohortRepartitionInitial(Guid epochId, Guid leader, IReadOnlySet<Guid> participants, CohortState cohortState) {
+            cohortState.EpochId = epochId;
+            cohortState.Leader = leader;
+            cohortState.Participants = participants.ToArray();
             return Initialize(new CohortRepartitionInitialPhase(), cohortState);
          }
 

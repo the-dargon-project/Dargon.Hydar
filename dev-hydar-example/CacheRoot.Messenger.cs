@@ -26,8 +26,12 @@ namespace Dargon.Hydar {
             messageSender.SendBroadcast(new LeaderHeartbeatDto(id, participants));
          }
 
-         public void Need(PartitionBlockInterval[] neededBlocks) {
-            messageSender.SendBroadcast(new CacheNeedDto(neededBlocks));
+         public void CacheNeed(PartitionBlockInterval[] neededBlockIntervals) {
+            messageSender.SendBroadcast(new CacheNeedDto(neededBlockIntervals));
+         }
+
+         public void CacheHave(PartitionBlockInterval[] haveBlockIntervals) {
+            messageSender.SendBroadcast(new CacheHaveDto(haveBlockIntervals));
          }
 
          public void OutsiderAnnounce() {
