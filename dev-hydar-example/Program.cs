@@ -12,13 +12,35 @@ using ItzWarty.Pooling;
 using ItzWarty.Threading;
 using System;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Threading;
+using CommandLine;
+using Dargon.Nest.Egg;
 
 namespace Dargon.Hydar {
    public static class Program {
-      public static void Main() {
-         Console.Title = "PID " + Process.GetCurrentProcess().Id;
+      public class Options {
+         [Option('s', "Port", DefaultValue = 32000, HelpText = "Dedicated port for hydar cache service dsp.")]
+         public int ServicePort { get; set; }
+      }
 
+      public static void Main(string[] args) {
+         Console.Title = "PID " + Process.GetCurrentProcess().Id;
+         var options = new Options();
+         if (Parser.Default.ParseArgumentsStrict(args, options)) {
+            new HydarEgg().Start(options.ServicePort);
+         } else {
+            Console.WriteLine("Failed to parse command line args.");
+         }
+      }
+   }
+
+   public class HydarEgg : INestApplicationEgg {
+      public NestResult Start(IEggParameters parameters) {
+         throw new NotImplementedException();
+      }
+
+      public NestResult Start(int servicePort) {
          // ItzWarty.Commons
          ICollectionFactory collectionFactory = new CollectionFactory();
          ObjectPoolFactory objectPoolFactory = new DefaultObjectPoolFactory(collectionFactory);
@@ -84,7 +106,7 @@ namespace Dargon.Hydar {
          CacheConfiguration cacheConfiguration = new CacheConfiguration {
             Name = "test-cache"
          };
-//         messageRouter.RegisterPayloadHandler<ElectionVoteDto>();
+         //         messageRouter.RegisterPayloadHandler<ElectionVoteDto>();
          var keyspace = new Keyspace(1024, 1);
          var cacheRoot = new CacheRoot<int, string>(endpoint, messageSender, cacheConfiguration);
          var cacheContext = new CacheContext<int, string>(cacheConfiguration);
@@ -104,20 +126,18 @@ namespace Dargon.Hydar {
          messageRouter.RegisterPayloadHandler<CohortHeartbeatDto>(phaseManager.Dispatch);
 
          new Thread(() => {
-            while(true) {
+            while (true) {
                phaseManager.HandleTick();
                Thread.Sleep(100);
             }
          }).Start();
 
-         var shutdown = new CountdownEvent(1);
-         shutdown.Wait();
-         //         const string kCacheNamespace = "test-cache";
-         //         var cacheNamespace = client.JoinNamespace(kCacheNamespace, Role.Cohort);
+         new CountdownEvent(1).Wait();
+         return NestResult.Success;
+      }
 
-         //         cacheNamespace.Propose(new { Key = 123, Action = Set, Params = 20 });
-         //                  messageRouter.RegisterPayloadHandler<string>(m => {
-         //                  });
+      public NestResult Shutdown() {
+         return NestResult.Success;
       }
    }
 
