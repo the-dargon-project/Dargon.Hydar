@@ -7,9 +7,15 @@ using Dargon.Services;
 
 namespace Dargon.Hydar {
    public partial class CacheRoot<TKey, TValue> {
-      public interface CacheService {
+      public interface ClientCacheService {
+
+      }
+
+      public interface InterCacheService {
          IReadOnlyDictionary<uint, object> TransferBlocks(PartitionBlockInterval[] blockIntervals);
       }
+
+      public interface CacheService : ClientCacheService, InterCacheService { }
 
       public class CacheServiceImpl : CacheService {
          public IReadOnlyDictionary<uint, object> TransferBlocks(PartitionBlockInterval[] blockIntervals) {

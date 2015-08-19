@@ -11,17 +11,25 @@ using ItzWarty.Networking;
 using ItzWarty.Pooling;
 using ItzWarty.Threading;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Threading;
+using Castle.DynamicProxy;
 using CommandLine;
+using Dargon.Hydar.Utilities;
 using Dargon.Nest.Egg;
+using Dargon.PortableObjects.Streams;
+using Dargon.Services;
 
 namespace Dargon.Hydar {
    public static class Program {
       public class Options {
-         [Option('s', "Port", DefaultValue = 32000, HelpText = "Dedicated port for hydar cache service dsp.")]
+         [Option('s', "ServicePort", DefaultValue = 32000, HelpText = "Dedicated port for hydar cache service dsp.")]
          public int ServicePort { get; set; }
+
+         [Option('m', "ManagementPort", DefaultValue = 32002, HelpText = "Dedicated port for hydar cache service dmi.")]
+         public int ManagementPort { get; set; }
       }
 
       public static void Main(string[] args) {
@@ -36,6 +44,8 @@ namespace Dargon.Hydar {
    }
 
    public class HydarEgg : INestApplicationEgg {
+      private readonly List<object> keepalive = new List<object>();
+
       public NestResult Start(IEggParameters parameters) {
          throw new NotImplementedException();
       }
@@ -73,8 +83,15 @@ namespace Dargon.Hydar {
             x.RegisterPortableObjectType(100010, typeof(CacheHaveDto));
          });
          var pofSerializer = new PofSerializer(pofContext);
+         var pofStreamsFactory = new PofStreamsFactoryImpl(threadingProxy, streamFactory, pofSerializer);
 
-         // Dargon.Courier for Networking
+         // Dargon.Services for node-to-node networking
+         var serviceClientFactory = new ServiceClientFactory(new ProxyGenerator(), streamFactory, collectionFactory, threadingProxy, networkingProxy, pofSerializer, pofStreamsFactory);
+         var clusteringConfiguration = new ClusteringConfiguration(servicePort, 1000, ClusteringRoleFlags.HostOnly);
+         var serviceClient = serviceClientFactory.CreateOrJoin(clusteringConfiguration);
+         keepalive.Add(serviceClient);
+
+         // Dargon.Courier for clustered networking
          var port = 50555;
          var identifier = Guid.NewGuid();
          var endpoint = new CourierEndpointImpl(pofSerializer, identifier, "node_?");
@@ -100,37 +117,13 @@ namespace Dargon.Hydar {
          var networkReceiver = new NetworkReceiverImpl(endpoint, networkContext, pofSerializer, messageRouter, messageAcknowledger, peerRegistry);
          networkReceiver.Initialize();
 
-         // Initialize Hydar
-         var client = new ClusterClient(identifier);
-         // var cache = client.StartCache<int, string>("test-cache");
-         CacheConfiguration cacheConfiguration = new CacheConfiguration {
-            Name = "test-cache"
-         };
-         //         messageRouter.RegisterPayloadHandler<ElectionVoteDto>();
-         var keyspace = new Keyspace(1024, 1);
-         var cacheRoot = new CacheRoot<int, string>(endpoint, messageSender, cacheConfiguration);
-         var cacheContext = new CacheContext<int, string>(cacheConfiguration);
-         var messenger = new CacheRoot<int, string>.Messenger(messageSender);
-         var phaseManager = new CacheRoot<int, string>.PhaseManagerImpl();
-         var phaseFactory = new CacheRoot<int, string>.PhaseFactory(receivedMessageFactory, identifier, keyspace, cacheRoot, phaseManager, messenger);
-         phaseManager.Transition(phaseFactory.Oblivious());
+         // Initialize Hydar Helpers
+         var guidHelper = new GuidHelperImpl();
 
-         messageRouter.RegisterPayloadHandler<ElectionVoteDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<LeaderHeartbeatDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<CacheNeedDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<CacheHaveDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<OutsiderAnnounceDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<LeaderRepartitionSignalDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<CohortRepartitionCompletionDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<LeaderRepartitionCompletingDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<CohortHeartbeatDto>(phaseManager.Dispatch);
-
-         new Thread(() => {
-            while (true) {
-               phaseManager.HandleTick();
-               Thread.Sleep(100);
-            }
-         }).Start();
+         // Initialize Hydar Cache
+         var cacheFactory = new CacheFactory(endpoint, messageSender, messageRouter, receivedMessageFactory, serviceClient);
+         var client = new ClusterClient();
+         client.AddCache(cacheFactory.Create<int, string>("test-cache"));
 
          new CountdownEvent(1).Wait();
          return NestResult.Success;
@@ -154,12 +147,12 @@ namespace Dargon.Hydar {
 
       public void Serialize(IPofWriter writer) {
          writer.WriteGuid(0, Nominee);
-         writer.WriteCollection(1, Followers ?? new HashSet<Guid>());
+         writer.WriteCollection(1, Followers ?? new ItzWarty.Collections.HashSet<Guid>());
       }
 
       public void Deserialize(IPofReader reader) {
          Nominee = reader.ReadGuid(0);
-         Followers = reader.ReadCollection<Guid, HashSet<Guid>>(1);
+         Followers = reader.ReadCollection<Guid, ItzWarty.Collections.HashSet<Guid>>(1);
       }
    }
 
@@ -181,7 +174,7 @@ namespace Dargon.Hydar {
 
       public void Deserialize(IPofReader reader) {
          EpochId = reader.ReadGuid(0);
-         Participants = reader.ReadCollection<Guid, HashSet<Guid>>(1);
+         Participants = reader.ReadCollection<Guid, ItzWarty.Collections.HashSet<Guid>>(1);
       }
    }
 
@@ -246,7 +239,7 @@ namespace Dargon.Hydar {
       }
       public void Deserialize(IPofReader reader) {
          epochId = reader.ReadGuid(0);
-         participants = reader.ReadCollection<Guid, HashSet<Guid>>(1);
+         participants = reader.ReadCollection<Guid, ItzWarty.Collections.HashSet<Guid>>(1);
       }
    }
 
