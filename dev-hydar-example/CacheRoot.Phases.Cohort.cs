@@ -66,7 +66,7 @@ namespace Dargon.Hydar {
             Console.WriteLine("Received have: " + message.Payload.Blocks.Select(x => x.ToString()).Join(", "));
             var remoteHaveBlocks = IntervalConverter.ConvertToUidSet(message.Payload.Blocks);
             var availableBlocks = remoteHaveBlocks.Intersect(neededBlocks);
-            Console.WriteLine("Need: " + neededBlocks + ", Available: " + availableBlocks);
+            Console.WriteLine("Need: " + neededBlocks + ", Available: " + availableBlocks + ", From: " + message.RemoteAddress);
          }
 
          public override void HandleTick() {

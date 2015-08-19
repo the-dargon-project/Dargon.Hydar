@@ -3,6 +3,7 @@ using ItzWarty;
 using ItzWarty.Collections;
 using System;
 using System.Linq;
+using System.Net;
 using SCG = System.Collections.Generic;
 
 namespace Dargon.Hydar {

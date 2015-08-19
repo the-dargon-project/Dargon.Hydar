@@ -117,9 +117,6 @@ namespace Dargon.Hydar {
          var networkReceiver = new NetworkReceiverImpl(endpoint, networkContext, pofSerializer, messageRouter, messageAcknowledger, peerRegistry);
          networkReceiver.Initialize();
 
-         // Initialize Hydar Helpers
-         var guidHelper = new GuidHelperImpl();
-
          // Initialize Hydar Cache
          var cacheFactory = new CacheFactory(endpoint, messageSender, messageRouter, receivedMessageFactory, serviceClient);
          var client = new ClusterClient();

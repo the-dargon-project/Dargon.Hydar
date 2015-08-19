@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Dargon.Courier.Identities;
 using Dargon.Courier.Messaging;
 using Dargon.Hydar.Utilities;
 using Dargon.Services;
+using ItzWarty.Networking;
 
 namespace Dargon.Hydar {
    public partial class CacheRoot<TKey, TValue> {
@@ -15,6 +17,20 @@ namespace Dargon.Hydar {
          this.endpoint = endpoint;
          this.messageSender = messageSender;
          this.cacheConfiguration = cacheConfiguration;
+      }
+
+      public class RemoteServiceContainer {
+         private readonly IServiceClientFactory serviceClientFactory;
+         private readonly IReadOnlyDictionary<Guid, IServiceClient> serviceClientsByOrigin;
+
+         public RemoteServiceContainer(IServiceClientFactory serviceClientFactory, IReadOnlyDictionary<Guid, IServiceClient> serviceClientsByOrigin) {
+            this.serviceClientFactory = serviceClientFactory;
+            this.serviceClientsByOrigin = serviceClientsByOrigin;
+         }
+
+         public void GetService() {
+            
+         }
       }
    }
 
