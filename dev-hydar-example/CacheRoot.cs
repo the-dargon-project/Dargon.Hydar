@@ -5,6 +5,9 @@ using System.Threading;
 using Dargon.Courier.Identities;
 using Dargon.Courier.Messaging;
 using Dargon.Hydar.Utilities;
+using Dargon.Management;
+using Dargon.Management.Server;
+using Dargon.PortableObjects;
 using Dargon.Services;
 using ItzWarty.Collections;
 using ItzWarty.Networking;
@@ -22,9 +25,17 @@ namespace Dargon.Hydar {
          this.cacheConfiguration = cacheConfiguration;
          this.remoteServiceContainer = remoteServiceContainer;
       }
+
+      public class CacheMob {
+         [ManagedOperation]
+         public TValue Get(TKey key) {
+            return default(TValue);
+         }
+      }
    }
 
    public class CacheFactory {
+      private const string kCacheMobNamePrefix = "@Hydar.";
       private readonly ManageableCourierEndpoint localEndpoint;
       private readonly MessageSender messageSender;
       private readonly MessageRouter messageRouter;
@@ -32,15 +43,19 @@ namespace Dargon.Hydar {
       private readonly int servicePort;
       private readonly IServiceClient serviceClient;
       private readonly IServiceClientFactory serviceClientFactory;
+      private readonly ILocalManagementServer localManagementServer;
+      private readonly IPofContext pofContext;
 
-      public CacheFactory(ManageableCourierEndpoint localEndpoint, MessageSender messageSender, MessageRouter messageRouter, ReceivedMessageFactory receivedMessageFactory, int servicePort, IServiceClient serviceClient, IServiceClientFactory serviceClientFactory) {
+      public CacheFactory(ManageableCourierEndpoint localEndpoint, IPofContext pofContext, MessageSender messageSender, MessageRouter messageRouter, ReceivedMessageFactory receivedMessageFactory, int servicePort, IServiceClient serviceClient, IServiceClientFactory serviceClientFactory, ILocalManagementServer localManagementServer) {
          this.localEndpoint = localEndpoint;
+         this.pofContext = pofContext;
          this.messageSender = messageSender;
          this.messageRouter = messageRouter;
          this.receivedMessageFactory = receivedMessageFactory;
          this.servicePort = servicePort;
          this.serviceClient = serviceClient;
          this.serviceClientFactory = serviceClientFactory;
+         this.localManagementServer = localManagementServer;
       }
 
       public CacheRoot<TKey, TValue> Create<TKey, TValue>(string cacheName) {
@@ -74,6 +89,8 @@ namespace Dargon.Hydar {
          messageRouter.RegisterPayloadHandler<CohortRepartitionCompletionDto>(phaseManager.Dispatch);
          messageRouter.RegisterPayloadHandler<LeaderRepartitionCompletingDto>(phaseManager.Dispatch);
          messageRouter.RegisterPayloadHandler<CohortHeartbeatDto>(phaseManager.Dispatch);
+
+         localManagementServer.RegisterContext(new ManagementContext(new CacheRoot<TKey, TValue>.CacheMob(), cacheGuid, kCacheMobNamePrefix + cacheName, pofContext));
 
          new Thread(() => {
             while (true) {

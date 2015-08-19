@@ -18,6 +18,8 @@ using System.Threading;
 using Castle.DynamicProxy;
 using CommandLine;
 using Dargon.Hydar.Utilities;
+using Dargon.Management;
+using Dargon.Management.Server;
 using Dargon.Nest.Egg;
 using Dargon.PortableObjects.Streams;
 using Dargon.Services;
@@ -45,7 +47,7 @@ namespace Dargon.Hydar {
          Console.Title = "PID " + Process.GetCurrentProcess().Id;
          var options = new Options();
          if (Parser.Default.ParseArgumentsStrict(args, options)) {
-            new HydarEgg().Start(options.ServicePort);
+            new HydarEgg().Start(options.ServicePort, options.ManagementPort);
          } else {
             Console.WriteLine("Failed to parse command line args.");
          }
@@ -87,7 +89,7 @@ namespace Dargon.Hydar {
          throw new NotImplementedException();
       }
 
-      public NestResult Start(int servicePort) {
+      public NestResult Start(int servicePort, int managementPort) {
          // ItzWarty.Commons
          ICollectionFactory collectionFactory = new CollectionFactory();
          ObjectPoolFactory objectPoolFactory = new DefaultObjectPoolFactory(collectionFactory);
@@ -109,6 +111,7 @@ namespace Dargon.Hydar {
          var pofContext = new PofContext().With(x => {
             x.MergeContext(new DspPofContext());
             x.MergeContext(new DargonCourierImplPofContext());
+            x.MergeContext(new ManagementPofContext());
             x.RegisterPortableObjectType(100001, typeof(ElectionVoteDto));
             x.RegisterPortableObjectType(100002, typeof(LeaderHeartbeatDto));
             x.RegisterPortableObjectType(100003, typeof(CacheNeedDto));
@@ -123,6 +126,12 @@ namespace Dargon.Hydar {
          });
          var pofSerializer = new PofSerializer(pofContext);
          var pofStreamsFactory = new PofStreamsFactoryImpl(threadingProxy, streamFactory, pofSerializer);
+
+         // Dargon.Management Stuff
+         ITcpEndPoint managementServerEndpoint = networkingProxy.CreateAnyEndPoint(managementPort);
+         var managementFactory = new ManagementFactoryImpl(collectionFactory, threadingProxy, networkingProxy, pofContext, pofSerializer);
+         var localManagementServer = managementFactory.CreateServer(new ManagementServerConfiguration(managementServerEndpoint));
+         keepalive.Add(localManagementServer);
 
          // Dargon.Services for node-to-node networking
          var serviceClientFactory = new ServiceClientFactory(new ProxyGenerator(), streamFactory, collectionFactory, threadingProxy, networkingProxy, pofSerializer, pofStreamsFactory);
@@ -157,7 +166,7 @@ namespace Dargon.Hydar {
          networkReceiver.Initialize();
 
          // Initialize Hydar Cache
-         var cacheFactory = new CacheFactory(endpoint, messageSender, messageRouter, receivedMessageFactory, servicePort, serviceClient, serviceClientFactory);
+         var cacheFactory = new CacheFactory(endpoint, pofContext, messageSender, messageRouter, receivedMessageFactory, servicePort, serviceClient, serviceClientFactory, localManagementServer);
          var client = new ClusterClient();
          client.AddCache(cacheFactory.Create<int, string>("test-cache"));
 
