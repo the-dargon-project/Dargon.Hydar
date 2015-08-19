@@ -67,6 +67,17 @@ namespace Dargon.Hydar {
             var remoteHaveBlocks = IntervalConverter.ConvertToUidSet(message.Payload.Blocks);
             var availableBlocks = remoteHaveBlocks.Intersect(neededBlocks);
             Console.WriteLine("Need: " + neededBlocks + ", Available: " + availableBlocks + ", From: " + message.RemoteAddress);
+
+            if (availableBlocks.Any()) {
+               var availableBlockIntervals = IntervalConverter.ConvertToPartitionBlockIntervals(availableBlocks);
+               var remoteCacheService = RemoteServiceContainer.GetCacheService(message.RemoteAddress, message.Payload.ServicePort);
+               var blockTransferResult = remoteCacheService.TransferBlocks(availableBlockIntervals);
+               Console.WriteLine("Got " + blockTransferResult.Blocks.Count + " blocks from remote!");
+
+               var nextNeededBlocks = neededBlocks.Except(availableBlocks);
+               var nextTicksToMaturity = ticksToMaturity + 1;
+               PhaseManager.Transition(PhaseFactory.CohortRepartitioning(nextTicksToMaturity, nextNeededBlocks, CohortState));
+            }
          }
 
          public override void HandleTick() {

@@ -21,6 +21,12 @@ using Dargon.Hydar.Utilities;
 using Dargon.Nest.Egg;
 using Dargon.PortableObjects.Streams;
 using Dargon.Services;
+using Dargon.Services.Messaging;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
+using NLog.Targets.Wrappers;
+using MessageSenderImpl = Dargon.Courier.Messaging.MessageSenderImpl;
 
 namespace Dargon.Hydar {
    public static class Program {
@@ -33,6 +39,9 @@ namespace Dargon.Hydar {
       }
 
       public static void Main(string[] args) {
+         ThreadPool.SetMaxThreads(64, 64);
+         InitializeLogging();
+
          Console.Title = "PID " + Process.GetCurrentProcess().Id;
          var options = new Options();
          if (Parser.Default.ParseArgumentsStrict(args, options)) {
@@ -40,6 +49,34 @@ namespace Dargon.Hydar {
          } else {
             Console.WriteLine("Failed to parse command line args.");
          }
+      }
+
+      private static void InitializeLogging() {
+         var config = new LoggingConfiguration();
+         Target debuggerTarget = new DebuggerTarget() {
+            Layout = "${longdate}|${level}|${logger}|${message} ${exception:format=tostring}"
+         };
+         Target consoleTarget = new ColoredConsoleTarget() {
+            Layout = "${longdate}|${level}|${logger}|${message} ${exception:format=tostring}"
+         };
+
+#if !DEBUG
+         debuggerTarget = new AsyncTargetWrapper(debuggerTarget);
+         consoleTarget = new AsyncTargetWrapper(consoleTarget);
+#else
+         AsyncTargetWrapper a; // Placeholder for optimizing imports
+#endif
+
+         config.AddTarget("debugger", debuggerTarget);
+         config.AddTarget("console", consoleTarget);
+
+         var debuggerRule = new LoggingRule("*", LogLevel.Trace, debuggerTarget);
+         config.LoggingRules.Add(debuggerRule);
+
+         var consoleRule = new LoggingRule("*", LogLevel.Trace, consoleTarget);
+         config.LoggingRules.Add(consoleRule);
+
+         LogManager.Configuration = config;
       }
    }
 
@@ -70,6 +107,7 @@ namespace Dargon.Hydar {
 
          // Dargon.PortableObjects
          var pofContext = new PofContext().With(x => {
+            x.MergeContext(new DspPofContext());
             x.MergeContext(new DargonCourierImplPofContext());
             x.RegisterPortableObjectType(100001, typeof(ElectionVoteDto));
             x.RegisterPortableObjectType(100002, typeof(LeaderHeartbeatDto));
@@ -81,6 +119,7 @@ namespace Dargon.Hydar {
             x.RegisterPortableObjectType(100008, typeof(CohortHeartbeatDto));
             x.RegisterPortableObjectType(100009, typeof(LeaderRepartitionCompletingDto));
             x.RegisterPortableObjectType(100010, typeof(CacheHaveDto));
+            x.RegisterPortableObjectType(100011, typeof(BlockTransferResult));
          });
          var pofSerializer = new PofSerializer(pofContext);
          var pofStreamsFactory = new PofStreamsFactoryImpl(threadingProxy, streamFactory, pofSerializer);
@@ -118,7 +157,7 @@ namespace Dargon.Hydar {
          networkReceiver.Initialize();
 
          // Initialize Hydar Cache
-         var cacheFactory = new CacheFactory(endpoint, messageSender, messageRouter, receivedMessageFactory, serviceClient);
+         var cacheFactory = new CacheFactory(endpoint, messageSender, messageRouter, receivedMessageFactory, servicePort, serviceClient, serviceClientFactory);
          var client = new ClusterClient();
          client.AddCache(cacheFactory.Create<int, string>("test-cache"));
 
@@ -196,18 +235,22 @@ namespace Dargon.Hydar {
    public class CacheHaveDto : IPortableObject {
       public CacheHaveDto() { }
 
-      public CacheHaveDto(PartitionBlockInterval[] blocks) {
+      public CacheHaveDto(PartitionBlockInterval[] blocks, int servicePort) {
          Blocks = blocks;
+         ServicePort = servicePort;
       }
 
       public PartitionBlockInterval[] Blocks { get; set; }
+      public int ServicePort { get; set; }
 
       public void Serialize(IPofWriter writer) {
          writer.WriteCollection(0, Blocks);
+         writer.WriteS32(1, ServicePort);
       }
 
       public void Deserialize(IPofReader reader) {
          Blocks = reader.ReadArray<PartitionBlockInterval>(0);
+         ServicePort = reader.ReadS32(1);
       }
    }
 
@@ -263,5 +306,25 @@ namespace Dargon.Hydar {
       RepartitioningStarted,
       RepartitioningCompleting,
       Partitioned
+   }
+
+   public class BlockTransferResult : IPortableObject {
+      private IDictionary<uint, object> blocks;
+
+      public BlockTransferResult() { }
+
+      public BlockTransferResult(IDictionary<uint, object> blocks) {
+         this.blocks = blocks;
+      }
+
+      public IReadOnlyDictionary<uint, object> Blocks => (IReadOnlyDictionary<uint, object>)blocks;
+
+      public void Serialize(IPofWriter writer) {
+         writer.WriteMap(0, blocks);
+      }
+
+      public void Deserialize(IPofReader reader) {
+         blocks = reader.ReadMap<uint, object>(0);
+      }
    }
 }

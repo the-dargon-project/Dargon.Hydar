@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 using Dargon.Courier.Identities;
 using Dargon.Courier.Messaging;
 using Dargon.Hydar.Utilities;
 using Dargon.Services;
+using ItzWarty.Collections;
 using ItzWarty.Networking;
 
 namespace Dargon.Hydar {
@@ -12,25 +14,13 @@ namespace Dargon.Hydar {
       private readonly ManageableCourierEndpoint endpoint;
       private readonly MessageSender messageSender;
       private readonly CacheConfiguration cacheConfiguration;
+      private readonly RemoteServiceContainer remoteServiceContainer;
 
-      public CacheRoot(ManageableCourierEndpoint endpoint, MessageSender messageSender, CacheConfiguration cacheConfiguration) {
+      public CacheRoot(ManageableCourierEndpoint endpoint, MessageSender messageSender, CacheConfiguration cacheConfiguration, RemoteServiceContainer remoteServiceContainer) {
          this.endpoint = endpoint;
          this.messageSender = messageSender;
          this.cacheConfiguration = cacheConfiguration;
-      }
-
-      public class RemoteServiceContainer {
-         private readonly IServiceClientFactory serviceClientFactory;
-         private readonly IReadOnlyDictionary<Guid, IServiceClient> serviceClientsByOrigin;
-
-         public RemoteServiceContainer(IServiceClientFactory serviceClientFactory, IReadOnlyDictionary<Guid, IServiceClient> serviceClientsByOrigin) {
-            this.serviceClientFactory = serviceClientFactory;
-            this.serviceClientsByOrigin = serviceClientsByOrigin;
-         }
-
-         public void GetService() {
-            
-         }
+         this.remoteServiceContainer = remoteServiceContainer;
       }
    }
 
@@ -39,14 +29,18 @@ namespace Dargon.Hydar {
       private readonly MessageSender messageSender;
       private readonly MessageRouter messageRouter;
       private readonly ReceivedMessageFactory receivedMessageFactory;
+      private readonly int servicePort;
       private readonly IServiceClient serviceClient;
+      private readonly IServiceClientFactory serviceClientFactory;
 
-      public CacheFactory(ManageableCourierEndpoint localEndpoint, MessageSender messageSender, MessageRouter messageRouter, ReceivedMessageFactory receivedMessageFactory, IServiceClient serviceClient) {
+      public CacheFactory(ManageableCourierEndpoint localEndpoint, MessageSender messageSender, MessageRouter messageRouter, ReceivedMessageFactory receivedMessageFactory, int servicePort, IServiceClient serviceClient, IServiceClientFactory serviceClientFactory) {
          this.localEndpoint = localEndpoint;
          this.messageSender = messageSender;
          this.messageRouter = messageRouter;
          this.receivedMessageFactory = receivedMessageFactory;
+         this.servicePort = servicePort;
          this.serviceClient = serviceClient;
+         this.serviceClientFactory = serviceClientFactory;
       }
 
       public CacheRoot<TKey, TValue> Create<TKey, TValue>(string cacheName) {
@@ -55,14 +49,18 @@ namespace Dargon.Hydar {
 
          CacheConfiguration cacheConfiguration = new CacheConfiguration {
             Name = cacheName,
-            Guid = cacheGuid
+            Guid = cacheGuid,
+            ServicePort = servicePort
          };
 
+         var serviceClientsByOrigin = new ConcurrentDictionary<IPEndPoint, IServiceClient>();
+         var remoteServiceContainer = new CacheRoot<TKey, TValue>.RemoteServiceContainer(cacheConfiguration, serviceClientFactory, serviceClientsByOrigin);
+
          var keyspace = new Keyspace(1024, 1);
-         var cacheRoot = new CacheRoot<TKey, TValue>(localEndpoint, messageSender, cacheConfiguration);
-         var messenger = new CacheRoot<TKey, TValue>.Messenger(messageSender);
+         var cacheRoot = new CacheRoot<TKey, TValue>(localEndpoint, messageSender, cacheConfiguration, remoteServiceContainer);
+         var messenger = new CacheRoot<TKey, TValue>.Messenger(messageSender, cacheConfiguration);
          var phaseManager = new CacheRoot<TKey, TValue>.PhaseManagerImpl();
-         var phaseFactory = new CacheRoot<TKey, TValue>.PhaseFactory(receivedMessageFactory, localEndpoint.Identifier, keyspace, cacheRoot, phaseManager, messenger);
+         var phaseFactory = new CacheRoot<TKey, TValue>.PhaseFactory(receivedMessageFactory, localEndpoint.Identifier, keyspace, cacheConfiguration, cacheRoot, phaseManager, messenger, remoteServiceContainer);
          var cacheService = new CacheRoot<TKey, TValue>.CacheServiceImpl();
          serviceClient.RegisterService(cacheService, typeof(CacheRoot<TKey, TValue>.CacheService), cacheGuid);
          phaseManager.Transition(phaseFactory.Oblivious());

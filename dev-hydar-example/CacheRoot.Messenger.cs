@@ -7,9 +7,11 @@ namespace Dargon.Hydar {
    public partial class CacheRoot<TKey, TValue> {
       public class Messenger {
          private readonly MessageSender messageSender;
+         private readonly CacheConfiguration cacheConfiguration;
 
-         public Messenger(MessageSender messageSender) {
+         public Messenger(MessageSender messageSender, CacheConfiguration cacheConfiguration) {
             this.messageSender = messageSender;
+            this.cacheConfiguration = cacheConfiguration;
          }
 
          public MessageSender __MessageSender => messageSender;
@@ -31,7 +33,7 @@ namespace Dargon.Hydar {
          }
 
          public void CacheHave(PartitionBlockInterval[] haveBlockIntervals) {
-            messageSender.SendBroadcast(new CacheHaveDto(haveBlockIntervals));
+            messageSender.SendBroadcast(new CacheHaveDto(haveBlockIntervals, cacheConfiguration.ServicePort));
          }
 
          public void OutsiderAnnounce() {
@@ -54,7 +56,7 @@ namespace Dargon.Hydar {
             messageSender.SendUnreliableUnicast(leaderId, new CohortHeartbeatDto());
          }
 
-         public Messenger WithMessageSender(MessageSender ms) => new Messenger(ms);
+         public Messenger WithMessageSender(MessageSender ms) => new Messenger(ms, cacheConfiguration);
       }
 
    }

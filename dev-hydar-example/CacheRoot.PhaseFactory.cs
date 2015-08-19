@@ -20,17 +20,21 @@ namespace Dargon.Hydar {
          // Stuff for constructed phases' properties
          private readonly Guid localIdentifier;
          private readonly Keyspace keyspace;
+         private readonly CacheConfiguration cacheConfiguration;
          private readonly CacheRoot<TKey, TValue> cacheRoot;
          private readonly PhaseManager phaseManager;
          private readonly Messenger messenger;
+         private readonly RemoteServiceContainer remoteServiceContainer;
 
-         public PhaseFactory(ReceivedMessageFactory receivedMessageFactory, Guid localIdentifier, Keyspace keyspace, CacheRoot<TKey, TValue> cacheRoot, PhaseManager phaseManager, Messenger messenger) {
+         public PhaseFactory(ReceivedMessageFactory receivedMessageFactory, Guid localIdentifier, Keyspace keyspace, CacheConfiguration cacheConfiguration, CacheRoot<TKey, TValue> cacheRoot, PhaseManager phaseManager, Messenger messenger, RemoteServiceContainer remoteServiceContainer) {
             this.receivedMessageFactory = receivedMessageFactory;
             this.localIdentifier = localIdentifier;
             this.keyspace = keyspace;
+            this.cacheConfiguration = cacheConfiguration;
             this.cacheRoot = cacheRoot;
             this.phaseManager = phaseManager;
             this.messenger = messenger;
+            this.remoteServiceContainer = remoteServiceContainer;
          }
 
          public PhaseBase Oblivious() {
@@ -73,11 +77,11 @@ namespace Dargon.Hydar {
             };
             leaderState.SubPhaseHost.Transition(
                this.WithPhaseManager(leaderState.SubPhaseHost)
-                   .WithMessenger(new Messenger(new SubphasedMessageSender(localIdentifier, messenger.__MessageSender, phaseManager)))
+                   .WithMessenger(new Messenger(new SubphasedMessageSender(localIdentifier, messenger.__MessageSender, phaseManager), cacheConfiguration))
                    .CohortRepartitionInitial(epochId, localIdentifier, new HashSet<Guid>(participants))
             );
             var coordinatorInitialPhase = Initialize(new CoordinatorInitialPhase(), leaderState);
-            var coordinatorMessenger = new Messenger(new SubphasedMessageSender(localIdentifier, messenger.__MessageSender, leaderState.SubPhaseHost));
+            var coordinatorMessenger = new Messenger(new SubphasedMessageSender(localIdentifier, messenger.__MessageSender, leaderState.SubPhaseHost), cacheConfiguration);
             coordinatorInitialPhase.Messenger = coordinatorMessenger;
             coordinatorInitialPhase.PhaseFactory = WithMessenger(coordinatorMessenger);
             return coordinatorInitialPhase;
@@ -138,6 +142,7 @@ namespace Dargon.Hydar {
             phase.PhaseFactory = this;
             phase.Router = new MessageRouterImpl(receivedMessageFactory);
             phase.Messenger = messenger;
+            phase.RemoteServiceContainer = remoteServiceContainer;
             phase.Initialize();
             return phase;
          }
@@ -148,11 +153,11 @@ namespace Dargon.Hydar {
          }
 
          public PhaseFactory WithPhaseManager(PhaseManager phaseManagerOverride) {
-            return new PhaseFactory(receivedMessageFactory, localIdentifier, keyspace, cacheRoot, phaseManagerOverride, messenger);
+            return new PhaseFactory(receivedMessageFactory, localIdentifier, keyspace, cacheConfiguration, cacheRoot, phaseManagerOverride, messenger, remoteServiceContainer);
          }
 
          public PhaseFactory WithMessenger(Messenger messengerOverride) {
-            return new PhaseFactory(receivedMessageFactory, localIdentifier, keyspace, cacheRoot, phaseManager, messengerOverride);
+            return new PhaseFactory(receivedMessageFactory, localIdentifier, keyspace, cacheConfiguration, cacheRoot, phaseManager, messengerOverride, remoteServiceContainer);
          }
       }
    }
