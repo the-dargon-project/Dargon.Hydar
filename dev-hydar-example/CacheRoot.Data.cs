@@ -1,12 +1,155 @@
-﻿using System;
-using System.Security.Cryptography.X509Certificates;
-using Dargon.PortableObjects;
+﻿using Dargon.PortableObjects;
 using ItzWarty.Collections;
+using System;
+using System.Threading.Tasks;
+using ItzWarty;
+using Nito.AsyncEx;
 using SCG = System.Collections.Generic;
 
 namespace Dargon.Hydar {
    public partial class CacheRoot<TKey, TValue> {
+      public class CacheEntryContext {
+         private readonly IConcurrentQueue<ExecutableEntryOperation> readOperationQueue = new ConcurrentQueue<ExecutableEntryOperation>();
+         private readonly IConcurrentQueue<ExecutableEntryOperation> nonreadOperationQueue = new ConcurrentQueue<ExecutableEntryOperation>();
+         private readonly TKey key;
+         private readonly AsyncSemaphore semaphore = new AsyncSemaphore(0);
+         private TValue value;
+         private bool exists;
+
+         public void Initialize() {
+            Task.Factory.StartNew(async () => await OperationProcessingTaskStart());
+         }
+
+         private async Task OperationProcessingTaskStart() {
+            while (true) {
+               await semaphore.WaitAsync();
+               semaphore.Release();
+
+               ExecutableEntryOperation operation;
+               Entry entry = new Entry(key, value, exists);
+               while (readOperationQueue.TryDequeue(out operation)) {
+                  await semaphore.WaitAsync();
+                  operation.Execute(entry);
+               }
+
+               bool isUpdated = false;
+               while (nonreadOperationQueue.TryDequeue(out operation)) {
+                  await semaphore.WaitAsync();
+                  operation.Execute(entry);
+                  if (entry.IsDirty) {
+                     // Set isUpdated so we update the cache context.
+                     isUpdated = true;
+
+                     // Unset Dirty flag for next execute operation.
+                     entry.IsDirty = false;
+                  }
+               }
+
+               if (isUpdated) {
+                  this.value = entry.Value;
+                  this.exists = true;
+               }
+            }
+         }
+
+         public void EnqueueOperation(ExecutableEntryOperation operation) {
+            if (operation.Type == EntryOperationType.Read) {
+               readOperationQueue.Enqueue(operation);
+            } else {
+               nonreadOperationQueue.Enqueue(operation);
+            }
+            semaphore.Release();
+         }
+      }
+
+      public class Entry {
+         private readonly TKey key;
+         private readonly bool exists;
+         private TValue value;
+         private bool isDirty;
+
+         public Entry(TKey key, TValue value, bool exists) {
+            this.key = key;
+            this.value = value;
+            this.exists = exists;
+         }
+
+         public TKey Key => key;
+         public bool Exists => exists;
+         public TValue Value {  get { return this.value; } set { this.value = value; } }
+         public bool IsDirty { get { return this.isDirty; } set { this.isDirty = true; } }
+      }
+
+      public interface ReadableEntryOperation {
+         TKey Key { get; }
+         EntryOperationType Type { get; }
+      }
+
+      public interface ExecutableEntryOperation : ReadableEntryOperation {
+         void Execute(Entry entry);
+      }
+
+      public abstract class EntryOperationBase<TResult> : ExecutableEntryOperation {
+         private readonly AsyncManualResetEvent completionLatch = new AsyncManualResetEvent();
+         private readonly TKey key;
+         private readonly EntryOperationType type;
+         private TResult internalResult;
+
+         public EntryOperationBase(TKey key, EntryOperationType type) {
+            this.key = key;
+            this.type = type;
+         }
+
+         public TKey Key => key;
+         public EntryOperationType Type => type;
+
+         public TResult GetResult() {
+            completionLatch.Wait();
+            return internalResult;
+         }
+
+         void ExecutableEntryOperation.Execute(Entry entry) {
+            internalResult = ExecuteInternal(entry);
+            completionLatch.Set();
+         }
+
+         protected abstract TResult ExecuteInternal(Entry entry);
+      }
+
+      public class EntryOperationPut : EntryOperationBase<bool> {
+         private readonly TValue value;
+
+         public EntryOperationPut(TKey key, TValue value) : base(key, EntryOperationType.Put) {
+            this.value = value;
+         }
+
+         public TValue Value => value;
+
+         protected override bool ExecuteInternal(Entry entry) {
+            entry.Value = value;
+            entry.IsDirty = true;
+            return entry.Exists;
+         }
+      }
+
+      public class EntryOperationGet : EntryOperationBase<TValue> {
+         public EntryOperationGet(TKey key) : base(key, EntryOperationType.Read) {}
+
+         protected override TValue ExecuteInternal(Entry entry) {
+            return entry.Exists ? entry.Value : default(TValue);
+         }
+      }
+
+      public enum EntryOperationType {
+         Read = 0x01,
+         Put = 0x02,
+         Update = 0x04,
+         ConditionalUpdate = 0x08
+      }
+
       public class Block {
+         private readonly IConcurrentDictionary<TKey, CacheEntryContext> entryContextsByKey = new ConcurrentDictionary<TKey, CacheEntryContext>();
+
          public Block(int id) {
             Id = id;
          }
@@ -21,14 +164,21 @@ namespace Dargon.Hydar {
          public void BlahBlahStale() {
             IsUpToDate = false;
          }
+
+         public CacheEntryContext GetEntry(TKey key) {
+            return entryContextsByKey.GetOrAdd(
+               key,
+               new CacheEntryContext().With(x => x.Initialize())
+            );
+         }
       }
 
-      public class BlockTable {
+      public class EntryBlockTable {
          private readonly Keyspace keyspace;
          private readonly SCG.IReadOnlyList<Block> blocks;
          private readonly IUniqueIdentificationSet haveBlocks = new UniqueIdentificationSet(false);
 
-         public BlockTable(Keyspace keyspace, SCG.IReadOnlyList<Block> blocks) {
+         public EntryBlockTable(Keyspace keyspace, SCG.IReadOnlyList<Block> blocks) {
             this.keyspace = keyspace;
             this.blocks = blocks;
          }
@@ -50,6 +200,29 @@ namespace Dargon.Hydar {
 
          public IUniqueIdentificationSet IntersectNeed(IUniqueIdentificationSet need) {
             return haveBlocks.Intersect(need);
+         }
+
+         public Block GetBlock(TKey key) {
+            return blocks[keyspace.HashToBlock(key.GetHashCode())];
+         }
+
+         public CacheEntryContext GetEntry(TKey key) {
+            var block = blocks[keyspace.HashToBlock(key.GetHashCode())];
+            return block.GetEntry(key);
+         }
+
+         public TValue Get(TKey key) {
+            return EnqueueAndAwaitOperationResult(new EntryOperationGet(key));
+         }
+
+         public bool Put(TKey key, TValue value) {
+            return EnqueueAndAwaitOperationResult(new EntryOperationPut(key, value));
+         }
+
+         public TResult EnqueueAndAwaitOperationResult<TResult>(EntryOperationBase<TResult> entryOperation) {
+            var entry = GetEntry(entryOperation.Key);
+            entry.EnqueueOperation(entryOperation);
+            return entryOperation.GetResult();
          }
       }
 

@@ -19,7 +19,7 @@ namespace Dargon.Hydar {
       }
 
       public class CohortState : EpochState {
-         public BlockTable BlockTable { get; set; }
+         public EntryBlockTable BlockTable { get; set; }
          public PartitionBlockIntervalConverter IntervalConverter { get; set; }
       }
    }

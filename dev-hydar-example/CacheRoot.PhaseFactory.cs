@@ -25,8 +25,9 @@ namespace Dargon.Hydar {
          private readonly PhaseManager phaseManager;
          private readonly Messenger messenger;
          private readonly RemoteServiceContainer remoteServiceContainer;
+         private readonly EntryBlockTable blockTable;
 
-         public PhaseFactory(ReceivedMessageFactory receivedMessageFactory, Guid localIdentifier, Keyspace keyspace, CacheConfiguration cacheConfiguration, CacheRoot<TKey, TValue> cacheRoot, PhaseManager phaseManager, Messenger messenger, RemoteServiceContainer remoteServiceContainer) {
+         public PhaseFactory(ReceivedMessageFactory receivedMessageFactory, Guid localIdentifier, Keyspace keyspace, CacheConfiguration cacheConfiguration, CacheRoot<TKey, TValue> cacheRoot, PhaseManager phaseManager, Messenger messenger, RemoteServiceContainer remoteServiceContainer, EntryBlockTable blockTable) {
             this.receivedMessageFactory = receivedMessageFactory;
             this.localIdentifier = localIdentifier;
             this.keyspace = keyspace;
@@ -35,6 +36,7 @@ namespace Dargon.Hydar {
             this.phaseManager = phaseManager;
             this.messenger = messenger;
             this.remoteServiceContainer = remoteServiceContainer;
+            this.blockTable = blockTable;
          }
 
          public PhaseBase Oblivious() {
@@ -106,7 +108,7 @@ namespace Dargon.Hydar {
          public PhaseBase CohortRepartitionInitial(Guid epochId, Guid leader, IReadOnlySet<Guid> participants) {
             var cohortState = new CohortState {
                Keyspace = keyspace,
-               BlockTable = new BlockTable(keyspace, Util.Generate(keyspace.BlockCount, blockId => new Block(blockId))),
+               BlockTable = blockTable,
                IntervalConverter = new PartitionBlockIntervalConverterImpl()
             };
             return CohortRepartitionInitial(epochId, leader, participants, cohortState);
@@ -153,11 +155,11 @@ namespace Dargon.Hydar {
          }
 
          public PhaseFactory WithPhaseManager(PhaseManager phaseManagerOverride) {
-            return new PhaseFactory(receivedMessageFactory, localIdentifier, keyspace, cacheConfiguration, cacheRoot, phaseManagerOverride, messenger, remoteServiceContainer);
+            return new PhaseFactory(receivedMessageFactory, localIdentifier, keyspace, cacheConfiguration, cacheRoot, phaseManagerOverride, messenger, remoteServiceContainer, blockTable);
          }
 
          public PhaseFactory WithMessenger(Messenger messengerOverride) {
-            return new PhaseFactory(receivedMessageFactory, localIdentifier, keyspace, cacheConfiguration, cacheRoot, phaseManager, messengerOverride, remoteServiceContainer);
+            return new PhaseFactory(receivedMessageFactory, localIdentifier, keyspace, cacheConfiguration, cacheRoot, phaseManager, messengerOverride, remoteServiceContainer, blockTable);
          }
       }
    }

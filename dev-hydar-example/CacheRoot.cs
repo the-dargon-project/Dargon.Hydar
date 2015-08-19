@@ -9,6 +9,7 @@ using Dargon.Management;
 using Dargon.Management.Server;
 using Dargon.PortableObjects;
 using Dargon.Services;
+using ItzWarty;
 using ItzWarty.Collections;
 using ItzWarty.Networking;
 
@@ -27,9 +28,33 @@ namespace Dargon.Hydar {
       }
 
       public class CacheMob {
+         private readonly EntryBlockTable blockTable;
+
+         public CacheMob(EntryBlockTable blockTable) {
+            this.blockTable = blockTable;
+         }
+
+         [ManagedOperation]
+         public string Hello() => "Hello, world!";
+
          [ManagedOperation]
          public TValue Get(TKey key) {
-            return default(TValue);
+            try {
+               return blockTable.Get(key);
+            } catch (Exception e) {
+               Console.WriteLine(e);
+               return default(TValue);
+            }
+         }
+
+         [ManagedOperation]
+         public bool Put(TKey key, TValue value) {
+            try {
+               return blockTable.Put(key, value);
+            } catch (Exception e) {
+               Console.WriteLine(e);
+               return false;
+            }
          }
       }
    }
@@ -75,7 +100,9 @@ namespace Dargon.Hydar {
          var cacheRoot = new CacheRoot<TKey, TValue>(localEndpoint, messageSender, cacheConfiguration, remoteServiceContainer);
          var messenger = new CacheRoot<TKey, TValue>.Messenger(messageSender, cacheConfiguration);
          var phaseManager = new CacheRoot<TKey, TValue>.PhaseManagerImpl();
-         var phaseFactory = new CacheRoot<TKey, TValue>.PhaseFactory(receivedMessageFactory, localEndpoint.Identifier, keyspace, cacheConfiguration, cacheRoot, phaseManager, messenger, remoteServiceContainer);
+         var blocks = Util.Generate(keyspace.BlockCount, blockId => new CacheRoot<TKey, TValue>.Block(blockId));
+         var blockTable = new CacheRoot<TKey, TValue>.EntryBlockTable(keyspace, blocks);
+         var phaseFactory = new CacheRoot<TKey, TValue>.PhaseFactory(receivedMessageFactory, localEndpoint.Identifier, keyspace, cacheConfiguration, cacheRoot, phaseManager, messenger, remoteServiceContainer, blockTable);
          var cacheService = new CacheRoot<TKey, TValue>.CacheServiceImpl();
          serviceClient.RegisterService(cacheService, typeof(CacheRoot<TKey, TValue>.CacheService), cacheGuid);
          phaseManager.Transition(phaseFactory.Oblivious());
@@ -90,7 +117,7 @@ namespace Dargon.Hydar {
          messageRouter.RegisterPayloadHandler<LeaderRepartitionCompletingDto>(phaseManager.Dispatch);
          messageRouter.RegisterPayloadHandler<CohortHeartbeatDto>(phaseManager.Dispatch);
 
-         localManagementServer.RegisterContext(new ManagementContext(new CacheRoot<TKey, TValue>.CacheMob(), cacheGuid, kCacheMobNamePrefix + cacheName, pofContext));
+         localManagementServer.RegisterContext(new ManagementContext(new CacheRoot<TKey, TValue>.CacheMob(blockTable), cacheGuid, kCacheMobNamePrefix + cacheName, pofContext));
 
          new Thread(() => {
             while (true) {

@@ -56,7 +56,7 @@ namespace Dargon.Hydar {
 
       public abstract class CohortPhaseBase : EpochPhaseBase {
          public CohortState CohortState => (CohortState)EpochState;
-         public BlockTable BlockTable => CohortState.BlockTable;
+         public EntryBlockTable BlockTable => CohortState.BlockTable;
          public PartitionBlockIntervalConverter IntervalConverter => CohortState.IntervalConverter;
 
          public abstract CohortPartitioningState PartitioningState { get; }
