@@ -17,6 +17,10 @@ namespace Dargon.Hydar {
          private TValue value;
          private bool exists;
 
+         public CacheEntryContext(TKey key) {
+            this.key = key;
+         }
+
          public void Initialize() {
             Task.Factory.StartNew(async () => await OperationProcessingTaskStart());
          }
@@ -178,7 +182,7 @@ namespace Dargon.Hydar {
          public CacheEntryContext GetEntry(TKey key) {
             return entryContextsByKey.GetOrAdd(
                key,
-               new CacheEntryContext().With(x => x.Initialize())
+               new CacheEntryContext(key).With(x => x.Initialize())
             );
          }
       }
