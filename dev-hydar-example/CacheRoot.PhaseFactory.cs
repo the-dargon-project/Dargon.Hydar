@@ -4,6 +4,7 @@ using ItzWarty.Collections;
 using System;
 using System.Linq;
 using System.Net;
+using Dargon.Courier.Peering;
 using SCG = System.Collections.Generic;
 
 namespace Dargon.Hydar {
@@ -27,8 +28,9 @@ namespace Dargon.Hydar {
          private readonly RemoteServiceContainer remoteServiceContainer;
          private readonly EntryBlockTable blockTable;
          private readonly CacheOperationsManager cacheOperationsManager;
+         private readonly ReadablePeerRegistry peerRegistry;
 
-         public PhaseFactory(ReceivedMessageFactory receivedMessageFactory, Guid localIdentifier, Keyspace keyspace, CacheConfiguration cacheConfiguration, CacheRoot<TKey, TValue> cacheRoot, PhaseManager phaseManager, Messenger messenger, RemoteServiceContainer remoteServiceContainer, EntryBlockTable blockTable, CacheOperationsManager cacheOperationsManager) {
+         public PhaseFactory(ReceivedMessageFactory receivedMessageFactory, Guid localIdentifier, Keyspace keyspace, CacheConfiguration cacheConfiguration, CacheRoot<TKey, TValue> cacheRoot, PhaseManager phaseManager, Messenger messenger, RemoteServiceContainer remoteServiceContainer, EntryBlockTable blockTable, CacheOperationsManager cacheOperationsManager, ReadablePeerRegistry peerRegistry) {
             this.receivedMessageFactory = receivedMessageFactory;
             this.localIdentifier = localIdentifier;
             this.keyspace = keyspace;
@@ -39,6 +41,7 @@ namespace Dargon.Hydar {
             this.remoteServiceContainer = remoteServiceContainer;
             this.blockTable = blockTable;
             this.cacheOperationsManager = cacheOperationsManager;
+            this.peerRegistry = peerRegistry;
          }
 
          public PhaseBase Oblivious() {
@@ -148,6 +151,7 @@ namespace Dargon.Hydar {
             phase.Messenger = messenger;
             phase.RemoteServiceContainer = remoteServiceContainer;
             phase.CacheOperationsManager = cacheOperationsManager;
+            phase.PeerRegistry = peerRegistry;
             phase.Initialize();
             return phase;
          }
@@ -158,11 +162,11 @@ namespace Dargon.Hydar {
          }
 
          public PhaseFactory WithPhaseManager(PhaseManager phaseManagerOverride) {
-            return new PhaseFactory(receivedMessageFactory, localIdentifier, keyspace, cacheConfiguration, cacheRoot, phaseManagerOverride, messenger, remoteServiceContainer, blockTable, cacheOperationsManager);
+            return new PhaseFactory(receivedMessageFactory, localIdentifier, keyspace, cacheConfiguration, cacheRoot, phaseManagerOverride, messenger, remoteServiceContainer, blockTable, cacheOperationsManager, peerRegistry);
          }
 
          public PhaseFactory WithMessenger(Messenger messengerOverride) {
-            return new PhaseFactory(receivedMessageFactory, localIdentifier, keyspace, cacheConfiguration, cacheRoot, phaseManager, messengerOverride, remoteServiceContainer, blockTable, cacheOperationsManager);
+            return new PhaseFactory(receivedMessageFactory, localIdentifier, keyspace, cacheConfiguration, cacheRoot, phaseManager, messengerOverride, remoteServiceContainer, blockTable, cacheOperationsManager, peerRegistry);
          }
       }
    }

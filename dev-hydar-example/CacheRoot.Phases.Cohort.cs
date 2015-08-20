@@ -3,6 +3,7 @@ using ItzWarty;
 using ItzWarty.Collections;
 using System;
 using System.Linq;
+using Dargon.Courier.Identities;
 
 namespace Dargon.Hydar {
    public partial class CacheRoot<TKey, TValue> {
@@ -86,8 +87,29 @@ namespace Dargon.Hydar {
             if (nextTicksToMaturity > 0) {
                PhaseManager.Transition(PhaseFactory.CohortRepartitioning(nextTicksToMaturity, neededBlocks, CohortState));
             } else {
-               BlockTable.BlahBlahEmptyBlocks(neededBlocks);
-               PhaseManager.Transition(PhaseFactory.CohortRepartitioningCompleted(EpochState));
+               bool permitProgression = true;
+               foreach (var peerId in Participants) {
+                  if (peerId == LocalIdentifier) {
+                     continue;
+                  }
+
+                  var remoteEndpoint = PeerRegistry.GetRemoteCourierEndpointOrNull(peerId);
+                  if (remoteEndpoint == null) {
+                     permitProgression = false;
+                     logger.Info("Not progressing further - have not received announce for " + peerId);
+                  } else {
+                     var serviceDescriptor = remoteEndpoint.GetPropertyOrDefault<HydarServiceDescriptor>();
+                     if (serviceDescriptor == null) {
+                        permitProgression = false;
+                        logger.Info("Not progressing further - have not received service descriptor for " + peerId);
+                     }
+                  }
+               }
+               logger.Info(PeerRegistry.EnumeratePeers().Count());
+               if (permitProgression) {
+                  BlockTable.BlahBlahEmptyBlocks(neededBlocks);
+                  PhaseManager.Transition(PhaseFactory.CohortRepartitioningCompleted(EpochState));
+               }
             }
          }
 

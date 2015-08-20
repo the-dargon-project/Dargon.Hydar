@@ -170,7 +170,7 @@ namespace Dargon.Hydar {
          networkReceiver.Initialize();
 
          // Initialize Hydar Cache
-         var cacheFactory = new CacheFactory(endpoint, pofContext, messageSender, messageRouter, receivedMessageFactory, servicePort, serviceClient, serviceClientFactory, localManagementServer);
+         var cacheFactory = new CacheFactory(endpoint, pofContext, messageSender, messageRouter, receivedMessageFactory, servicePort, serviceClient, serviceClientFactory, localManagementServer, peerRegistry);
          var client = new ClusterClient();
          client.AddCache(cacheFactory.Create<int, string>("test-cache"));
 

@@ -2,6 +2,8 @@
 using ItzWarty.Collections;
 using System;
 using System.Linq;
+using Dargon.Courier.Peering;
+using NLog;
 using SCG = System.Collections.Generic;
 
 namespace Dargon.Hydar {
@@ -15,6 +17,7 @@ namespace Dargon.Hydar {
          public Messenger Messenger { get; set; }
          public RemoteServiceContainer RemoteServiceContainer { get; set; }
          public CacheOperationsManager CacheOperationsManager { get; set; }
+         public ReadablePeerRegistry PeerRegistry { get; set; }
 
          public abstract void Initialize();
          public abstract void HandleEntered();
@@ -23,6 +26,12 @@ namespace Dargon.Hydar {
       }
 
       public abstract class EpochPhaseBase : PhaseBase {
+         protected readonly Logger logger;
+
+         protected EpochPhaseBase() {
+            logger = LogManager.GetLogger(GetType().Name);
+         }
+
          public Guid EpochId => EpochState.EpochId;
          public Guid Leader => EpochState.Leader;
          public SCG.IReadOnlyList<Guid> Participants => EpochState.Participants;

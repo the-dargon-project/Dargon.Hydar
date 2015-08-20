@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading;
 using Dargon.Courier.Identities;
 using Dargon.Courier.Messaging;
+using Dargon.Courier.Peering;
 using Dargon.Hydar.Utilities;
 using Dargon.Management;
 using Dargon.Management.Server;
@@ -64,6 +65,7 @@ namespace Dargon.Hydar {
    public class CacheFactory {
       private const string kCacheMobNamePrefix = "@Hydar.";
       private readonly ManageableCourierEndpoint localEndpoint;
+      private readonly IPofContext pofContext;
       private readonly MessageSender messageSender;
       private readonly MessageRouter messageRouter;
       private readonly ReceivedMessageFactory receivedMessageFactory;
@@ -71,9 +73,9 @@ namespace Dargon.Hydar {
       private readonly IServiceClient serviceClient;
       private readonly IServiceClientFactory serviceClientFactory;
       private readonly ILocalManagementServer localManagementServer;
-      private readonly IPofContext pofContext;
+      private readonly ReadablePeerRegistry peerRegistry;
 
-      public CacheFactory(ManageableCourierEndpoint localEndpoint, IPofContext pofContext, MessageSender messageSender, MessageRouter messageRouter, ReceivedMessageFactory receivedMessageFactory, int servicePort, IServiceClient serviceClient, IServiceClientFactory serviceClientFactory, ILocalManagementServer localManagementServer) {
+      public CacheFactory(ManageableCourierEndpoint localEndpoint, IPofContext pofContext, MessageSender messageSender, MessageRouter messageRouter, ReceivedMessageFactory receivedMessageFactory, int servicePort, IServiceClient serviceClient, IServiceClientFactory serviceClientFactory, ILocalManagementServer localManagementServer, ReadablePeerRegistry peerRegistry) {
          this.localEndpoint = localEndpoint;
          this.pofContext = pofContext;
          this.messageSender = messageSender;
@@ -83,6 +85,7 @@ namespace Dargon.Hydar {
          this.serviceClient = serviceClient;
          this.serviceClientFactory = serviceClientFactory;
          this.localManagementServer = localManagementServer;
+         this.peerRegistry = peerRegistry;
       }
 
       public CacheRoot<TKey, TValue> Create<TKey, TValue>(string cacheName) {
@@ -105,7 +108,7 @@ namespace Dargon.Hydar {
          var blocks = Util.Generate(keyspace.BlockCount, blockId => new CacheRoot<TKey, TValue>.Block(blockId));
          var blockTable = new CacheRoot<TKey, TValue>.EntryBlockTable(keyspace, blocks);
          var cacheOperationsManager = new CacheRoot<TKey, TValue>.CacheOperationsManager(keyspace, blockTable);
-         var phaseFactory = new CacheRoot<TKey, TValue>.PhaseFactory(receivedMessageFactory, localEndpoint.Identifier, keyspace, cacheConfiguration, cacheRoot, phaseManager, messenger, remoteServiceContainer, blockTable, cacheOperationsManager);
+         var phaseFactory = new CacheRoot<TKey, TValue>.PhaseFactory(receivedMessageFactory, localEndpoint.Identifier, keyspace, cacheConfiguration, cacheRoot, phaseManager, messenger, remoteServiceContainer, blockTable, cacheOperationsManager, peerRegistry);
          var cacheService = new CacheRoot<TKey, TValue>.CacheServiceImpl();
          serviceClient.RegisterService(cacheService, typeof(CacheRoot<TKey, TValue>.CacheService), cacheGuid);
          phaseManager.Transition(phaseFactory.Oblivious());
