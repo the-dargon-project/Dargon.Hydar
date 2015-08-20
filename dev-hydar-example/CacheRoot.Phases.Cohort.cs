@@ -12,6 +12,7 @@ namespace Dargon.Hydar {
          public override void Initialize() { }
 
          public override void HandleEntered() {
+            CacheOperationsManager.SuspendOperations();
             var neededBlockRanges = Keyspace.GetNodePartitionRanges(Rank, Participants.Count);
             var neededBlocks = IntervalConverter.ConvertToUidSet(neededBlockRanges);
             PhaseManager.Transition(PhaseFactory.CohortRepartitioning(neededBlocks, CohortState));
@@ -124,6 +125,7 @@ namespace Dargon.Hydar {
          }
 
          public override void HandleEntered() {
+            CacheOperationsManager.ResumeOperations(Rank, Participants.Count);
             SendCohortHeartBeat();
          }
 

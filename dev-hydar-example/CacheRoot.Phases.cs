@@ -14,6 +14,7 @@ namespace Dargon.Hydar {
          public MessageRouter Router { get; set; }
          public Messenger Messenger { get; set; }
          public RemoteServiceContainer RemoteServiceContainer { get; set; }
+         public CacheOperationsManager CacheOperationsManager { get; set; }
 
          public abstract void Initialize();
          public abstract void HandleEntered();

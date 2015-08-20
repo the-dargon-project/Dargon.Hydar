@@ -1,6 +1,7 @@
 ﻿using Dargon.PortableObjects;
 using ItzWarty.Collections;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using ItzWarty;
 using Nito.AsyncEx;
@@ -89,7 +90,12 @@ namespace Dargon.Hydar {
          void Execute(Entry entry);
       }
 
-      public abstract class EntryOperationBase<TResult> : ExecutableEntryOperation {
+      public interface EntryOperation<TResult> : ExecutableEntryOperation {
+         Task<TResult> GetResultAsync();
+         void SetResult(TResult result);
+      }
+
+      public abstract class EntryOperationBase<TResult> : EntryOperation<TResult> {
          private readonly AsyncManualResetEvent completionLatch = new AsyncManualResetEvent();
          private readonly TKey key;
          private readonly EntryOperationType type;
@@ -103,13 +109,17 @@ namespace Dargon.Hydar {
          public TKey Key => key;
          public EntryOperationType Type => type;
 
-         public TResult GetResult() {
-            completionLatch.Wait();
+         public async Task<TResult> GetResultAsync() {
+            await completionLatch.WaitAsync();
             return internalResult;
          }
 
          void ExecutableEntryOperation.Execute(Entry entry) {
-            internalResult = ExecuteInternal(entry);
+            SetResult(ExecuteInternal(entry));
+         }
+
+         public void SetResult(TResult result) {
+            internalResult = result;
             completionLatch.Set();
          }
 
@@ -203,26 +213,79 @@ namespace Dargon.Hydar {
          }
 
          public Block GetBlock(TKey key) {
-            return blocks[keyspace.HashToBlock(key.GetHashCode())];
+            return blocks[keyspace.HashToBlockId(key.GetHashCode())];
          }
 
          public CacheEntryContext GetEntry(TKey key) {
-            var block = blocks[keyspace.HashToBlock(key.GetHashCode())];
+            var block = blocks[keyspace.HashToBlockId(key.GetHashCode())];
             return block.GetEntry(key);
          }
 
-         public TValue Get(TKey key) {
-            return EnqueueAndAwaitOperationResult(new EntryOperationGet(key));
+         public Task<TValue> GetAsync(TKey key) {
+            return EnqueueAwaitableOperation(new EntryOperationGet(key));
          }
 
-         public bool Put(TKey key, TValue value) {
-            return EnqueueAndAwaitOperationResult(new EntryOperationPut(key, value));
+         public Task<bool> PutAsync(TKey key, TValue value) {
+            return EnqueueAwaitableOperation(new EntryOperationPut(key, value));
          }
 
-         public TResult EnqueueAndAwaitOperationResult<TResult>(EntryOperationBase<TResult> entryOperation) {
+         public Task<TResult> EnqueueAwaitableOperation<TResult>(EntryOperation<TResult> entryOperation) {
             var entry = GetEntry(entryOperation.Key);
             entry.EnqueueOperation(entryOperation);
-            return entryOperation.GetResult();
+            return entryOperation.GetResultAsync();
+         }
+      }
+
+      public class CacheOperationsManager {
+         private readonly AsyncReaderWriterLock synchronization = new AsyncReaderWriterLock();
+         private readonly AsyncManualResetEvent resumedLatch = new AsyncManualResetEvent(false);
+         private readonly Keyspace keyspace;
+         private readonly EntryBlockTable entryBlockTable;
+         private int nodeRank;
+         private int nodeCount;
+         private bool isSuspended = true;
+
+         public CacheOperationsManager(Keyspace keyspace, EntryBlockTable entryBlockTable) {
+            this.keyspace = keyspace;
+            this.entryBlockTable = entryBlockTable;
+         }
+
+         public void SuspendOperations() {
+            using (synchronization.WriterLock()) {
+               isSuspended = true;
+               resumedLatch.Reset();
+            }
+         }
+
+         public void ResumeOperations(int nodeRank, int nodeCount) {
+            using (synchronization.WriterLock()) {
+               this.isSuspended = false;
+               this.nodeRank = nodeRank;
+               this.nodeCount = nodeCount;
+               this.resumedLatch.Set();
+            }
+         }
+
+         public async Task<TResult> EnqueueAndAwaitResults<TResult>(EntryOperation<TResult> operation) {
+            while (true) {
+               await resumedLatch.WaitAsync();
+               using (var readerLock = await synchronization.ReaderLockAsync()) {
+                  if (!isSuspended) {
+                     var blockId = (uint)keyspace.HashToBlockId(operation.Key.GetHashCode());
+                     var partitionRanges = keyspace.GetNodePartitionRanges(nodeRank, nodeCount);
+                     var maxPartitionIndex = operation.Type == EntryOperationType.Read ? partitionRanges.Length : 0;
+                     var blockPartitionIndex = Array.FindIndex(partitionRanges, interval => interval.Contains(blockId));
+                     Console.WriteLine("Key: " + operation.Key + ", Block: " + blockId + ", Local: " + partitionRanges.Join(", "));
+                     if (blockPartitionIndex != -1 && blockPartitionIndex <= maxPartitionIndex) {
+                        // perform locally
+                        return await entryBlockTable.EnqueueAwaitableOperation(operation);
+                     } else {
+                        // perform networked
+                        throw new NotImplementedException("Have not implemented networked entry operations");
+                     }
+                  }
+               }
+            }
          }
       }
 

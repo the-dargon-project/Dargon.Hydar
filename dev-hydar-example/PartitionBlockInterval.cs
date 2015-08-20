@@ -19,6 +19,10 @@ namespace Dargon.Hydar {
       public uint StartBlockInclusive { get; set; }
       public uint EndBlockExclusive { get; set; }
 
+      public bool Contains(uint blockId) {
+         return StartBlockInclusive <= blockId && blockId < EndBlockExclusive;
+      }
+
       public override string ToString() => $"[{StartBlockInclusive},{EndBlockExclusive})";
 
       public void Serialize(IPofWriter writer) {
