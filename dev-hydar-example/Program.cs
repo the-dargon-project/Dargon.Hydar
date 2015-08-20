@@ -123,6 +123,7 @@ namespace Dargon.Hydar {
             x.RegisterPortableObjectType(100009, typeof(LeaderRepartitionCompletingDto));
             x.RegisterPortableObjectType(100010, typeof(CacheHaveDto));
             x.RegisterPortableObjectType(100011, typeof(BlockTransferResult));
+            x.RegisterPortableObjectType(100012, typeof(HydarServiceDescriptor));
          });
          var pofSerializer = new PofSerializer(pofContext);
          var pofStreamsFactory = new PofStreamsFactoryImpl(threadingProxy, streamFactory, pofSerializer);
@@ -143,6 +144,8 @@ namespace Dargon.Hydar {
          var port = 50555;
          var identifier = Guid.NewGuid();
          var endpoint = new CourierEndpointImpl(pofSerializer, identifier, "node_?");
+         endpoint.SetProperty(HydarConstants.kHydarServiceDescriptorPropertyGuid, new HydarServiceDescriptor { ServicePort = servicePort });
+
          var network = new UdpCourierNetwork(networkingProxy, new UdpCourierNetworkConfiguration(port));
          var networkContext = network.Join(endpoint);
 
@@ -176,6 +179,24 @@ namespace Dargon.Hydar {
 
       public NestResult Shutdown() {
          return NestResult.Success;
+      }
+   }
+
+   public class HydarServiceDescriptor : IPortableObject {
+      private const int kVersion = 0;
+
+      public int ServicePort { get; set; }
+
+      public void Serialize(IPofWriter writer) {
+         writer.WriteS32(0, kVersion);
+         writer.WriteS32(1, ServicePort);
+      }
+
+      public void Deserialize(IPofReader reader) {
+         var version = reader.ReadS32(0);
+         ServicePort = reader.ReadS32(1);
+
+         Trace.Assert(version == kVersion, "version == kVersion");
       }
    }
 
