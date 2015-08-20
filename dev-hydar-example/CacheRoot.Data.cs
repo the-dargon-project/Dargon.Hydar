@@ -3,6 +3,7 @@ using ItzWarty.Collections;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Dargon.Courier.Peering;
 using ItzWarty;
 using Nito.AsyncEx;
 using SCG = System.Collections.Generic;
@@ -245,13 +246,16 @@ namespace Dargon.Hydar {
          private readonly AsyncManualResetEvent resumedLatch = new AsyncManualResetEvent(false);
          private readonly Keyspace keyspace;
          private readonly EntryBlockTable entryBlockTable;
+         private readonly ReadablePeerRegistry peerRegistry;
          private int nodeRank;
          private int nodeCount;
          private bool isSuspended = true;
+         private SCG.IReadOnlyList<Guid> peers;
 
-         public CacheOperationsManager(Keyspace keyspace, EntryBlockTable entryBlockTable) {
+         public CacheOperationsManager(Keyspace keyspace, EntryBlockTable entryBlockTable, ReadablePeerRegistry peerRegistry) {
             this.keyspace = keyspace;
             this.entryBlockTable = entryBlockTable;
+            this.peerRegistry = peerRegistry;
          }
 
          public void SuspendOperations() {
@@ -261,11 +265,12 @@ namespace Dargon.Hydar {
             }
          }
 
-         public void ResumeOperations(int nodeRank, int nodeCount) {
+         public void ResumeOperations(int nodeRank, int nodeCount, SCG.IReadOnlyList<Guid> peers) {
             using (synchronization.WriterLock()) {
                this.isSuspended = false;
                this.nodeRank = nodeRank;
                this.nodeCount = nodeCount;
+               this.peers = peers;
                this.resumedLatch.Set();
             }
          }
@@ -277,14 +282,15 @@ namespace Dargon.Hydar {
                   if (!isSuspended) {
                      var blockId = (uint)keyspace.HashToBlockId(operation.Key.GetHashCode());
                      var partitionRanges = keyspace.GetNodePartitionRanges(nodeRank, nodeCount);
-                     var maxPartitionIndex = operation.Type == EntryOperationType.Read ? partitionRanges.Length : 0;
+                     var maxPartitionIndexUpperExclusive = operation.Type == EntryOperationType.Read ? partitionRanges.Length : 1;
                      var blockPartitionIndex = Array.FindIndex(partitionRanges, interval => interval.Contains(blockId));
                      Console.WriteLine("Key: " + operation.Key + ", Block: " + blockId + ", Local: " + partitionRanges.Join(", "));
-                     if (blockPartitionIndex != -1 && blockPartitionIndex <= maxPartitionIndex) {
+                     if (blockPartitionIndex != -1 && blockPartitionIndex < maxPartitionIndexUpperExclusive) {
                         // perform locally
                         return await entryBlockTable.EnqueueAwaitableOperation(operation);
                      } else {
                         // perform networked
+                        var peerIndex = keyspace.GetPeerIndex(operation.Type == EntryOperationType.Read, nodeCount);
                         throw new NotImplementedException("Have not implemented networked entry operations");
                      }
                   }
