@@ -29,6 +29,7 @@ using NLog.Config;
 using NLog.Targets;
 using NLog.Targets.Wrappers;
 using MessageSenderImpl = Dargon.Courier.Messaging.MessageSenderImpl;
+using System.Runtime.InteropServices;
 
 namespace Dargon.Hydar {
    public static class Program {
@@ -144,7 +145,7 @@ namespace Dargon.Hydar {
          var port = 50555;
          var identifier = Guid.NewGuid();
          var endpoint = new CourierEndpointImpl(pofSerializer, identifier, "node_?");
-         endpoint.SetProperty(HydarConstants.kHydarServiceDescriptorPropertyGuid, new HydarServiceDescriptor { ServicePort = servicePort });
+         endpoint.SetProperty(new HydarServiceDescriptor { ServicePort = servicePort });
 
          var network = new UdpCourierNetwork(networkingProxy, new UdpCourierNetworkConfiguration(port));
          var networkContext = network.Join(endpoint);
@@ -182,6 +183,7 @@ namespace Dargon.Hydar {
       }
    }
 
+   [Guid("07B72FFE-828A-4A20-BA83-06B60D990B30")]
    public class HydarServiceDescriptor : IPortableObject {
       private const int kVersion = 0;
 

@@ -129,7 +129,6 @@
     <Compile Include="CacheRoot.ServiceNode.cs" />
     <Compile Include="CacheRoot.States.cs" />
     <Compile Include="CacheRoot.Subphase.Host.cs" />
-    <Compile Include="HydarConstants.cs" />
     <Compile Include="PartitionBlockIntervalConverter.cs" />
     <Compile Include="Utilities\GuidHelper.cs" />
     <Compile Include="_Unused\EpochState.cs" />
