@@ -109,7 +109,7 @@ namespace Dargon.Hydar {
          var blockTable = new CacheRoot<TKey, TValue>.EntryBlockTable(keyspace, blocks);
          var cacheOperationsManager = new CacheRoot<TKey, TValue>.CacheOperationsManager(keyspace, blockTable, remoteServiceContainer);
          var phaseFactory = new CacheRoot<TKey, TValue>.PhaseFactory(receivedMessageFactory, localEndpoint.Identifier, keyspace, cacheConfiguration, cacheRoot, phaseManager, messenger, remoteServiceContainer, blockTable, cacheOperationsManager, peerRegistry);
-         var cacheService = new CacheRoot<TKey, TValue>.CacheServiceImpl();
+         var cacheService = new CacheRoot<TKey, TValue>.CacheServiceImpl(cacheOperationsManager);
          serviceClient.RegisterService(cacheService, typeof(CacheRoot<TKey, TValue>.CacheService), cacheGuid);
          phaseManager.Transition(phaseFactory.Oblivious());
 

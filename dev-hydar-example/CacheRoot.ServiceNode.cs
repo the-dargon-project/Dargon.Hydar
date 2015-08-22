@@ -57,6 +57,11 @@ namespace Dargon.Hydar {
 
       public class CacheServiceImpl : CacheService {
          private static readonly Logger logger = LogManager.GetCurrentClassLogger();
+         private readonly CacheOperationsManager cacheOperationsManager;
+
+         public CacheServiceImpl(CacheOperationsManager cacheOperationsManager) {
+            this.cacheOperationsManager = cacheOperationsManager;
+         }
 
          public BlockTransferResult TransferBlocks(PartitionBlockInterval[] blockIntervals) {
             var result = new Dictionary<uint, object>();
@@ -70,8 +75,7 @@ namespace Dargon.Hydar {
 
          public TResult ExecuteProxiedOperation<TResult>(EntryOperation<TResult> operation) {
             logger.Info("Executing Proxied Operation: " + operation);
-//            Debugger.Break();
-            return (TResult)(object)"Hello";// default(TResult);
+            return cacheOperationsManager.EnqueueAndAwaitResults(operation).Result;
          }
 
          public bool Put(TKey key, TValue value) {
