@@ -7,6 +7,7 @@ using SCG = System.Collections.Generic;
 
 namespace Dargon.Hydar {
    public class Keyspace {
+      [ThreadStatic] private static Random random;
       private const long kTwoPow32 = 0x100000000L;
       private readonly int blockCount;
       private readonly int redundancy;
@@ -18,6 +19,7 @@ namespace Dargon.Hydar {
 
       public int BlockCount => blockCount;
       public int HashesPerBlock => (int)(kTwoPow32 / blockCount);
+      private Random Random => random = random ?? new Random();
 
       public int HashToBlockId(int hash) {
          var mixedHash = Mix((uint)hash);
@@ -74,6 +76,15 @@ namespace Dargon.Hydar {
                new PartitionBlockInterval(0, highPartitionRange.StartBlockInclusive)
             };
          }
+      }
+
+      public int GetPeerIndex(int blockId, int nodeCount, bool masterOnly) {
+         var partitionCount = nodeCount;
+         var partitionId = blockId * partitionCount / blockCount;
+         if (!masterOnly) {
+            partitionId = (partitionId + Random.Next(0, redundancy)) % partitionCount;
+         }
+         return partitionId;
       }
    }
 }

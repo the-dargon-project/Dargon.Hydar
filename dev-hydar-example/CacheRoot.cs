@@ -99,7 +99,7 @@ namespace Dargon.Hydar {
          };
 
          var serviceClientsByOrigin = new ConcurrentDictionary<IPEndPoint, IServiceClient>();
-         var remoteServiceContainer = new CacheRoot<TKey, TValue>.RemoteServiceContainer(cacheConfiguration, serviceClientFactory, serviceClientsByOrigin);
+         var remoteServiceContainer = new CacheRoot<TKey, TValue>.RemoteServiceContainer(cacheConfiguration, serviceClientFactory, peerRegistry, serviceClientsByOrigin);
 
          var keyspace = new Keyspace(1024, 1);
          var cacheRoot = new CacheRoot<TKey, TValue>(localEndpoint, messageSender, cacheConfiguration, remoteServiceContainer);
@@ -107,7 +107,7 @@ namespace Dargon.Hydar {
          var phaseManager = new CacheRoot<TKey, TValue>.PhaseManagerImpl();
          var blocks = Util.Generate(keyspace.BlockCount, blockId => new CacheRoot<TKey, TValue>.Block(blockId));
          var blockTable = new CacheRoot<TKey, TValue>.EntryBlockTable(keyspace, blocks);
-         var cacheOperationsManager = new CacheRoot<TKey, TValue>.CacheOperationsManager(keyspace, blockTable);
+         var cacheOperationsManager = new CacheRoot<TKey, TValue>.CacheOperationsManager(keyspace, blockTable, remoteServiceContainer);
          var phaseFactory = new CacheRoot<TKey, TValue>.PhaseFactory(receivedMessageFactory, localEndpoint.Identifier, keyspace, cacheConfiguration, cacheRoot, phaseManager, messenger, remoteServiceContainer, blockTable, cacheOperationsManager, peerRegistry);
          var cacheService = new CacheRoot<TKey, TValue>.CacheServiceImpl();
          serviceClient.RegisterService(cacheService, typeof(CacheRoot<TKey, TValue>.CacheService), cacheGuid);

@@ -1,4 +1,5 @@
-﻿using Dargon.Courier.Messaging;
+﻿using System;
+using Dargon.Courier.Messaging;
 
 namespace Dargon.Hydar {
    public partial class CacheRoot<TKey, TValue> {
@@ -16,8 +17,8 @@ namespace Dargon.Hydar {
          }
 
          private void HandleLeaderRepartitionSignal(IReceivedMessage<LeaderRepartitionSignalDto> x) {
-            if (x.Payload.Participants.Contains(LocalIdentifier)) {
-               PhaseManager.Transition(PhaseFactory.CohortRepartitionInitial(x.Payload.EpochId, x.SenderId, x.Payload.Participants));
+            if (Array.BinarySearch(x.Payload.ParticipantsOrdered, LocalIdentifier) >= 0) {
+               PhaseManager.Transition(PhaseFactory.CohortRepartitionInitial(x.Payload.EpochId, x.SenderId, x.Payload.ParticipantsOrdered));
             }
          }
 

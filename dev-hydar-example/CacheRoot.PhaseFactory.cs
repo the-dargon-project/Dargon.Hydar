@@ -73,11 +73,12 @@ namespace Dargon.Hydar {
          }
 
          public PhaseBase CoordinatorRepartitionInitial(IReadOnlySet<Guid> participants) {
+            var participantsOrdered = participants.ToArray().With(Array.Sort);
             var epochId = Guid.NewGuid();
             var leaderState = new LeaderState {
                EpochId = epochId,
                Leader = localIdentifier,
-               Participants = participants.ToArray().With(Array.Sort),
+               Participants = participantsOrdered,
                Keyspace = keyspace,
                PendingOutsiders = new HashSet<Guid>(),
                SubPhaseHost = new SubPhaseHost()
@@ -85,7 +86,7 @@ namespace Dargon.Hydar {
             leaderState.SubPhaseHost.Transition(
                this.WithPhaseManager(leaderState.SubPhaseHost)
                    .WithMessenger(new Messenger(new SubphasedMessageSender(localIdentifier, messenger.__MessageSender, phaseManager), cacheConfiguration))
-                   .CohortRepartitionInitial(epochId, localIdentifier, new HashSet<Guid>(participants))
+                   .CohortRepartitionInitial(epochId, localIdentifier, participantsOrdered)
             );
             var coordinatorInitialPhase = Initialize(new CoordinatorInitialPhase(), leaderState);
             var coordinatorMessenger = new Messenger(new SubphasedMessageSender(localIdentifier, messenger.__MessageSender, leaderState.SubPhaseHost), cacheConfiguration);
@@ -110,7 +111,7 @@ namespace Dargon.Hydar {
             return Initialize(new OutsiderPhase());
          }
 
-         public PhaseBase CohortRepartitionInitial(Guid epochId, Guid leader, IReadOnlySet<Guid> participants) {
+         public PhaseBase CohortRepartitionInitial(Guid epochId, Guid leader, Guid[] participants) {
             var cohortState = new CohortState {
                Keyspace = keyspace,
                BlockTable = blockTable,
@@ -119,10 +120,10 @@ namespace Dargon.Hydar {
             return CohortRepartitionInitial(epochId, leader, participants, cohortState);
          }
 
-         public PhaseBase CohortRepartitionInitial(Guid epochId, Guid leader, IReadOnlySet<Guid> participants, CohortState cohortState) {
+         public PhaseBase CohortRepartitionInitial(Guid epochId, Guid leader, Guid[] participants, CohortState cohortState) {
             cohortState.EpochId = epochId;
             cohortState.Leader = leader;
-            cohortState.Participants = participants.ToArray();
+            cohortState.Participants = participants;
             return Initialize(new CohortRepartitionInitialPhase(), cohortState);
          }
 

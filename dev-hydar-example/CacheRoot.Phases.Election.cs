@@ -1,6 +1,7 @@
 ﻿using Dargon.Courier.Messaging;
 using ItzWarty.Collections;
 using System;
+using Castle.Core.Internal;
 
 namespace Dargon.Hydar {
    public partial class CacheRoot<TKey, TValue> {
@@ -80,8 +81,8 @@ namespace Dargon.Hydar {
          }
 
          private void HandleLeaderHeartBeat(IReceivedMessage<LeaderHeartbeatDto> message) {
-            if (message.Payload.Participants.Contains(LocalIdentifier)) {
-               PhaseManager.Transition(PhaseFactory.CohortRepartitionInitial(message.Payload.EpochId, message.SenderId, message.Payload.Participants));
+            if (Array.BinarySearch(message.Payload.OrderedParticipants, LocalIdentifier) >= 0) {
+               PhaseManager.Transition(PhaseFactory.CohortRepartitionInitial(message.Payload.EpochId, message.SenderId, message.Payload.OrderedParticipants));
             } else {
                PhaseManager.Transition(PhaseFactory.Outsider());
             }

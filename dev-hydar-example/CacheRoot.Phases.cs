@@ -34,7 +34,8 @@ namespace Dargon.Hydar {
 
          public Guid EpochId => EpochState.EpochId;
          public Guid Leader => EpochState.Leader;
-         public SCG.IReadOnlyList<Guid> Participants => EpochState.Participants;
+         // Ordered by rank
+         public Guid[] Participants => EpochState.Participants;
          public Keyspace Keyspace => EpochState.Keyspace;
          public EpochState EpochState { get; set; }
 
@@ -43,7 +44,7 @@ namespace Dargon.Hydar {
          private int localRankCache = -1;
          private int GetLocalRank() {
             if (localRankCache == -1) {
-               localRankCache = Participants.OrderBy(x => x).ToList().IndexOf(LocalIdentifier);
+               localRankCache = Array.BinarySearch(Participants, LocalIdentifier);
             }
             return localRankCache;
          }
@@ -55,7 +56,7 @@ namespace Dargon.Hydar {
          public IReadOnlySet<Guid> PendingOutsiders => LeaderState.PendingOutsiders;
 
          protected void SendLeaderHeartBeat() {
-            Messenger.LeaderHeartBeat(EpochId, new SortedSet<Guid>(Participants));
+            Messenger.LeaderHeartBeat(EpochId, Participants);
          }
 
          public override void Dispatch<TPayload>(IReceivedMessage<TPayload> message) {

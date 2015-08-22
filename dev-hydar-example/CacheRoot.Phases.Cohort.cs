@@ -14,7 +14,7 @@ namespace Dargon.Hydar {
 
          public override void HandleEntered() {
             CacheOperationsManager.SuspendOperations();
-            var neededBlockRanges = Keyspace.GetNodePartitionRanges(Rank, Participants.Count);
+            var neededBlockRanges = Keyspace.GetNodePartitionRanges(Rank, Participants.Length);
             var neededBlocks = IntervalConverter.ConvertToUidSet(neededBlockRanges);
             PhaseManager.Transition(PhaseFactory.CohortRepartitioning(neededBlocks, CohortState));
          }
@@ -136,7 +136,7 @@ namespace Dargon.Hydar {
             PhaseManager.Transition(PhaseFactory.CohortPartitioned(EpochState));
          }
 
-         public override string ToString() => $"[CohortRepartitioningCompleted Rank {Rank} of {Participants.Count}]";
+         public override string ToString() => $"[CohortRepartitioningCompleted Rank {Rank} of {Participants.Length}]";
       }
 
       public class CohortPartitionedPhase : CohortPhaseBase {
@@ -147,7 +147,7 @@ namespace Dargon.Hydar {
          }
 
          public override void HandleEntered() {
-            CacheOperationsManager.ResumeOperations(Rank, Participants.Count);
+            CacheOperationsManager.ResumeOperations(Rank, Participants.Length, Participants);
             SendCohortHeartBeat();
          }
 
@@ -157,11 +157,11 @@ namespace Dargon.Hydar {
 
          private void HandleLeaderRepartitionSignal(IReceivedMessage<LeaderRepartitionSignalDto> x) {
             if (!x.Payload.EpochId.Equals(EpochId)) {
-               PhaseManager.Transition(PhaseFactory.CohortRepartitionInitial(x.Payload.EpochId, Leader, x.Payload.Participants, CohortState));
+               PhaseManager.Transition(PhaseFactory.CohortRepartitionInitial(x.Payload.EpochId, Leader, x.Payload.ParticipantsOrdered, CohortState));
             }
          }
 
-         public override string ToString() => $"[CohortPartitioned Rank {Rank} of {Participants.Count}]";
+         public override string ToString() => $"[CohortPartitioned Rank {Rank} of {Participants.Length}]";
       }
    }
 }

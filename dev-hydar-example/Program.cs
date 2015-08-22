@@ -123,6 +123,8 @@ namespace Dargon.Hydar {
             x.RegisterPortableObjectType(100010, typeof(CacheHaveDto));
             x.RegisterPortableObjectType(100011, typeof(BlockTransferResult));
             x.RegisterPortableObjectType(100012, typeof(HydarServiceDescriptor));
+            x.RegisterPortableObjectType(100013, typeof(CacheRoot<,>.EntryOperationGet));
+            x.RegisterPortableObjectType(100014, typeof(CacheRoot<,>.EntryOperationPut));
          });
          var pofSerializer = new PofSerializer(pofContext);
          var pofStreamsFactory = new PofStreamsFactoryImpl(threadingProxy, streamFactory, pofSerializer);
@@ -144,6 +146,7 @@ namespace Dargon.Hydar {
          var identifier = Guid.NewGuid();
          var endpoint = new CourierEndpointImpl(pofSerializer, identifier, "node_?");
          endpoint.SetProperty(new HydarServiceDescriptor { ServicePort = servicePort });
+         Console.Title = "PID " + Process.GetCurrentProcess().Id + ": " + identifier.ToString("N");
 
          var network = new UdpCourierNetwork(networkingProxy, new UdpCourierNetworkConfiguration(port));
          var networkContext = network.Join(endpoint);
@@ -225,22 +228,22 @@ namespace Dargon.Hydar {
    public class LeaderHeartbeatDto : IPortableObject {
       public LeaderHeartbeatDto() { }
 
-      public LeaderHeartbeatDto(Guid epochId, IReadOnlySet<Guid> participants) {
+      public LeaderHeartbeatDto(Guid epochId, Guid[] orderedParticipants) {
          this.EpochId = epochId;
-         this.Participants = participants;
+         this.OrderedParticipants = orderedParticipants;
       }
 
       public Guid EpochId { get; set; }
-      public IReadOnlySet<Guid> Participants { get; set; }
+      public Guid[] OrderedParticipants { get; set; }
 
       public void Serialize(IPofWriter writer) {
          writer.WriteGuid(0, EpochId);
-         writer.WriteCollection(1, Participants);
+         writer.WriteCollection(1, OrderedParticipants);
       }
 
       public void Deserialize(IPofReader reader) {
          EpochId = reader.ReadGuid(0);
-         Participants = reader.ReadCollection<Guid, ItzWarty.Collections.HashSet<Guid>>(1);
+         OrderedParticipants = reader.ReadArray<Guid>(1);
       }
    }
 
@@ -291,25 +294,25 @@ namespace Dargon.Hydar {
 
    public class LeaderRepartitionSignalDto : IPortableObject {
       private Guid epochId;
-      private IReadOnlySet<Guid> participants;
+      private Guid[] participantsOrdered;
 
       public LeaderRepartitionSignalDto() { }
 
-      public LeaderRepartitionSignalDto(Guid epochId, IReadOnlySet<Guid> participants) {
+      public LeaderRepartitionSignalDto(Guid epochId, Guid[] participantsOrdered) {
          this.epochId = epochId;
-         this.participants = participants;
+         this.participantsOrdered = participantsOrdered;
       }
 
       public Guid EpochId => epochId;
-      public IReadOnlySet<Guid> Participants => participants;
+      public Guid[] ParticipantsOrdered => participantsOrdered;
 
       public void Serialize(IPofWriter writer) {
          writer.WriteGuid(0, epochId);
-         writer.WriteCollection(1, participants);
+         writer.WriteCollection(1, participantsOrdered);
       }
       public void Deserialize(IPofReader reader) {
          epochId = reader.ReadGuid(0);
-         participants = reader.ReadCollection<Guid, ItzWarty.Collections.HashSet<Guid>>(1);
+         participantsOrdered = reader.ReadArray<Guid>(1);
       }
    }
 

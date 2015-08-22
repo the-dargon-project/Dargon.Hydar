@@ -24,7 +24,7 @@ namespace Dargon.Hydar {
             messageSender.SendBroadcast(new ElectionVoteDto(nominee, followers));
          }
 
-         public void LeaderHeartBeat(Guid id, IReadOnlySet<Guid> participants) {
+         public void LeaderHeartBeat(Guid id, Guid[] participants) {
             messageSender.SendBroadcast(new LeaderHeartbeatDto(id, participants));
          }
 
@@ -40,8 +40,8 @@ namespace Dargon.Hydar {
             messageSender.SendBroadcast(new OutsiderAnnounceDto());
          }
 
-         public void LeaderRepartitionSignal(Guid epochId, IReadOnlySet<Guid> participants) {
-            messageSender.SendBroadcast(new LeaderRepartitionSignalDto(epochId, participants));
+         public void LeaderRepartitionSignal(Guid epochId, Guid[] participantsOrdered) {
+            messageSender.SendBroadcast(new LeaderRepartitionSignalDto(epochId, participantsOrdered));
          }
 
          public void CohortRepartitionCompletion() {

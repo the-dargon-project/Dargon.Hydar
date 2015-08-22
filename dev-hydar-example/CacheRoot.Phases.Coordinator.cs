@@ -33,12 +33,12 @@ namespace Dargon.Hydar {
          }
 
          public override void HandleEntered() {
-            Messenger.LeaderRepartitionSignal(EpochId, new HashSet<Guid>(Participants));
+            Messenger.LeaderRepartitionSignal(EpochId, Participants);
          }
 
          public override void HandleTick() {
             SubPhaseHost.HandleTick();
-            Messenger.LeaderRepartitionSignal(EpochId, new HashSet<Guid>(Participants));
+            Messenger.LeaderRepartitionSignal(EpochId, Participants);
             SendLeaderHeartBeat();
          }
 

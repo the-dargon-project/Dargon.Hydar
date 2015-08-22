@@ -7,6 +7,7 @@ using Dargon.Courier.Peering;
 using ItzWarty;
 using Nito.AsyncEx;
 using SCG = System.Collections.Generic;
+using static Dargon.Services.AsyncStatics;
 
 namespace Dargon.Hydar {
    public partial class CacheRoot<TKey, TValue> {
@@ -86,24 +87,24 @@ namespace Dargon.Hydar {
          public bool IsDirty { get { return this.isDirty; } set { this.isDirty = true; } }
       }
 
-      public interface ReadableEntryOperation {
+      public interface ReadableEntryOperation : IPortableObject {
          TKey Key { get; }
          EntryOperationType Type { get; }
       }
 
-      public interface ExecutableEntryOperation : ReadableEntryOperation {
+      public interface ExecutableEntryOperation : ReadableEntryOperation, IPortableObject {
          void Execute(Entry entry);
       }
 
-      public interface EntryOperation<TResult> : ExecutableEntryOperation {
+      public interface EntryOperation<TResult> : ExecutableEntryOperation, IPortableObject {
          Task<TResult> GetResultAsync();
          void SetResult(TResult result);
       }
 
       public abstract class EntryOperationBase<TResult> : EntryOperation<TResult> {
          private readonly AsyncManualResetEvent completionLatch = new AsyncManualResetEvent();
-         private readonly TKey key;
          private readonly EntryOperationType type;
+         private TKey key;
          private TResult internalResult;
 
          public EntryOperationBase(TKey key, EntryOperationType type) {
@@ -129,10 +130,26 @@ namespace Dargon.Hydar {
          }
 
          protected abstract TResult ExecuteInternal(Entry entry);
+
+         public void Serialize(IPofWriter writer) {
+            writer.WriteObject(0, key);
+            Serialize(writer, 1);
+         }
+
+         protected abstract void Serialize(IPofWriter writer, int slotOffset);
+
+         public void Deserialize(IPofReader reader) {
+            key = reader.ReadObject<TKey>(0);
+            Deserialize(reader, 1);
+         }
+
+         protected abstract void Deserialize(IPofReader reader, int slotOffset);
       }
 
       public class EntryOperationPut : EntryOperationBase<bool> {
-         private readonly TValue value;
+         private TValue value;
+
+         public EntryOperationPut() : this(default(TKey), default(TValue)) { }
 
          public EntryOperationPut(TKey key, TValue value) : base(key, EntryOperationType.Put) {
             this.value = value;
@@ -145,14 +162,27 @@ namespace Dargon.Hydar {
             entry.IsDirty = true;
             return entry.Exists;
          }
+
+         protected override void Serialize(IPofWriter writer, int slotOffset) {
+            writer.WriteObject(slotOffset + 0, value);
+         }
+
+         protected override void Deserialize(IPofReader reader, int slotOffset) {
+            value = reader.ReadObject<TValue>(slotOffset + 0);
+         }
       }
 
       public class EntryOperationGet : EntryOperationBase<TValue> {
+         public EntryOperationGet() : this(default(TKey)) { }
+
          public EntryOperationGet(TKey key) : base(key, EntryOperationType.Read) {}
 
          protected override TValue ExecuteInternal(Entry entry) {
             return entry.Exists ? entry.Value : default(TValue);
          }
+
+         protected override void Serialize(IPofWriter writer, int slotOffset) { }
+         protected override void Deserialize(IPofReader reader, int slotOffset) { }
       }
 
       public enum EntryOperationType {
@@ -246,16 +276,16 @@ namespace Dargon.Hydar {
          private readonly AsyncManualResetEvent resumedLatch = new AsyncManualResetEvent(false);
          private readonly Keyspace keyspace;
          private readonly EntryBlockTable entryBlockTable;
-         private readonly ReadablePeerRegistry peerRegistry;
+         private readonly RemoteServiceContainer remoteServiceContainer;
          private int nodeRank;
          private int nodeCount;
          private bool isSuspended = true;
          private SCG.IReadOnlyList<Guid> peers;
 
-         public CacheOperationsManager(Keyspace keyspace, EntryBlockTable entryBlockTable, ReadablePeerRegistry peerRegistry) {
+         public CacheOperationsManager(Keyspace keyspace, EntryBlockTable entryBlockTable, RemoteServiceContainer remoteServiceContainer) {
             this.keyspace = keyspace;
             this.entryBlockTable = entryBlockTable;
-            this.peerRegistry = peerRegistry;
+            this.remoteServiceContainer = remoteServiceContainer;
          }
 
          public void SuspendOperations() {
@@ -290,8 +320,11 @@ namespace Dargon.Hydar {
                         return await entryBlockTable.EnqueueAwaitableOperation(operation);
                      } else {
                         // perform networked
-                        var peerIndex = keyspace.GetPeerIndex(operation.Type == EntryOperationType.Read, nodeCount);
-                        throw new NotImplementedException("Have not implemented networked entry operations");
+                        var peerIndex = keyspace.GetPeerIndex((int)blockId, nodeCount, operation.Type == EntryOperationType.Read);
+                        Console.WriteLine("PeerIndex: " + peerIndex);
+                        Console.WriteLine("Peers: " + peers.Join(", "));
+                        var peerCacheService = remoteServiceContainer.GetCacheService(peers[peerIndex]);
+                        return await Async(() => peerCacheService.ExecuteProxiedOperation<TResult>(operation));
                      }
                   }
                }
