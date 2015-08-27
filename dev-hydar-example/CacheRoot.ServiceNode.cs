@@ -45,6 +45,7 @@ namespace Dargon.Hydar {
       }
 
       public interface ClientCacheService {
+         TValue Get(TKey key);
          bool Put(TKey key, TValue value);
       }
 
@@ -78,8 +79,14 @@ namespace Dargon.Hydar {
             return cacheOperationsManager.EnqueueAndAwaitResults(operation).Result;
          }
 
+         public TValue Get(TKey key) {
+            var operation = new EntryOperationGet(key);
+            return cacheOperationsManager.EnqueueAndAwaitResults(operation).Result;
+         }
+
          public bool Put(TKey key, TValue value) {
-            throw new NotImplementedException();
+            var operation = new EntryOperationPut(key, value);
+            return cacheOperationsManager.EnqueueAndAwaitResults(operation).Result;
          }
       }
    }

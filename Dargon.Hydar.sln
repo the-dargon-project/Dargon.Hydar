@@ -9,6 +9,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Courier.Impl", "..\D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Courier.Api", "..\Dargon.Courier\Dargon.Courier\Dargon.Courier.Api.csproj", "{00A1DA2F-D316-4387-8BD4-F1A47C05A402}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "client-example", "client-example\client-example.csproj", "{E4A9BB0C-058D-48DF-9759-0066CB33CB73}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Hydar.Client.Api", "Dargon.Hydar.Client.Api\Dargon.Hydar.Client.Api.csproj", "{74EB9821-34A6-445A-A9E8-40F035CCD582}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Hydar.Common.Api", "Dargon.Hydar.Common.Api\Dargon.Hydar.Common.Api.csproj", "{79B62103-6D47-4650-9868-5A22139CC750}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +33,18 @@ Global
 		{00A1DA2F-D316-4387-8BD4-F1A47C05A402}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00A1DA2F-D316-4387-8BD4-F1A47C05A402}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00A1DA2F-D316-4387-8BD4-F1A47C05A402}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4A9BB0C-058D-48DF-9759-0066CB33CB73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4A9BB0C-058D-48DF-9759-0066CB33CB73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4A9BB0C-058D-48DF-9759-0066CB33CB73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4A9BB0C-058D-48DF-9759-0066CB33CB73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74EB9821-34A6-445A-A9E8-40F035CCD582}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74EB9821-34A6-445A-A9E8-40F035CCD582}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74EB9821-34A6-445A-A9E8-40F035CCD582}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74EB9821-34A6-445A-A9E8-40F035CCD582}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79B62103-6D47-4650-9868-5A22139CC750}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79B62103-6D47-4650-9868-5A22139CC750}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79B62103-6D47-4650-9868-5A22139CC750}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79B62103-6D47-4650-9868-5A22139CC750}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

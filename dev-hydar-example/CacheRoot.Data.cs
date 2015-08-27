@@ -4,6 +4,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Dargon.Courier.Peering;
+using Dargon.Hydar.Common;
 using ItzWarty;
 using Nito.AsyncEx;
 using SCG = System.Collections.Generic;
@@ -183,13 +184,6 @@ namespace Dargon.Hydar {
 
          protected override void Serialize(IPofWriter writer, int slotOffset) { }
          protected override void Deserialize(IPofReader reader, int slotOffset) { }
-      }
-
-      public enum EntryOperationType {
-         Read = 0x01,
-         Put = 0x02,
-         Update = 0x04,
-         ConditionalUpdate = 0x08
       }
 
       public class Block {
