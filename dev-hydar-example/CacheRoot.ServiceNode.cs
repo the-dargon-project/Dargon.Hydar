@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dargon.Courier.Identities;
 using Dargon.Courier.Peering;
+using Dargon.Hydar.Common;
 using Dargon.PortableObjects;
 using Dargon.Services;
 using ItzWarty.Collections;
@@ -47,6 +48,7 @@ namespace Dargon.Hydar {
       public interface ClientCacheService {
          TValue Get(TKey key);
          bool Put(TKey key, TValue value);
+         TResult Process<TResult>(TKey key, EntryProcessor<TKey, TValue, TResult> entryProcessor);
       }
 
       public interface InterCacheService {
@@ -86,6 +88,11 @@ namespace Dargon.Hydar {
 
          public bool Put(TKey key, TValue value) {
             var operation = new EntryOperationPut(key, value);
+            return cacheOperationsManager.EnqueueAndAwaitResults(operation).Result;
+         }
+
+         public TResult Process<TResult>(TKey key, EntryProcessor<TKey, TValue, TResult> entryProcessor) {
+            var operation = new EntryOperationProcess<TResult>(key, entryProcessor);
             return cacheOperationsManager.EnqueueAndAwaitResults(operation).Result;
          }
       }

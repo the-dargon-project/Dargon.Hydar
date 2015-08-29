@@ -20,23 +20,4 @@ namespace Dargon.Hydar.Client {
          return cache[key] = value;
       }
    }
-
-   public interface Entry<TKey, TValue> {
-      TKey Key { get; set; }
-      TValue Value { get; set; }
-
-      bool Exists { get; }
-      bool IsDirty { get; set; }
-   }
-
-   public static class EntryExtensions {
-      public static void FlagAsDirty<TKey, TValue>(Entry<TKey, TValue> entry) {
-         entry.IsDirty = true;
-      }
-   }
-
-   public interface EntryProcessor<TKey, TValue, TResult> {
-      EntryOperationType Type { get; }
-      TResult Process(Entry<TKey, TValue> entry);
-   }
 }

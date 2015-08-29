@@ -9,10 +9,15 @@ using ItzWarty.Collections;
 using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using Dargon.Hydar.Common;
+using NLog;
 using SCG = System.Collections.Generic;
 
 namespace client_example {
-   class Program {
+   public static class Program {
+      private static Logger logger = LogManager.GetCurrentClassLogger();
+
       public static void Main(string[] args) {
          var ryu = new RyuFactory().Create();
          ryu.Setup();
@@ -27,18 +32,32 @@ namespace client_example {
          var cacheGuid = guidHelper.ComputeMd5(cacheName);
 
          Thread.Sleep(5000);
-         Console.WriteLine("Running client operations.");
+         logger.Info("Running client operations.");
          var serviceClientFactory = ryu.Get<IServiceClientFactory>();
          var serviceClients = Util.Generate(4, i => serviceClientFactory.CreateOrJoin(new ClusteringConfiguration(32001 + i, 0, ClusteringRoleFlags.GuestOnly)));
-         var cacheServices = Util.Generate(serviceClients.Length, i => serviceClients[i].GetService<CacheRoot<int, string>.ClientCacheService>(cacheGuid));
+         var cacheServices = Util.Generate(serviceClients.Length, i => serviceClients[i].GetService<CacheRoot<int, int>.ClientCacheService>(cacheGuid));
 
          var proxyGenerator = ryu.Get<ProxyGenerator>();
-         var cache = new ClientCacheImpl<int, string>(proxyGenerator.CreateInterfaceProxyWithoutTarget<CacheRoot<int, string>.ClientCacheService>(new RoundRobinServiceProxyInterceptorImpl<CacheRoot<int, string>.ClientCacheService>(cacheServices)));
+         var cache = new ClientCacheImpl<int, int>(proxyGenerator.CreateInterfaceProxyWithoutTarget<CacheRoot<int, int>.ClientCacheService>(new RoundRobinServiceProxyInterceptorImpl<CacheRoot<int, int>.ClientCacheService>(cacheServices)));
 
-
-         cache[0] = "test";
+         cache[0] = 1337;
          for (var i = 0; i < 10; i++) {
-            Console.WriteLine("Reading from cache: " + cache[0]);
+            logger.Info("Reading from cache: " + cache[0]);
+            cache.Process(0, new Int32IncrementProcessor<int>());
+         }
+
+         cache[0] = 1337;
+         var increments = 100;
+         var incrementCountdown = new CountdownEvent(increments);
+         for (var i = 0; i < increments; i++) {
+            Task.Factory.StartNew(() => {
+               cache.Process(0, new Int32IncrementProcessor<int>());
+               incrementCountdown.Signal();
+            }, TaskCreationOptions.LongRunning);
+         }
+         incrementCountdown.Wait();
+         for (var i = 0; i < 4; i++) {
+            logger.Info("Reading from cache " + i + ": " + cache[0]);
          }
 
          var latch = new CountdownEvent(1);
@@ -46,6 +65,8 @@ namespace client_example {
       }
 
       public class RoundRobinServiceProxyInterceptorImpl<TService> : IInterceptor {
+         private static Logger logger = LogManager.GetCurrentClassLogger();
+
          private readonly object synchronization = new object();
          private int counter = 0;
          private TService[] services;
@@ -74,7 +95,7 @@ namespace client_example {
             var count = Interlocked.Increment(ref counter);
             var candidates = services;
             var candidate = candidates[count % candidates.Length];
-            Console.WriteLine("Round Robin Dispatch #" + count);
+            logger.Trace("Round Robin Dispatch #" + count);
             invocation.ReturnValue = invocation.Method.Invoke(candidate, invocation.Arguments);
          }
       }
@@ -87,7 +108,7 @@ namespace client_example {
          }
 
          public TResult Process<TResult>(TKey key, EntryProcessor<TKey, TValue, TResult> entryProcessor) {
-            throw new NotImplementedException();
+            return cacheService.Process(key, entryProcessor);
          }
 
          public TResult Process<TResult, TProcessor>(TKey key, params object[] args) where TProcessor : EntryProcessor<TKey, TValue, TResult> {

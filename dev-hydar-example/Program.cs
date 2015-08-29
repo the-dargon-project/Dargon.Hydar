@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Dargon.Hydar.Common;
 using MessageSenderImpl = Dargon.Courier.Messaging.MessageSenderImpl;
 
 namespace Dargon.Hydar {
@@ -111,20 +112,22 @@ namespace Dargon.Hydar {
             x.MergeContext(new DspPofContext());
             x.MergeContext(new DargonCourierImplPofContext());
             x.MergeContext(new ManagementPofContext());
-            x.RegisterPortableObjectType(100001, typeof(ElectionVoteDto));
-            x.RegisterPortableObjectType(100002, typeof(LeaderHeartbeatDto));
-            x.RegisterPortableObjectType(100003, typeof(CacheNeedDto));
-            x.RegisterPortableObjectType(100004, typeof(PartitionBlockInterval));
-            x.RegisterPortableObjectType(100005, typeof(OutsiderAnnounceDto));
-            x.RegisterPortableObjectType(100006, typeof(LeaderRepartitionSignalDto));
-            x.RegisterPortableObjectType(100007, typeof(CohortRepartitionCompletionDto));
-            x.RegisterPortableObjectType(100008, typeof(CohortHeartbeatDto));
-            x.RegisterPortableObjectType(100009, typeof(LeaderRepartitionCompletingDto));
-            x.RegisterPortableObjectType(100010, typeof(CacheHaveDto));
-            x.RegisterPortableObjectType(100011, typeof(BlockTransferResult));
-            x.RegisterPortableObjectType(100012, typeof(HydarServiceDescriptor));
-            x.RegisterPortableObjectType(100013, typeof(CacheRoot<,>.EntryOperationGet));
-            x.RegisterPortableObjectType(100014, typeof(CacheRoot<,>.EntryOperationPut));
+            x.RegisterPortableObjectType(2001, typeof(ElectionVoteDto));
+            x.RegisterPortableObjectType(2002, typeof(LeaderHeartbeatDto));
+            x.RegisterPortableObjectType(2003, typeof(CacheNeedDto));
+            x.RegisterPortableObjectType(2004, typeof(PartitionBlockInterval));
+            x.RegisterPortableObjectType(2005, typeof(OutsiderAnnounceDto));
+            x.RegisterPortableObjectType(2006, typeof(LeaderRepartitionSignalDto));
+            x.RegisterPortableObjectType(2007, typeof(CohortRepartitionCompletionDto));
+            x.RegisterPortableObjectType(2008, typeof(CohortHeartbeatDto));
+            x.RegisterPortableObjectType(2009, typeof(LeaderRepartitionCompletingDto));
+            x.RegisterPortableObjectType(2010, typeof(CacheHaveDto));
+            x.RegisterPortableObjectType(2011, typeof(BlockTransferResult));
+            x.RegisterPortableObjectType(2012, typeof(HydarServiceDescriptor));
+            x.RegisterPortableObjectType(2013, typeof(CacheRoot<,>.EntryOperationGet));
+            x.RegisterPortableObjectType(2014, typeof(CacheRoot<,>.EntryOperationPut));
+            x.RegisterPortableObjectType(2015, typeof(CacheRoot<,>.EntryOperationProcess<>));
+            x.MergeContext(new HydarCommonApiPofContext());
          });
          var pofSerializer = new PofSerializer(pofContext);
          var pofStreamsFactory = new PofStreamsFactoryImpl(threadingProxy, streamFactory, pofSerializer);
@@ -173,7 +176,7 @@ namespace Dargon.Hydar {
          // Initialize Hydar Cache
          var cacheFactory = new CacheFactory(endpoint, pofContext, messageSender, messageRouter, receivedMessageFactory, servicePort, serviceClient, serviceClientFactory, localManagementServer, peerRegistry);
          var client = new ClusterClient();
-         client.AddCache(cacheFactory.Create<int, string>("test-cache"));
+         client.AddCache(cacheFactory.Create<int, int>("test-cache"));
 
          new CountdownEvent(1).Wait();
          return NestResult.Success;

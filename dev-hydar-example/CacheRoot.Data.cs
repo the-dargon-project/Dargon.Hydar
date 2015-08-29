@@ -34,7 +34,7 @@ namespace Dargon.Hydar {
                semaphore.Release();
 
                ExecutableEntryOperation operation;
-               Entry entry = new Entry(key, value, exists);
+               EntryImpl entry = new EntryImpl(key, value, exists);
                while (readOperationQueue.TryDequeue(out operation)) {
                   await semaphore.WaitAsync();
                   operation.Execute(entry);
@@ -44,7 +44,9 @@ namespace Dargon.Hydar {
                while (nonreadOperationQueue.TryDequeue(out operation)) {
                   await semaphore.WaitAsync();
                   operation.Execute(entry);
-                  if (entry.IsDirty) {
+                  if (operation.Type == EntryOperationType.Put || 
+                      operation.Type == EntryOperationType.Update ||
+                      (operation.Type == EntryOperationType.ConditionalUpdate && entry.IsDirty)) {
                      // Set isUpdated so we update the cache context.
                      isUpdated = true;
 
@@ -70,13 +72,13 @@ namespace Dargon.Hydar {
          }
       }
 
-      public class Entry {
+      public class EntryImpl : Entry<TKey, TValue> {
          private readonly TKey key;
          private readonly bool exists;
          private TValue value;
          private bool isDirty;
 
-         public Entry(TKey key, TValue value, bool exists) {
+         public EntryImpl(TKey key, TValue value, bool exists) {
             this.key = key;
             this.value = value;
             this.exists = exists;
@@ -94,7 +96,7 @@ namespace Dargon.Hydar {
       }
 
       public interface ExecutableEntryOperation : ReadableEntryOperation, IPortableObject {
-         void Execute(Entry entry);
+         void Execute(Entry<TKey, TValue> entry);
       }
 
       public interface EntryOperation<TResult> : ExecutableEntryOperation, IPortableObject {
@@ -104,7 +106,7 @@ namespace Dargon.Hydar {
 
       public abstract class EntryOperationBase<TResult> : EntryOperation<TResult> {
          private readonly AsyncManualResetEvent completionLatch = new AsyncManualResetEvent();
-         private readonly EntryOperationType type;
+         private EntryOperationType type;
          private TKey key;
          private TResult internalResult;
 
@@ -116,12 +118,14 @@ namespace Dargon.Hydar {
          public TKey Key => key;
          public EntryOperationType Type => type;
 
+         internal void __SetType(EntryOperationType newType) => type = newType;
+
          public async Task<TResult> GetResultAsync() {
             await completionLatch.WaitAsync();
             return internalResult;
          }
 
-         void ExecutableEntryOperation.Execute(Entry entry) {
+         void ExecutableEntryOperation.Execute(Entry<TKey, TValue> entry) {
             SetResult(ExecuteInternal(entry));
          }
 
@@ -130,7 +134,7 @@ namespace Dargon.Hydar {
             completionLatch.Set();
          }
 
-         protected abstract TResult ExecuteInternal(Entry entry);
+         protected abstract TResult ExecuteInternal(Entry<TKey, TValue> entry);
 
          public void Serialize(IPofWriter writer) {
             writer.WriteObject(0, key);
@@ -158,7 +162,7 @@ namespace Dargon.Hydar {
 
          public TValue Value => value;
 
-         protected override bool ExecuteInternal(Entry entry) {
+         protected override bool ExecuteInternal(Entry<TKey, TValue> entry) {
             entry.Value = value;
             entry.IsDirty = true;
             return entry.Exists;
@@ -178,12 +182,35 @@ namespace Dargon.Hydar {
 
          public EntryOperationGet(TKey key) : base(key, EntryOperationType.Read) {}
 
-         protected override TValue ExecuteInternal(Entry entry) {
+         protected override TValue ExecuteInternal(Entry<TKey, TValue> entry) {
             return entry.Exists ? entry.Value : default(TValue);
          }
 
          protected override void Serialize(IPofWriter writer, int slotOffset) { }
          protected override void Deserialize(IPofReader reader, int slotOffset) { }
+      }
+
+      public class EntryOperationProcess<TResult> : EntryOperationBase<TResult> {
+         private EntryProcessor<TKey, TValue, TResult> processor;
+
+         public EntryOperationProcess() : base(default(TKey), EntryOperationType.Update) { } 
+
+         public EntryOperationProcess(TKey key, EntryProcessor<TKey, TValue, TResult> processor) : base(key, processor.Type) {
+            this.processor = processor;
+         }
+
+         protected override TResult ExecuteInternal(Entry<TKey, TValue> entry) {
+            return processor.Process(entry);
+         }
+
+         protected override void Serialize(IPofWriter writer, int slotOffset) {
+            writer.WriteObject(slotOffset + 0, processor);
+         }
+
+         protected override void Deserialize(IPofReader reader, int slotOffset) {
+            processor = reader.ReadObject<EntryProcessor<TKey, TValue, TResult>>(slotOffset + 0);
+            __SetType(processor.Type);
+         }
       }
 
       public class Block {
