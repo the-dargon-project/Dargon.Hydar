@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>client_example</RootNamespace>
     <AssemblyName>client-example</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -107,6 +108,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dargon.Hydar.Client.Api\Dargon.Hydar.Client.Api.csproj">
+      <Project>{74EB9821-34A6-445A-A9E8-40F035CCD582}</Project>
+      <Name>Dargon.Hydar.Client.Api</Name>
+    </ProjectReference>
     <ProjectReference Include="..\dev-hydar-example\dev-hydar-example.csproj">
       <Project>{17d7db40-5a07-4b49-8523-c0e2f5655d13}</Project>
       <Name>dev-hydar-example</Name>
