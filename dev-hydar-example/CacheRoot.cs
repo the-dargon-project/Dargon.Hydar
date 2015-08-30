@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
+using Dargon.Courier;
 using Dargon.Courier.Identities;
 using Dargon.Courier.Messaging;
 using Dargon.Courier.Peering;
@@ -9,6 +10,7 @@ using Dargon.Hydar.Utilities;
 using Dargon.Management;
 using Dargon.Management.Server;
 using Dargon.PortableObjects;
+using Dargon.Ryu;
 using Dargon.Services;
 using ItzWarty;
 using ItzWarty.Collections;
@@ -64,32 +66,38 @@ namespace Dargon.Hydar {
 
    public class CacheFactory {
       private const string kCacheMobNamePrefix = "@Hydar.";
-      private readonly ManageableCourierEndpoint localEndpoint;
-      private readonly IPofContext pofContext;
-      private readonly MessageSender messageSender;
-      private readonly MessageRouter messageRouter;
-      private readonly ReceivedMessageFactory receivedMessageFactory;
-      private readonly int servicePort;
-      private readonly IServiceClient serviceClient;
-      private readonly IServiceClientFactory serviceClientFactory;
-      private readonly ILocalManagementServer localManagementServer;
-      private readonly ReadablePeerRegistry peerRegistry;
 
-      public CacheFactory(ManageableCourierEndpoint localEndpoint, IPofContext pofContext, MessageSender messageSender, MessageRouter messageRouter, ReceivedMessageFactory receivedMessageFactory, int servicePort, IServiceClient serviceClient, IServiceClientFactory serviceClientFactory, ILocalManagementServer localManagementServer, ReadablePeerRegistry peerRegistry) {
-         this.localEndpoint = localEndpoint;
-         this.pofContext = pofContext;
-         this.messageSender = messageSender;
-         this.messageRouter = messageRouter;
-         this.receivedMessageFactory = receivedMessageFactory;
-         this.servicePort = servicePort;
-         this.serviceClient = serviceClient;
+      private readonly GuidHelper guidHelper;
+      private readonly IServiceClientFactory serviceClientFactory;
+      private readonly IServiceClient serviceClient;
+      private readonly CourierClient courierClient;
+      private readonly ILocalManagementServer localManagementServer;
+      private readonly ReceivedMessageFactory receivedMessageFactory;
+      private readonly IPofContext pofContext;
+      private int servicePort;
+
+      public CacheFactory(GuidHelper guidHelper, IServiceClientFactory serviceClientFactory, IServiceClient serviceClient, CourierClient courierClient, ILocalManagementServer localManagementServer, ReceivedMessageFactory receivedMessageFactory, IPofContext pofContext) {
+         this.guidHelper = guidHelper;
          this.serviceClientFactory = serviceClientFactory;
+         this.serviceClient = serviceClient;
+         this.courierClient = courierClient;
          this.localManagementServer = localManagementServer;
-         this.peerRegistry = peerRegistry;
+         this.receivedMessageFactory = receivedMessageFactory;
+         this.pofContext = pofContext;
+      }
+
+      public void SetServicePort(int newServicePort) {
+         this.servicePort = newServicePort;
+         courierClient.SetProperty(new HydarServiceDescriptor { ServicePort = servicePort });
       }
 
       public CacheRoot<TKey, TValue> Create<TKey, TValue>(string cacheName) {
-         var guidHelper = new GuidHelperImpl();
+         // Get Dependencies
+         var localEndpoint = courierClient.LocalEndpoint;
+         var messageSender = courierClient.MessageSender;
+         var messageRouter = courierClient.MessageRouter;
+         var peerRegistry = courierClient.PeerRegistry;
+
          var cacheGuid = guidHelper.ComputeMd5(cacheName);
 
          CacheConfiguration cacheConfiguration = new CacheConfiguration {

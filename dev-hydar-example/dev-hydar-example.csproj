@@ -63,7 +63,11 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Dargon.Ryu.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dargon.Ryu.Api.0.0.3\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\Dargon.Ryu.Api.dll</HintPath>
+      <HintPath>..\packages\Dargon.Ryu.Api.0.0.4\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\Dargon.Ryu.Api.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Dargon.Ryu.Impl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dargon.Ryu.Impl.0.1.3\lib\net45\Dargon.Ryu.Impl.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Dargon.Services.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -129,6 +133,8 @@
     <Compile Include="CacheRoot.ServiceNode.cs" />
     <Compile Include="CacheRoot.States.cs" />
     <Compile Include="CacheRoot.Subphase.Host.cs" />
+    <Compile Include="HydarRyuPackage.cs" />
+    <Compile Include="HydarCachePofContext.cs" />
     <Compile Include="PartitionBlockIntervalConverter.cs" />
     <Compile Include="Utilities\GuidHelper.cs" />
     <Compile Include="PartitionBlockInterval.cs" />

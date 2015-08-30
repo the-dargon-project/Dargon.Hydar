@@ -27,7 +27,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Dargon.Courier;
 using Dargon.Hydar.Common;
+using Dargon.Ryu;
 using MessageSenderImpl = Dargon.Courier.Messaging.MessageSenderImpl;
 
 namespace Dargon.Hydar {
@@ -84,97 +86,46 @@ namespace Dargon.Hydar {
 
    public class HydarEgg : INestApplicationEgg {
       private readonly List<object> keepalive = new List<object>();
+      private readonly RyuContainer ryu;
+
+      public HydarEgg() {
+         ryu = new RyuFactory().Create();
+      }
 
       public NestResult Start(IEggParameters parameters) {
          throw new NotImplementedException();
       }
 
       public NestResult Start(int servicePort, int managementPort) {
-         // ItzWarty.Commons
-         ICollectionFactory collectionFactory = new CollectionFactory();
-         ObjectPoolFactory objectPoolFactory = new DefaultObjectPoolFactory(collectionFactory);
+         ryu.Setup();
 
-         // ItzWarty.Proxies
-         IThreadingFactory threadingFactory = new ThreadingFactory();
-         ISynchronizationFactory synchronizationFactory = new SynchronizationFactory();
-         IThreadingProxy threadingProxy = new ThreadingProxy(threadingFactory, synchronizationFactory);
-         GuidProxy guidProxy = new GuidProxyImpl();
+         var networkingProxy = ryu.Get<INetworkingProxy>();
 
-         IDnsProxy dnsProxy = new DnsProxy();
-         var tcpEndPointFactory = new TcpEndPointFactory(dnsProxy);
-         IStreamFactory streamFactory = new StreamFactory();
-         INetworkingInternalFactory networkingInternalFactory = new NetworkingInternalFactory(threadingProxy, streamFactory);
-         ISocketFactory socketFactory = new SocketFactory(tcpEndPointFactory, networkingInternalFactory);
-         INetworkingProxy networkingProxy = new NetworkingProxy(socketFactory, tcpEndPointFactory);
-
-         // Dargon.PortableObjects
-         var pofContext = new PofContext().With(x => {
-            x.MergeContext(new DspPofContext());
-            x.MergeContext(new DargonCourierImplPofContext());
-            x.MergeContext(new ManagementPofContext());
-            x.RegisterPortableObjectType(2001, typeof(ElectionVoteDto));
-            x.RegisterPortableObjectType(2002, typeof(LeaderHeartbeatDto));
-            x.RegisterPortableObjectType(2003, typeof(CacheNeedDto));
-            x.RegisterPortableObjectType(2004, typeof(PartitionBlockInterval));
-            x.RegisterPortableObjectType(2005, typeof(OutsiderAnnounceDto));
-            x.RegisterPortableObjectType(2006, typeof(LeaderRepartitionSignalDto));
-            x.RegisterPortableObjectType(2007, typeof(CohortRepartitionCompletionDto));
-            x.RegisterPortableObjectType(2008, typeof(CohortHeartbeatDto));
-            x.RegisterPortableObjectType(2009, typeof(LeaderRepartitionCompletingDto));
-            x.RegisterPortableObjectType(2010, typeof(CacheHaveDto));
-            x.RegisterPortableObjectType(2011, typeof(BlockTransferResult));
-            x.RegisterPortableObjectType(2012, typeof(HydarServiceDescriptor));
-            x.RegisterPortableObjectType(2013, typeof(CacheRoot<,>.EntryOperationGet));
-            x.RegisterPortableObjectType(2014, typeof(CacheRoot<,>.EntryOperationPut));
-            x.RegisterPortableObjectType(2015, typeof(CacheRoot<,>.EntryOperationProcess<>));
-            x.MergeContext(new HydarCommonApiPofContext());
-         });
-         var pofSerializer = new PofSerializer(pofContext);
-         var pofStreamsFactory = new PofStreamsFactoryImpl(threadingProxy, streamFactory, pofSerializer);
-
-         // Dargon.Management Stuff
-         ITcpEndPoint managementServerEndpoint = networkingProxy.CreateAnyEndPoint(managementPort);
-         var managementFactory = new ManagementFactoryImpl(collectionFactory, threadingProxy, networkingProxy, pofContext, pofSerializer);
+         // Dargon.Management
+         var managementServerEndpoint = networkingProxy.CreateAnyEndPoint(managementPort);
+         var managementFactory = ryu.Get<ManagementFactoryImpl>();
          var localManagementServer = managementFactory.CreateServer(new ManagementServerConfiguration(managementServerEndpoint));
+         ryu.Set<ILocalManagementServer>(localManagementServer);
          keepalive.Add(localManagementServer);
 
          // Dargon.Services for node-to-node networking
-         var serviceClientFactory = new ServiceClientFactory(new ProxyGenerator(), streamFactory, collectionFactory, threadingProxy, networkingProxy, pofSerializer, pofStreamsFactory);
          var clusteringConfiguration = new ClusteringConfiguration(servicePort, 1000, ClusteringRoleFlags.HostOnly);
-         var serviceClient = serviceClientFactory.CreateOrJoin(clusteringConfiguration);
+         ryu.Set<IClusteringConfiguration>(clusteringConfiguration);
+         var serviceClient = ryu.Get<IServiceClient>();
          keepalive.Add(serviceClient);
 
+         // Initialize Dargon.Courier
+         var courierPort = 50555;
+         var courierClientFactory = ryu.Get<CourierClientFactory>();
+         var courierClient = courierClientFactory.CreateUdpCourierClient(courierPort);
+         ryu.Set<CourierClient>(courierClient);
+         
          // Dargon.Courier for clustered networking
-         var port = 50555;
-         var identifier = Guid.NewGuid();
-         var endpoint = new CourierEndpointImpl(pofSerializer, identifier, "node_?");
-         endpoint.SetProperty(new HydarServiceDescriptor { ServicePort = servicePort });
-         Console.Title = "PID " + Process.GetCurrentProcess().Id + ": " + identifier.ToString("N");
-
-         var network = new UdpCourierNetwork(networkingProxy, new UdpCourierNetworkConfiguration(port));
-         var networkContext = network.Join(endpoint);
-
-         var networkBroadcaster = new NetworkBroadcasterImpl(endpoint, networkContext, pofSerializer);
-         var messageContextPool = objectPoolFactory.CreatePool(() => new UnacknowledgedReliableMessageContext());
-         var unacknowledgedReliableMessageContainer = new UnacknowledgedReliableMessageContainer(messageContextPool);
-         var messageDtoPool = objectPoolFactory.CreatePool(() => new CourierMessageV1());
-         var messageTransmitter = new MessageTransmitterImpl(guidProxy, pofSerializer, networkBroadcaster, unacknowledgedReliableMessageContainer, messageDtoPool);
-         var messageSender = new MessageSenderImpl(guidProxy, unacknowledgedReliableMessageContainer, messageTransmitter);
-         var acknowledgeDtoPool = objectPoolFactory.CreatePool(() => new CourierMessageAcknowledgeV1());
-         var messageAcknowledger = new MessageAcknowledgerImpl(networkBroadcaster, unacknowledgedReliableMessageContainer, acknowledgeDtoPool);
-         var periodicAnnouncer = new PeriodicAnnouncerImpl(threadingProxy, pofSerializer, endpoint, networkBroadcaster);
-         periodicAnnouncer.Start();
-         var periodicResender = new PeriodicResenderImpl(threadingProxy, unacknowledgedReliableMessageContainer, messageTransmitter);
-         periodicResender.Start();
-
-         ReceivedMessageFactory receivedMessageFactory = new ReceivedMessageFactoryImpl(pofSerializer);
-         MessageRouter messageRouter = new MessageRouterImpl(receivedMessageFactory);
-         var peerRegistry = new PeerRegistryImpl(pofSerializer);
-         var networkReceiver = new NetworkReceiverImpl(endpoint, networkContext, pofSerializer, messageRouter, messageAcknowledger, peerRegistry);
-         networkReceiver.Initialize();
+         Console.Title = "PID " + Process.GetCurrentProcess().Id + ": " + courierClient.Identifier.ToString("N");
 
          // Initialize Hydar Cache
-         var cacheFactory = new CacheFactory(endpoint, pofContext, messageSender, messageRouter, receivedMessageFactory, servicePort, serviceClient, serviceClientFactory, localManagementServer, peerRegistry);
+         var cacheFactory = ryu.Get<CacheFactory>();
+         cacheFactory.SetServicePort(servicePort);
          var client = new ClusterClient();
          client.AddCache(cacheFactory.Create<int, int>("test-cache"));
 

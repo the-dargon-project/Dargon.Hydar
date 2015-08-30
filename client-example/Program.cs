@@ -20,6 +20,7 @@ namespace client_example {
 
       public static void Main(string[] args) {
          var ryu = new RyuFactory().Create();
+         ryu.Touch<ItzWartyProxiesRyuPackage>();
          ryu.Setup();
 
          new Thread(() => Dargon.Hydar.Program.Main("-s 32001 -m 32101".Split(' '))).Start();

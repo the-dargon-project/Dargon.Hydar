@@ -148,7 +148,7 @@ namespace Dargon.Hydar {
             phase.CacheRoot = cacheRoot;
             phase.PhaseManager = phaseManager;
             phase.PhaseFactory = this;
-            phase.Router = new MessageRouterImpl(receivedMessageFactory);
+            phase.Router = new MessageRouterImpl();
             phase.Messenger = messenger;
             phase.RemoteServiceContainer = remoteServiceContainer;
             phase.CacheOperationsManager = cacheOperationsManager;
