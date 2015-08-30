@@ -126,8 +126,10 @@ namespace Dargon.Hydar {
          // Initialize Hydar Cache
          var cacheFactory = ryu.Get<CacheFactory>();
          cacheFactory.SetServicePort(servicePort);
-         var client = new ClusterClient();
-         client.AddCache(cacheFactory.Create<int, int>("test-cache"));
+         var cacheDispatcher = new CacheDispatcher(courierClient.MessageRouter);
+         cacheDispatcher.Initialize();
+         cacheDispatcher.AddCache(cacheFactory.Create<int, int>("test-cache"));
+         cacheDispatcher.AddCache(cacheFactory.Create<int, string>("test-string-cache"));
 
          new CountdownEvent(1).Wait();
          return NestResult.Success;
@@ -157,10 +159,34 @@ namespace Dargon.Hydar {
       }
    }
 
-   public class ElectionVoteDto : IPortableObject {
-      public ElectionVoteDto() { }
+   public abstract class HydarCacheMessageBase : IPortableObject {
+      private Guid cacheId;
 
-      public ElectionVoteDto(Guid nominee, IReadOnlySet<Guid> followers) {
+      protected HydarCacheMessageBase(Guid cacheId) {
+         this.cacheId = cacheId;
+      }
+
+      public Guid CacheId => cacheId;
+
+      public void Serialize(IPofWriter writer) {
+         writer.WriteGuid(0, cacheId);
+         Serialize(writer, 1);
+      }
+
+      protected abstract void Serialize(IPofWriter writer, int baseSlot);
+
+      public void Deserialize(IPofReader reader) {
+         cacheId = reader.ReadGuid(0);
+         Deserialize(reader, 1);
+      }
+
+      protected abstract void Deserialize(IPofReader reader, int baseSlot);
+   }
+
+   public class ElectionVoteDto : HydarCacheMessageBase {
+      public ElectionVoteDto() : base(Guid.Empty) { }
+
+      public ElectionVoteDto(Guid cacheId, Guid nominee, IReadOnlySet<Guid> followers) : base(cacheId) {
          this.Nominee = nominee;
          this.Followers = followers;
       }
@@ -168,21 +194,21 @@ namespace Dargon.Hydar {
       public Guid Nominee { get; set; }
       public IReadOnlySet<Guid> Followers { get; set; }
 
-      public void Serialize(IPofWriter writer) {
-         writer.WriteGuid(0, Nominee);
-         writer.WriteCollection(1, Followers ?? new ItzWarty.Collections.HashSet<Guid>());
+      protected override void Serialize(IPofWriter writer, int baseSlot) {
+         writer.WriteGuid(baseSlot + 0, Nominee);
+         writer.WriteCollection(baseSlot + 1, Followers ?? new ItzWarty.Collections.HashSet<Guid>());
       }
 
-      public void Deserialize(IPofReader reader) {
-         Nominee = reader.ReadGuid(0);
-         Followers = reader.ReadCollection<Guid, ItzWarty.Collections.HashSet<Guid>>(1);
+      protected override void Deserialize(IPofReader reader, int baseSlot) {
+         Nominee = reader.ReadGuid(baseSlot + 0);
+         Followers = reader.ReadCollection<Guid, ItzWarty.Collections.HashSet<Guid>>(baseSlot + 1);
       }
    }
 
-   public class LeaderHeartbeatDto : IPortableObject {
-      public LeaderHeartbeatDto() { }
+   public class LeaderHeartbeatDto : HydarCacheMessageBase {
+      public LeaderHeartbeatDto() : base(Guid.Empty) { }
 
-      public LeaderHeartbeatDto(Guid epochId, Guid[] orderedParticipants) {
+      public LeaderHeartbeatDto(Guid cacheId, Guid epochId, Guid[] orderedParticipants) : base(cacheId) {
          this.EpochId = epochId;
          this.OrderedParticipants = orderedParticipants;
       }
@@ -190,39 +216,39 @@ namespace Dargon.Hydar {
       public Guid EpochId { get; set; }
       public Guid[] OrderedParticipants { get; set; }
 
-      public void Serialize(IPofWriter writer) {
-         writer.WriteGuid(0, EpochId);
-         writer.WriteCollection(1, OrderedParticipants);
+      protected override void Serialize(IPofWriter writer, int baseSlot) {
+         writer.WriteGuid(baseSlot + 0, EpochId);
+         writer.WriteCollection(baseSlot + 1, OrderedParticipants);
       }
 
-      public void Deserialize(IPofReader reader) {
-         EpochId = reader.ReadGuid(0);
-         OrderedParticipants = reader.ReadArray<Guid>(1);
+      protected override void Deserialize(IPofReader reader, int baseSlot) {
+         EpochId = reader.ReadGuid(baseSlot + 0);
+         OrderedParticipants = reader.ReadArray<Guid>(baseSlot + 1);
       }
    }
 
-   public class CacheNeedDto : IPortableObject {
-      public CacheNeedDto() { }
+   public class CacheNeedDto : HydarCacheMessageBase {
+      public CacheNeedDto() : base(Guid.Empty) { }
 
-      public CacheNeedDto(PartitionBlockInterval[] blocks) {
+      public CacheNeedDto(Guid cacheId, PartitionBlockInterval[] blocks) : base(cacheId) {
          Blocks = blocks;
       }
 
       public PartitionBlockInterval[] Blocks { get; set; }
 
-      public void Serialize(IPofWriter writer) {
-         writer.WriteCollection(0, Blocks);
+      protected override void Serialize(IPofWriter writer, int baseSlot) {
+         writer.WriteCollection(baseSlot + 0, Blocks);
       }
 
-      public void Deserialize(IPofReader reader) {
-         Blocks = reader.ReadArray<PartitionBlockInterval>(0);
+      protected override void Deserialize(IPofReader reader, int baseSlot) {
+         Blocks = reader.ReadArray<PartitionBlockInterval>(baseSlot + 0);
       }
    }
 
-   public class CacheHaveDto : IPortableObject {
-      public CacheHaveDto() { }
+   public class CacheHaveDto : HydarCacheMessageBase {
+      public CacheHaveDto() : base(Guid.Empty) { }
 
-      public CacheHaveDto(PartitionBlockInterval[] blocks, int servicePort) {
+      public CacheHaveDto(Guid cacheId, PartitionBlockInterval[] blocks, int servicePort) : base(cacheId) {
          Blocks = blocks;
          ServicePort = servicePort;
       }
@@ -230,29 +256,34 @@ namespace Dargon.Hydar {
       public PartitionBlockInterval[] Blocks { get; set; }
       public int ServicePort { get; set; }
 
-      public void Serialize(IPofWriter writer) {
-         writer.WriteCollection(0, Blocks);
-         writer.WriteS32(1, ServicePort);
+      protected override void Serialize(IPofWriter writer, int baseSlot) {
+         writer.WriteCollection(baseSlot + 0, Blocks);
+         writer.WriteS32(baseSlot + 1, ServicePort);
       }
 
-      public void Deserialize(IPofReader reader) {
-         Blocks = reader.ReadArray<PartitionBlockInterval>(0);
-         ServicePort = reader.ReadS32(1);
+      protected override void Deserialize(IPofReader reader, int baseSlot) {
+         Blocks = reader.ReadArray<PartitionBlockInterval>(baseSlot + 0);
+         ServicePort = reader.ReadS32(baseSlot + 1);
       }
    }
 
-   public class OutsiderAnnounceDto : IPortableObject {
-      public void Serialize(IPofWriter writer) { }
-      public void Deserialize(IPofReader reader) { }
+   public class OutsiderAnnounceDto : HydarCacheMessageBase {
+      public OutsiderAnnounceDto() : base(Guid.Empty) { }
+
+      public OutsiderAnnounceDto(Guid cacheId) : base(cacheId) { }
+
+      protected override void Serialize(IPofWriter writer, int baseSlot) { }
+
+      protected override void Deserialize(IPofReader reader, int baseSlot) { }
    }
 
-   public class LeaderRepartitionSignalDto : IPortableObject {
+   public class LeaderRepartitionSignalDto : HydarCacheMessageBase {
       private Guid epochId;
       private Guid[] participantsOrdered;
 
-      public LeaderRepartitionSignalDto() { }
+      public LeaderRepartitionSignalDto() : base(Guid.Empty) { }
 
-      public LeaderRepartitionSignalDto(Guid epochId, Guid[] participantsOrdered) {
+      public LeaderRepartitionSignalDto(Guid cacheId, Guid epochId, Guid[] participantsOrdered) : base(cacheId) {
          this.epochId = epochId;
          this.participantsOrdered = participantsOrdered;
       }
@@ -260,29 +291,45 @@ namespace Dargon.Hydar {
       public Guid EpochId => epochId;
       public Guid[] ParticipantsOrdered => participantsOrdered;
 
-      public void Serialize(IPofWriter writer) {
-         writer.WriteGuid(0, epochId);
-         writer.WriteCollection(1, participantsOrdered);
+      protected override void Serialize(IPofWriter writer, int baseSlot) {
+         writer.WriteGuid(baseSlot + 0, epochId);
+         writer.WriteCollection(baseSlot + 1, participantsOrdered);
       }
-      public void Deserialize(IPofReader reader) {
-         epochId = reader.ReadGuid(0);
-         participantsOrdered = reader.ReadArray<Guid>(1);
+
+      protected override void Deserialize(IPofReader reader, int baseSlot) {
+         epochId = reader.ReadGuid(baseSlot + 0);
+         participantsOrdered = reader.ReadArray<Guid>(baseSlot + 1);
       }
    }
 
-   public class CohortRepartitionCompletionDto : IPortableObject {
-      public void Serialize(IPofWriter writer) { }
-      public void Deserialize(IPofReader reader) { }
+   public class CohortRepartitionCompletionDto : HydarCacheMessageBase {
+      public CohortRepartitionCompletionDto() : base(Guid.Empty) { }
+
+      public CohortRepartitionCompletionDto(Guid cacheId) : base(cacheId) { }
+
+      protected override void Serialize(IPofWriter writer, int baseSlot) { }
+
+      protected override void Deserialize(IPofReader reader, int baseSlot) { }
    }
 
-   public class LeaderRepartitionCompletingDto : IPortableObject {
-      public void Serialize(IPofWriter writer) { }
-      public void Deserialize(IPofReader reader) { }
+   public class LeaderRepartitionCompletingDto : HydarCacheMessageBase {
+      public LeaderRepartitionCompletingDto() : base(Guid.Empty) { }
+
+      public LeaderRepartitionCompletingDto(Guid cacheId) : base(cacheId) { }
+
+      protected override void Serialize(IPofWriter writer, int baseSlot) { }
+
+      protected override void Deserialize(IPofReader reader, int baseSlot) { }
    }
 
-   public class CohortHeartbeatDto : IPortableObject {
-      public void Serialize(IPofWriter writer) { }
-      public void Deserialize(IPofReader reader) { }
+   public class CohortHeartbeatDto : HydarCacheMessageBase {
+      public CohortHeartbeatDto() : base(Guid.Empty) { }
+
+      public CohortHeartbeatDto(Guid cacheId) : base(cacheId) { }
+
+      protected override void Serialize(IPofWriter writer, int baseSlot) { }
+
+      protected override void Deserialize(IPofReader reader, int baseSlot) { }
    }
 
    public enum Role {

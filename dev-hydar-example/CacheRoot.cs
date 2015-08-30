@@ -17,17 +17,26 @@ using ItzWarty.Collections;
 using ItzWarty.Networking;
 
 namespace Dargon.Hydar {
-   public partial class CacheRoot<TKey, TValue> {
-      private readonly ManageableCourierEndpoint endpoint;
-      private readonly MessageSender messageSender;
-      private readonly CacheConfiguration cacheConfiguration;
-      private readonly RemoteServiceContainer remoteServiceContainer;
+   public interface ICacheRoot {
+      void Dispatch<T>(IReceivedMessage<T> message);
+   }
 
-      public CacheRoot(ManageableCourierEndpoint endpoint, MessageSender messageSender, CacheConfiguration cacheConfiguration, RemoteServiceContainer remoteServiceContainer) {
-         this.endpoint = endpoint;
-         this.messageSender = messageSender;
-         this.cacheConfiguration = cacheConfiguration;
-         this.remoteServiceContainer = remoteServiceContainer;
+   public partial class CacheRoot<TKey, TValue> : ICacheRoot {
+      private readonly string cacheName;
+      private readonly Guid id;
+      private readonly PhaseManager phaseManager;
+
+      public CacheRoot(string cacheName, Guid id, PhaseManager phaseManager) {
+         this.cacheName = cacheName;
+         this.id = id;
+         this.phaseManager = phaseManager;
+      }
+
+      public string Name => cacheName;
+      public Guid Id => id;
+
+      public void Dispatch<T>(IReceivedMessage<T> message) {
+         phaseManager.Dispatch(message);
       }
 
       public class CacheMob {
@@ -110,26 +119,16 @@ namespace Dargon.Hydar {
          var remoteServiceContainer = new CacheRoot<TKey, TValue>.RemoteServiceContainer(cacheConfiguration, serviceClientFactory, peerRegistry, serviceClientsByOrigin);
 
          var keyspace = new Keyspace(1024, 1);
-         var cacheRoot = new CacheRoot<TKey, TValue>(localEndpoint, messageSender, cacheConfiguration, remoteServiceContainer);
-         var messenger = new CacheRoot<TKey, TValue>.Messenger(messageSender, cacheConfiguration);
+         var messenger = new CacheRoot<TKey, TValue>.Messenger(cacheGuid, messageSender, cacheConfiguration);
          var phaseManager = new CacheRoot<TKey, TValue>.PhaseManagerImpl();
+         var cacheRoot = new CacheRoot<TKey, TValue>(cacheName, cacheGuid, phaseManager);
          var blocks = Util.Generate(keyspace.BlockCount, blockId => new CacheRoot<TKey, TValue>.Block(blockId));
          var blockTable = new CacheRoot<TKey, TValue>.EntryBlockTable(keyspace, blocks);
          var cacheOperationsManager = new CacheRoot<TKey, TValue>.CacheOperationsManager(keyspace, blockTable, remoteServiceContainer);
-         var phaseFactory = new CacheRoot<TKey, TValue>.PhaseFactory(receivedMessageFactory, localEndpoint.Identifier, keyspace, cacheConfiguration, cacheRoot, phaseManager, messenger, remoteServiceContainer, blockTable, cacheOperationsManager, peerRegistry);
+         var phaseFactory = new CacheRoot<TKey, TValue>.PhaseFactory(receivedMessageFactory, cacheGuid, localEndpoint.Identifier, keyspace, cacheConfiguration, cacheRoot, phaseManager, messenger, remoteServiceContainer, blockTable, cacheOperationsManager, peerRegistry);
          var cacheService = new CacheRoot<TKey, TValue>.CacheServiceImpl(cacheOperationsManager);
          serviceClient.RegisterService(cacheService, typeof(CacheRoot<TKey, TValue>.CacheService), cacheGuid);
          phaseManager.Transition(phaseFactory.Oblivious());
-
-         messageRouter.RegisterPayloadHandler<ElectionVoteDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<LeaderHeartbeatDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<CacheNeedDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<CacheHaveDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<OutsiderAnnounceDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<LeaderRepartitionSignalDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<CohortRepartitionCompletionDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<LeaderRepartitionCompletingDto>(phaseManager.Dispatch);
-         messageRouter.RegisterPayloadHandler<CohortHeartbeatDto>(phaseManager.Dispatch);
 
          localManagementServer.RegisterContext(new ManagementContext(new CacheRoot<TKey, TValue>.CacheMob(cacheOperationsManager), cacheGuid, kCacheMobNamePrefix + cacheName, pofContext));
 

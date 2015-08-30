@@ -23,43 +23,57 @@ namespace client_example {
          ryu.Touch<ItzWartyProxiesRyuPackage>();
          ryu.Setup();
 
+         var proxyGenerator = ryu.Get<ProxyGenerator>();
+
          new Thread(() => Dargon.Hydar.Program.Main("-s 32001 -m 32101".Split(' '))).Start();
          new Thread(() => Dargon.Hydar.Program.Main("-s 32002 -m 32102".Split(' '))).Start();
          new Thread(() => Dargon.Hydar.Program.Main("-s 32003 -m 32103".Split(' '))).Start();
          new Thread(() => Dargon.Hydar.Program.Main("-s 32004 -m 32104".Split(' '))).Start();
-
-         var cacheName = "test-cache";
+         
          var guidHelper = new GuidHelperImpl();
-         var cacheGuid = guidHelper.ComputeMd5(cacheName);
+         var testCacheGuid = guidHelper.ComputeMd5("test-cache");
+         var testStringCacheGuid = guidHelper.ComputeMd5("test-string-cache");
 
          Thread.Sleep(5000);
          logger.Info("Running client operations.");
          var serviceClientFactory = ryu.Get<IServiceClientFactory>();
          var serviceClients = Util.Generate(4, i => serviceClientFactory.CreateOrJoin(new ClusteringConfiguration(32001 + i, 0, ClusteringRoleFlags.GuestOnly)));
-         var cacheServices = Util.Generate(serviceClients.Length, i => serviceClients[i].GetService<CacheRoot<int, int>.ClientCacheService>(cacheGuid));
+         var testCacheServices = Util.Generate(serviceClients.Length, i => serviceClients[i].GetService<CacheRoot<int, int>.ClientCacheService>(testCacheGuid));
+         var testCache = new ClientCacheImpl<int, int>(proxyGenerator.CreateInterfaceProxyWithoutTarget<CacheRoot<int, int>.ClientCacheService>(new RoundRobinServiceProxyInterceptorImpl<CacheRoot<int, int>.ClientCacheService>(testCacheServices)));
 
-         var proxyGenerator = ryu.Get<ProxyGenerator>();
-         var cache = new ClientCacheImpl<int, int>(proxyGenerator.CreateInterfaceProxyWithoutTarget<CacheRoot<int, int>.ClientCacheService>(new RoundRobinServiceProxyInterceptorImpl<CacheRoot<int, int>.ClientCacheService>(cacheServices)));
+         var testStringCacheServices = Util.Generate(serviceClients.Length, i => serviceClients[i].GetService<CacheRoot<int, string>.ClientCacheService>(testStringCacheGuid));
+         var testStringCache = new ClientCacheImpl<int, string>(proxyGenerator.CreateInterfaceProxyWithoutTarget<CacheRoot<int, string>.ClientCacheService>(new RoundRobinServiceProxyInterceptorImpl<CacheRoot<int, string>.ClientCacheService>(testStringCacheServices)));
 
-         cache[0] = 1337;
+         testCache[0] = 1337;
          for (var i = 0; i < 10; i++) {
-            logger.Info("Reading from cache: " + cache[0]);
-            cache.Process(0, new Int32IncrementProcessor<int>());
+            logger.Info("Reading from cache: " + testCache[0]);
+            testCache.Process(0, new Int32IncrementProcessor<int>());
          }
 
-         cache[0] = 1337;
+         testCache[0] = 1337;
          var increments = 100;
          var incrementCountdown = new CountdownEvent(increments);
          for (var i = 0; i < increments; i++) {
             Task.Factory.StartNew(() => {
-               cache.Process(0, new Int32IncrementProcessor<int>());
+               testCache.Process(0, new Int32IncrementProcessor<int>());
                incrementCountdown.Signal();
             }, TaskCreationOptions.LongRunning);
          }
          incrementCountdown.Wait();
          for (var i = 0; i < 4; i++) {
-            logger.Info("Reading from cache " + i + ": " + cache[0]);
+            logger.Info("Reading from cache " + i + ": " + testCache[0]);
          }
+
+         testStringCache[0] = "Hello";
+         for (var i = 0; i < 100; i++) {
+            logger.Info("Reading from cache " + i + "...");
+            var value = testStringCache[0];
+            logger.Info("Read from cache " + i + ": " + value);
+            logger.Info("Appending 0 and writing...");
+            testStringCache[0] = value + "0";
+         }
+
+         logger.Info(testCache[0] + " " + testStringCache[0]);
 
          var latch = new CountdownEvent(1);
          latch.Wait();

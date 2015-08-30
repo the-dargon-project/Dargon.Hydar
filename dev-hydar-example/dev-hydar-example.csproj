@@ -139,7 +139,7 @@
     <Compile Include="Utilities\GuidHelper.cs" />
     <Compile Include="PartitionBlockInterval.cs" />
     <Compile Include="CacheRoot.cs" />
-    <Compile Include="ClusterClient.cs" />
+    <Compile Include="CacheDispatcher.cs" />
     <Compile Include="Keyspace.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
