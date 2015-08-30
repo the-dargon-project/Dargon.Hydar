@@ -131,14 +131,12 @@
     <Compile Include="CacheRoot.Subphase.Host.cs" />
     <Compile Include="PartitionBlockIntervalConverter.cs" />
     <Compile Include="Utilities\GuidHelper.cs" />
-    <Compile Include="_Unused\EpochState.cs" />
     <Compile Include="PartitionBlockInterval.cs" />
     <Compile Include="CacheRoot.cs" />
     <Compile Include="ClusterClient.cs" />
     <Compile Include="Keyspace.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="_Unused\HydarMessage.cs" />
     <Compile Include="CacheRoot.Subphase.Messenger.cs" />
     <None Include="packages.config" />
   </ItemGroup>
