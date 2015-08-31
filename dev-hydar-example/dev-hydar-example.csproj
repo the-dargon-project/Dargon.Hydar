@@ -120,30 +120,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CacheRoot.Data.cs" />
-    <Compile Include="CacheRoot.Messenger.cs" />
-    <Compile Include="CacheRoot.PhaseManager.cs" />
-    <Compile Include="CacheRoot.PhaseFactory.cs" />
-    <Compile Include="CacheRoot.Phases.Coordinator.cs" />
-    <Compile Include="CacheRoot.Phases.cs" />
-    <Compile Include="CacheRoot.Phases.Election.cs" />
-    <Compile Include="CacheRoot.Phases.Cohort.cs" />
-    <Compile Include="CacheRoot.Phases.Outsider.cs" />
-    <Compile Include="CacheRoot.Phases.Oblivious.cs" />
-    <Compile Include="CacheRoot.ServiceNode.cs" />
-    <Compile Include="CacheRoot.States.cs" />
-    <Compile Include="CacheRoot.Subphase.Host.cs" />
-    <Compile Include="HydarRyuPackage.cs" />
-    <Compile Include="HydarCachePofContext.cs" />
-    <Compile Include="PartitionBlockIntervalConverter.cs" />
-    <Compile Include="Utilities\GuidHelper.cs" />
-    <Compile Include="PartitionBlockInterval.cs" />
-    <Compile Include="CacheRoot.cs" />
-    <Compile Include="CacheDispatcher.cs" />
-    <Compile Include="Keyspace.cs" />
+    <Compile Include="HydarEgg.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CacheRoot.Subphase.Messenger.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +133,10 @@
     <ProjectReference Include="..\..\Dargon.Courier\Dargon.Courier\Dargon.Courier.Api.csproj">
       <Project>{00a1da2f-d316-4387-8bd4-f1a47c05a402}</Project>
       <Name>Dargon.Courier.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dargon.Hydar.Cache.Impl\Dargon.Hydar.Cache.Impl.csproj">
+      <Project>{bb6d28f4-1ee8-4ba6-9448-e992227abf51}</Project>
+      <Name>Dargon.Hydar.Cache.Impl</Name>
     </ProjectReference>
     <ProjectReference Include="..\Dargon.Hydar.Common.Api\Dargon.Hydar.Common.Api.csproj">
       <Project>{79b62103-6d47-4650-9868-5a22139cc750}</Project>

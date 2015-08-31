@@ -60,6 +60,7 @@
     <Compile Include="HydarCommonApiPofContext.cs" />
     <Compile Include="HydarCommonRyuPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\GuidHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

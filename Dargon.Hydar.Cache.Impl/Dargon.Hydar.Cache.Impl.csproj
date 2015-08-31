@@ -4,18 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E4A9BB0C-058D-48DF-9759-0066CB33CB73}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{BB6D28F4-1EE8-4BA6-9448-E992227ABF51}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>client_example</RootNamespace>
-    <AssemblyName>client-example</AssemblyName>
+    <RootNamespace>Dargon.Hydar.Cache</RootNamespace>
+    <AssemblyName>Dargon.Hydar.Cache.Api</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -25,7 +23,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -42,6 +39,10 @@
       <HintPath>..\packages\Dargon.Management.Api.0.1.2\lib\net45\Dargon.Management.Api.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Dargon.Management.Impl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dargon.Management.Impl.0.1.3\lib\net45\Dargon.Management.Impl.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Dargon.PortableObjects, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dargon.PortableObjects.0.2.0\lib\net45\Dargon.PortableObjects.dll</HintPath>
       <Private>True</Private>
@@ -51,11 +52,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Dargon.Ryu.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dargon.Ryu.Api.0.0.4\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\Dargon.Ryu.Api.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Dargon.Ryu.Impl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dargon.Ryu.Impl.0.1.3\lib\net45\Dargon.Ryu.Impl.dll</HintPath>
+      <HintPath>..\packages\Dargon.Ryu.Api.0.0.3\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\Dargon.Ryu.Api.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Dargon.Services.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -66,20 +63,12 @@
       <HintPath>..\packages\Dargon.Services.Impl.0.5.1\lib\net45\Dargon.Services.Impl.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ImpromptuInterface, Version=6.2.2.0, Culture=neutral, PublicKeyToken=0b1781c923b2975b, processorArchitecture=MSIL">
-      <HintPath>..\packages\ImpromptuInterface.6.2.2\lib\net40\ImpromptuInterface.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="ItzWarty.Commons, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ItzWarty.Commons.0.5.1\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\ItzWarty.Commons.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ItzWarty.Proxies.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ItzWarty.Proxies.Api.0.1.1\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\ItzWarty.Proxies.Api.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ItzWarty.Proxies.Impl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ItzWarty.Proxies.Impl.0.2.2\lib\net45\ItzWarty.Proxies.Impl.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Nito.AsyncEx, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -108,31 +97,87 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Data\Block.cs" />
+    <Compile Include="Data\CacheEntryContext.cs" />
+    <Compile Include="Data\EntryBlockTable.cs" />
+    <Compile Include="Data\EntryImpl.cs" />
+    <Compile Include="Data\EntryOperation.cs" />
+    <Compile Include="Data\EntryOperationBase.cs" />
+    <Compile Include="Data\EntryOperationGet.cs" />
+    <Compile Include="Data\EntryOperationProcess.cs" />
+    <Compile Include="Data\EntryOperationPut.cs" />
+    <Compile Include="Data\ExecutableEntryOperation.cs" />
+    <Compile Include="Data\ReadableEntryOperation.cs" />
+    <Compile Include="CacheDispatcher.cs" />
+    <Compile Include="CacheRoot.cs" />
+    <Compile Include="Data\CacheOperationsManager.cs" />
+    <Compile Include="Phases\CoordinatorPhaseBase.cs" />
+    <Compile Include="Phases\EpochPhaseBase.cs" />
+    <Compile Include="Phases\PhaseBase.cs" />
+    <Compile Include="Phases\PhaseFactory.cs" />
+    <Compile Include="Phases\PhaseManager.cs" />
+    <Compile Include="Phases\Cohort\CohortPartitionedPhase.cs" />
+    <Compile Include="Phases\Cohort\CohortRepartitioningCompletedPhase.cs" />
+    <Compile Include="Phases\Cohort\CohortRepartitioningPhase.cs" />
+    <Compile Include="Phases\Cohort\CohortRepartitionInitialPhase.cs" />
+    <Compile Include="Phases\Coordinator\CoordinatorPartitionedPhase.cs" />
+    <Compile Include="Phases\CohortPhaseBase.cs" />
+    <Compile Include="Phases\Coordinator\CoordinatorInitialPhase.cs" />
+    <Compile Include="Phases\Coordinator\CoordinatorPartitioningCompletingPhase.cs" />
+    <Compile Include="Phases\Coordinator\CoordinatorRepartitionPhase.cs" />
+    <Compile Include="Phases\Election\ElectionCandidatePhase.cs" />
+    <Compile Include="Phases\Oblivious\ObliviousPhase.cs" />
+    <Compile Include="Phases\Outsider\OutsiderPhase.cs" />
+    <Compile Include="Phases\Election\ElectionFollowerPhase.cs" />
+    <Compile Include="Phases\State\EpochState.cs" />
+    <Compile Include="Phases\State\LeaderState.cs" />
+    <Compile Include="Services\RemoteServiceContainer.cs" />
+    <Compile Include="Phases\State\CohortState.cs" />
+    <Compile Include="Phases\SubPhaseHost.cs" />
+    <Compile Include="Messaging\SubphasedMessageSender.cs" />
+    <Compile Include="HydarCachePofContext.cs" />
+    <Compile Include="HydarRyuPackage.cs" />
+    <Compile Include="Keyspace.cs" />
+    <Compile Include="Messaging\Messenger.cs" />
+    <Compile Include="PortableObjects\BlockTransferResult.cs" />
+    <Compile Include="PortableObjects\CacheHaveDto.cs" />
+    <Compile Include="PortableObjects\CacheNeedDto.cs" />
+    <Compile Include="PortableObjects\CohortHeartbeatDto.cs" />
+    <Compile Include="PortableObjects\CohortPartitioningState.cs" />
+    <Compile Include="PortableObjects\CohortRepartitionCompletionDto.cs" />
+    <Compile Include="PortableObjects\ElectionVoteDto.cs" />
+    <Compile Include="PortableObjects\HydarCacheMessageBase.cs" />
+    <Compile Include="PortableObjects\HydarServiceDescriptor.cs" />
+    <Compile Include="PortableObjects\LeaderHeartbeatDto.cs" />
+    <Compile Include="PortableObjects\LeaderRepartitionCompletingDto.cs" />
+    <Compile Include="PortableObjects\LeaderRepartitionSignalDto.cs" />
+    <Compile Include="PortableObjects\OutsiderAnnounceDto.cs" />
+    <Compile Include="PortableObjects\PartitionBlockInterval.cs" />
+    <Compile Include="PartitionBlockIntervalConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\CacheService.cs" />
+    <Compile Include="Services\CacheServiceImpl.cs" />
+    <Compile Include="Services\ClientCacheService.cs" />
+    <Compile Include="Services\InterCacheService.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dargon.Hydar.Cache.Impl\Dargon.Hydar.Cache.Impl.csproj">
-      <Project>{bb6d28f4-1ee8-4ba6-9448-e992227abf51}</Project>
-      <Name>Dargon.Hydar.Cache.Impl</Name>
+    <ProjectReference Include="..\..\Dargon.Courier\Dargon.Courier.Impl\Dargon.Courier.Impl.csproj">
+      <Project>{648271D2-2A52-4496-A9D1-6E54353D1448}</Project>
+      <Name>Dargon.Courier.Impl</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Dargon.Hydar.Client.Api\Dargon.Hydar.Client.Api.csproj">
-      <Project>{74EB9821-34A6-445A-A9E8-40F035CCD582}</Project>
-      <Name>Dargon.Hydar.Client.Api</Name>
+    <ProjectReference Include="..\..\Dargon.Courier\Dargon.Courier\Dargon.Courier.Api.csproj">
+      <Project>{00A1DA2F-D316-4387-8BD4-F1A47C05A402}</Project>
+      <Name>Dargon.Courier.Api</Name>
     </ProjectReference>
     <ProjectReference Include="..\Dargon.Hydar.Common.Api\Dargon.Hydar.Common.Api.csproj">
       <Project>{79B62103-6D47-4650-9868-5A22139CC750}</Project>
       <Name>Dargon.Hydar.Common.Api</Name>
     </ProjectReference>
-    <ProjectReference Include="..\dev-hydar-example\dev-hydar-example.csproj">
-      <Project>{17d7db40-5a07-4b49-8523-c0e2f5655d13}</Project>
-      <Name>dev-hydar-example</Name>
-    </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

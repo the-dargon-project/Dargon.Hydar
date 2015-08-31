@@ -1,7 +1,6 @@
 ﻿using Castle.DynamicProxy;
 using Dargon.Hydar;
 using Dargon.Hydar.Client;
-using Dargon.Hydar.Utilities;
 using Dargon.Ryu;
 using Dargon.Services;
 using ItzWarty;
@@ -10,7 +9,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dargon.Hydar.Cache;
+using Dargon.Hydar.Cache.Services;
 using Dargon.Hydar.Common;
+using Dargon.Hydar.Common.Utilities;
 using NLog;
 using SCG = System.Collections.Generic;
 
@@ -38,11 +40,11 @@ namespace client_example {
          logger.Info("Running client operations.");
          var serviceClientFactory = ryu.Get<IServiceClientFactory>();
          var serviceClients = Util.Generate(4, i => serviceClientFactory.CreateOrJoin(new ClusteringConfiguration(32001 + i, 0, ClusteringRoleFlags.GuestOnly)));
-         var testCacheServices = Util.Generate(serviceClients.Length, i => serviceClients[i].GetService<CacheRoot<int, int>.ClientCacheService>(testCacheGuid));
-         var testCache = new ClientCacheImpl<int, int>(proxyGenerator.CreateInterfaceProxyWithoutTarget<CacheRoot<int, int>.ClientCacheService>(new RoundRobinServiceProxyInterceptorImpl<CacheRoot<int, int>.ClientCacheService>(testCacheServices)));
+         var testCacheServices = Util.Generate(serviceClients.Length, i => serviceClients[i].GetService<ClientCacheService<int, int>>(testCacheGuid));
+         var testCache = new ClientCacheImpl<int, int>(proxyGenerator.CreateInterfaceProxyWithoutTarget<ClientCacheService<int, int>>(new RoundRobinServiceProxyInterceptorImpl<ClientCacheService<int, int>>(testCacheServices)));
 
-         var testStringCacheServices = Util.Generate(serviceClients.Length, i => serviceClients[i].GetService<CacheRoot<int, string>.ClientCacheService>(testStringCacheGuid));
-         var testStringCache = new ClientCacheImpl<int, string>(proxyGenerator.CreateInterfaceProxyWithoutTarget<CacheRoot<int, string>.ClientCacheService>(new RoundRobinServiceProxyInterceptorImpl<CacheRoot<int, string>.ClientCacheService>(testStringCacheServices)));
+         var testStringCacheServices = Util.Generate(serviceClients.Length, i => serviceClients[i].GetService<ClientCacheService<int, string>>(testStringCacheGuid));
+         var testStringCache = new ClientCacheImpl<int, string>(proxyGenerator.CreateInterfaceProxyWithoutTarget<ClientCacheService<int, string>>(new RoundRobinServiceProxyInterceptorImpl<ClientCacheService<int, string>>(testStringCacheServices)));
 
          testCache[0] = 1337;
          for (var i = 0; i < 10; i++) {
@@ -116,9 +118,9 @@ namespace client_example {
       }
 
       public class ClientCacheImpl<TKey, TValue> : Cache<TKey, TValue> {
-         private readonly CacheRoot<TKey, TValue>.ClientCacheService cacheService;
+         private readonly ClientCacheService<TKey, TValue> cacheService;
 
-         public ClientCacheImpl(CacheRoot<TKey, TValue>.ClientCacheService cacheService) {
+         public ClientCacheImpl(ClientCacheService<TKey, TValue> cacheService) {
             this.cacheService = cacheService;
          }
 
