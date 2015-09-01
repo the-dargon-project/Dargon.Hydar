@@ -4,16 +4,18 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{74EB9821-34A6-445A-A9E8-40F035CCD582}</ProjectGuid>
+    <ProjectGuid>{5531CE02-C3D2-4690-B33B-0F64A317C72E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Dargon.Hydar.Client</RootNamespace>
-    <AssemblyName>Dargon.Hydar.Client.Api</AssemblyName>
+    <RootNamespace>Dargon.Platform.Accounts</RootNamespace>
+    <AssemblyName>Dargon.Platform.Accounts.Api</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,6 +25,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -30,17 +33,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dargon.PortableObjects, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Dargon.PortableObjects">
       <HintPath>..\packages\Dargon.PortableObjects.0.2.0\lib\net45\Dargon.PortableObjects.dll</HintPath>
-      <Private>True</Private>
     </Reference>
-    <Reference Include="ItzWarty.Commons, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ItzWarty.Commons.0.1.1\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\ItzWarty.Commons.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ItzWarty.Proxies.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ItzWarty.Proxies.Api.0.1.0\lib\net45\ItzWarty.Proxies.Api.dll</HintPath>
+    <Reference Include="Dargon.Ryu.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dargon.Ryu.Api.0.0.4\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\Dargon.Ryu.Api.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -53,15 +54,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccountCreationService.cs" />
+    <Compile Include="AccountIdTakenException.cs" />
+    <Compile Include="AccountService.cs" />
+    <Compile Include="Domain\AccountsApiDomainPofContext.cs" />
+    <Compile Include="DargonPlatformAccountsApiRyuPackage.cs" />
+    <Compile Include="Domain\Account.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dargon.Hydar.Common.Api\Dargon.Hydar.Common.Api.csproj">
-      <Project>{79b62103-6d47-4650-9868-5a22139cc750}</Project>
-      <Name>Dargon.Hydar.Common.Api</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

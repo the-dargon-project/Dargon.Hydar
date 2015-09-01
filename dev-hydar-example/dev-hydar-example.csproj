@@ -47,7 +47,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Dargon.Management.Impl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dargon.Management.Impl.0.1.3\lib\net45\Dargon.Management.Impl.dll</HintPath>
+      <HintPath>..\packages\Dargon.Management.Impl.0.2.0\lib\net45\Dargon.Management.Impl.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Dargon.Nest.Egg.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -66,16 +66,24 @@
       <HintPath>..\packages\Dargon.Ryu.Api.0.0.4\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\Dargon.Ryu.Api.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Dargon.Ryu.Impl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dargon.Ryu.Impl.0.1.3\lib\net45\Dargon.Ryu.Impl.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Dargon.Services.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dargon.Services.Api.0.5.0\lib\net45\Dargon.Services.Api.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Dargon.Services.Impl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dargon.Services.Impl.0.5.1\lib\net45\Dargon.Services.Impl.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Dargon.SystemState.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dargon.SystemState.Api.0.1.1\lib\net45\Dargon.SystemState.Api.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Dargon.Zilean.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dargon.Zilean.Api.0.0.0\lib\net45\Dargon.Zilean.Api.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Dargon.Zilean.Client.Impl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dargon.Zilean.Client.Impl.0.0.0\lib\net45\Dargon.Zilean.Client.Impl.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ImpromptuInterface, Version=6.2.2.0, Culture=neutral, PublicKeyToken=0b1781c923b2975b, processorArchitecture=MSIL">
@@ -106,8 +114,8 @@
       <HintPath>..\packages\Nito.AsyncEx.3.0.0\lib\net45\Nito.AsyncEx.Enlightenment.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NLog, Version=3.1.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.3.1.0.0\lib\net45\NLog.dll</HintPath>
+    <Reference Include="NLog, Version=3.2.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.3.2.0.0\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -121,8 +129,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HydarEgg.cs" />
+    <Compile Include="PlatformSystemStateImpl.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -134,6 +144,14 @@
       <Project>{00a1da2f-d316-4387-8bd4-f1a47c05a402}</Project>
       <Name>Dargon.Courier.Api</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Dargon.Ryu\Dargon.Ryu.Impl\Dargon.Ryu.Impl.csproj">
+      <Project>{2ed5c703-8a91-4701-9ae9-da86aa93a169}</Project>
+      <Name>Dargon.Ryu.Impl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dargon.Hydar.Cache.Api\Dargon.Hydar.Cache.Api.csproj">
+      <Project>{7c04d8de-120d-4cc1-9d2c-6b94175a594c}</Project>
+      <Name>Dargon.Hydar.Cache.Api</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dargon.Hydar.Cache.Impl\Dargon.Hydar.Cache.Impl.csproj">
       <Project>{bb6d28f4-1ee8-4ba6-9448-e992227abf51}</Project>
       <Name>Dargon.Hydar.Cache.Impl</Name>
@@ -141,6 +159,10 @@
     <ProjectReference Include="..\Dargon.Hydar.Common.Api\Dargon.Hydar.Common.Api.csproj">
       <Project>{79b62103-6d47-4650-9868-5a22139cc750}</Project>
       <Name>Dargon.Hydar.Common.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dargon.Platform.Accounts.Impl\Dargon.Platform.Accounts.Impl.csproj">
+      <Project>{e8c8322c-7e03-46d2-bea1-1285ecff8a63}</Project>
+      <Name>Dargon.Platform.Accounts.Impl</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

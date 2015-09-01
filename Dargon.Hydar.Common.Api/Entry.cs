@@ -8,7 +8,7 @@
    }
 
    public static class EntryExtensions {
-      public static void FlagAsDirty<TKey, TValue>(Entry<TKey, TValue> entry) {
+      public static void FlagAsDirty<TKey, TValue>(this Entry<TKey, TValue> entry) {
          entry.IsDirty = true;
       }
    }

@@ -8,7 +8,6 @@ using Dargon.Hydar.Cache.Services;
 namespace Dargon.Hydar.Cache.Phases {
    public abstract class PhaseBase<TKey, TValue> {
       public Guid LocalIdentifier { get; set; }
-      public CacheRoot<TKey, TValue> CacheRoot { get; set; }
       public PhaseManager<TKey, TValue> PhaseManager { get; set; }
       public PhaseFactory<TKey, TValue> PhaseFactory { get; set; }
       public MessageRouter Router { get; set; }

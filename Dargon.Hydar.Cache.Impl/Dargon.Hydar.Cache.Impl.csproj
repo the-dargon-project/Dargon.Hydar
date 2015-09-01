@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Dargon.Hydar.Cache</RootNamespace>
-    <AssemblyName>Dargon.Hydar.Cache.Api</AssemblyName>
+    <AssemblyName>Dargon.Hydar.Cache.Impl</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -97,7 +97,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CacheFactory.cs" />
+    <Compile Include="CacheConfiguration.cs" />
+    <Compile Include="CacheDispatcherImpl.cs" />
+    <Compile Include="CacheFactoryImpl.cs" />
+    <Compile Include="Data\Operations\EntryOperationTryGet.cs" />
     <Compile Include="Management\CacheMob.cs" />
     <Compile Include="Data\Partitioning\Block.cs" />
     <Compile Include="Data\Entries\CacheEntryContext.cs" />
@@ -110,8 +113,7 @@
     <Compile Include="Data\Operations\EntryOperationPut.cs" />
     <Compile Include="Data\Operations\ExecutableEntryOperation.cs" />
     <Compile Include="Data\Operations\ReadableEntryOperation.cs" />
-    <Compile Include="CacheDispatcher.cs" />
-    <Compile Include="CacheRoot.cs" />
+    <Compile Include="CacheRootImpl.cs" />
     <Compile Include="Data\Operations\CacheOperationsManager.cs" />
     <Compile Include="Phases\CoordinatorPhaseBase.cs" />
     <Compile Include="Phases\EpochPhaseBase.cs" />
@@ -133,6 +135,7 @@
     <Compile Include="Phases\Election\ElectionFollowerPhase.cs" />
     <Compile Include="Phases\States\EpochState.cs" />
     <Compile Include="Phases\States\LeaderState.cs" />
+    <Compile Include="PortableObjects\EntryTryGetResult.cs" />
     <Compile Include="Services\RemoteServiceContainer.cs" />
     <Compile Include="Phases\States\CohortState.cs" />
     <Compile Include="Phases\SubPhaseHost.cs" />
@@ -173,6 +176,10 @@
     <ProjectReference Include="..\..\Dargon.Courier\Dargon.Courier\Dargon.Courier.Api.csproj">
       <Project>{00A1DA2F-D316-4387-8BD4-F1A47C05A402}</Project>
       <Name>Dargon.Courier.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dargon.Hydar.Cache.Api\Dargon.Hydar.Cache.Api.csproj">
+      <Project>{7c04d8de-120d-4cc1-9d2c-6b94175a594c}</Project>
+      <Name>Dargon.Hydar.Cache.Api</Name>
     </ProjectReference>
     <ProjectReference Include="..\Dargon.Hydar.Common.Api\Dargon.Hydar.Common.Api.csproj">
       <Project>{79B62103-6D47-4650-9868-5A22139CC750}</Project>

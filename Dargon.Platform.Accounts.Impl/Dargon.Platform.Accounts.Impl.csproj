@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{74EB9821-34A6-445A-A9E8-40F035CCD582}</ProjectGuid>
+    <ProjectGuid>{E8C8322C-7E03-46D2-BEA1-1285ECFF8A63}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Dargon.Hydar.Client</RootNamespace>
-    <AssemblyName>Dargon.Hydar.Client.Api</AssemblyName>
+    <RootNamespace>Dargon.Platform.Accounts</RootNamespace>
+    <AssemblyName>Dargon.Platform.Accounts.Impl</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -31,16 +31,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dargon.PortableObjects, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Dargon.PortableObjects">
       <HintPath>..\packages\Dargon.PortableObjects.0.2.0\lib\net45\Dargon.PortableObjects.dll</HintPath>
+    </Reference>
+    <Reference Include="Dargon.Ryu.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dargon.Ryu.Api.0.0.4\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\Dargon.Ryu.Api.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ItzWarty.Commons, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ItzWarty.Commons.0.1.1\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\ItzWarty.Commons.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ItzWarty.Proxies.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ItzWarty.Proxies.Api.0.1.0\lib\net45\ItzWarty.Proxies.Api.dll</HintPath>
+    <Reference Include="Dargon.Zilean.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dargon.Zilean.Api.0.0.0\lib\net45\Dargon.Zilean.Api.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -53,16 +52,32 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccountCreationServiceImpl.cs" />
+    <Compile Include="AccountServiceProxyImpl.cs" />
+    <Compile Include="DargonPlatformAccountsImplRyuPackage.cs" />
+    <Compile Include="Hydar\AccountsImplHydarPofContext.cs" />
+    <Compile Include="Hydar\Caches.cs" />
+    <Compile Include="Hydar\Processors\AccountAuthenticationProcessor.cs" />
+    <Compile Include="Hydar\Processors\AccountCreationProcessor.cs" />
+    <Compile Include="Hydar\Processors\AccountProcessorFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Dargon.Hydar.Common.Api\Dargon.Hydar.Common.Api.csproj">
-      <Project>{79b62103-6d47-4650-9868-5a22139cc750}</Project>
-      <Name>Dargon.Hydar.Common.Api</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\Dargon.Hydar.Cache.Api\Dargon.Hydar.Cache.Api.csproj">
+      <Project>{7C04D8DE-120D-4CC1-9D2C-6B94175A594C}</Project>
+      <Name>Dargon.Hydar.Cache.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dargon.Hydar.Common.Api\Dargon.Hydar.Common.Api.csproj">
+      <Project>{79B62103-6D47-4650-9868-5A22139CC750}</Project>
+      <Name>Dargon.Hydar.Common.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dargon.Platform.Accounts.Api\Dargon.Platform.Accounts.Api.csproj">
+      <Project>{5531CE02-C3D2-4690-B33B-0F64A317C72E}</Project>
+      <Name>Dargon.Platform.Accounts.Api</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -28,6 +28,11 @@ namespace Dargon.Hydar.Cache.Services {
          return cacheOperationsManager.EnqueueAndAwaitResults(operation).Result;
       }
 
+      public EntryTryGetResult<TValue> TryGet(TKey key) {
+         var operation = new EntryOperationTryGet<TKey, TValue>(key);
+         return cacheOperationsManager.EnqueueAndAwaitResults(operation).Result;
+      }
+
       public TValue Get(TKey key) {
          var operation = new EntryOperationGet<TKey, TValue>(key);
          return cacheOperationsManager.EnqueueAndAwaitResults(operation).Result;

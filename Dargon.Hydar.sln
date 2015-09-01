@@ -17,6 +17,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Hydar.Common.Api", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Hydar.Cache.Impl", "Dargon.Hydar.Cache.Impl\Dargon.Hydar.Cache.Impl.csproj", "{BB6D28F4-1EE8-4BA6-9448-E992227ABF51}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Platform.Accounts.Api", "Dargon.Platform.Accounts.Api\Dargon.Platform.Accounts.Api.csproj", "{5531CE02-C3D2-4690-B33B-0F64A317C72E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Hydar.Cache.Api", "Dargon.Hydar.Cache.Api\Dargon.Hydar.Cache.Api.csproj", "{7C04D8DE-120D-4CC1-9D2C-6B94175A594C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Platform.Accounts.Impl", "Dargon.Platform.Accounts.Impl\Dargon.Platform.Accounts.Impl.csproj", "{E8C8322C-7E03-46D2-BEA1-1285ECFF8A63}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Ryu.Impl", "..\Dargon.Ryu\Dargon.Ryu.Impl\Dargon.Ryu.Impl.csproj", "{2ED5C703-8A91-4701-9AE9-DA86AA93A169}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +59,22 @@ Global
 		{BB6D28F4-1EE8-4BA6-9448-E992227ABF51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB6D28F4-1EE8-4BA6-9448-E992227ABF51}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB6D28F4-1EE8-4BA6-9448-E992227ABF51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5531CE02-C3D2-4690-B33B-0F64A317C72E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5531CE02-C3D2-4690-B33B-0F64A317C72E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5531CE02-C3D2-4690-B33B-0F64A317C72E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5531CE02-C3D2-4690-B33B-0F64A317C72E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C04D8DE-120D-4CC1-9D2C-6B94175A594C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C04D8DE-120D-4CC1-9D2C-6B94175A594C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C04D8DE-120D-4CC1-9D2C-6B94175A594C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C04D8DE-120D-4CC1-9D2C-6B94175A594C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8C8322C-7E03-46D2-BEA1-1285ECFF8A63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8C8322C-7E03-46D2-BEA1-1285ECFF8A63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8C8322C-7E03-46D2-BEA1-1285ECFF8A63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8C8322C-7E03-46D2-BEA1-1285ECFF8A63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2ED5C703-8A91-4701-9AE9-DA86AA93A169}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2ED5C703-8A91-4701-9AE9-DA86AA93A169}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2ED5C703-8A91-4701-9AE9-DA86AA93A169}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2ED5C703-8A91-4701-9AE9-DA86AA93A169}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

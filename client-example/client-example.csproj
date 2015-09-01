@@ -116,6 +116,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dargon.Hydar.Cache.Api\Dargon.Hydar.Cache.Api.csproj">
+      <Project>{7C04D8DE-120D-4CC1-9D2C-6B94175A594C}</Project>
+      <Name>Dargon.Hydar.Cache.Api</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dargon.Hydar.Cache.Impl\Dargon.Hydar.Cache.Impl.csproj">
       <Project>{bb6d28f4-1ee8-4ba6-9448-e992227abf51}</Project>
       <Name>Dargon.Hydar.Cache.Impl</Name>

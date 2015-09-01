@@ -1,15 +1,15 @@
-﻿using System;
+using System;
 using Dargon.Courier.Messaging;
 using Dargon.Hydar.Cache.PortableObjects;
 using ItzWarty.Collections;
 
 namespace Dargon.Hydar.Cache {
-   public class CacheDispatcher {
-      private readonly IConcurrentSet<ICacheRoot> caches = new ConcurrentSet<ICacheRoot>();
-      private readonly IConcurrentDictionary<Guid, ICacheRoot> cachesById = new ConcurrentDictionary<Guid, ICacheRoot>();
+   public class CacheDispatcherImpl : CacheDispatcher {
+      private readonly IConcurrentSet<CacheRoot> caches = new ConcurrentSet<CacheRoot>();
+      private readonly IConcurrentDictionary<Guid, CacheRoot> cachesById = new ConcurrentDictionary<Guid, CacheRoot>();
       private readonly MessageRouter messageRouter;
 
-      public CacheDispatcher(MessageRouter messageRouter) {
+      public CacheDispatcherImpl(MessageRouter messageRouter) {
          this.messageRouter = messageRouter;
       }
 
@@ -29,7 +29,7 @@ namespace Dargon.Hydar.Cache {
          var cacheMessage = message.Payload as HydarCacheMessageBase;
          if (cacheMessage != null) {
             var cacheId = cacheMessage.CacheId;
-            ICacheRoot cacheRoot;
+            CacheRoot cacheRoot;
             if (cachesById.TryGetValue(cacheId, out cacheRoot)) {
                cacheRoot.Dispatch(message);
             }
@@ -38,20 +38,9 @@ namespace Dargon.Hydar.Cache {
          }
       }
 
-      public void AddCache<TKey, TValue>(CacheRoot<TKey, TValue> cache) {
+      public void RegisterCache(CacheRoot cache) {
          caches.Add(cache);
          cachesById.Add(cache.Id, cache);
       }
-   }
-
-   public class CacheConfiguration {
-      public string Name { get; set; }
-
-      /// <summary>
-      /// Gets the GUID of the cache, which is equivalent to the MD5 of the cache's name.
-      /// </summary>
-      public Guid Guid { get; set; }
-
-      public int ServicePort { get; set; }
    }
 }

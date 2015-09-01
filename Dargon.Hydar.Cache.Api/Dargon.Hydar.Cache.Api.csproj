@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{74EB9821-34A6-445A-A9E8-40F035CCD582}</ProjectGuid>
+    <ProjectGuid>{7C04D8DE-120D-4CC1-9D2C-6B94175A594C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Dargon.Hydar.Client</RootNamespace>
-    <AssemblyName>Dargon.Hydar.Client.Api</AssemblyName>
+    <RootNamespace>Dargon.Hydar.Cache</RootNamespace>
+    <AssemblyName>Dargon.Hydar.Cache.Api</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -53,9 +53,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cache.cs" />
+    <Compile Include="CacheDispatcher.cs" />
+    <Compile Include="CacheFactory.cs" />
+    <Compile Include="CacheRoot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Dargon.Courier\Dargon.Courier\Dargon.Courier.Api.csproj">
+      <Project>{00A1DA2F-D316-4387-8BD4-F1A47C05A402}</Project>
+      <Name>Dargon.Courier.Api</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dargon.Hydar.Common.Api\Dargon.Hydar.Common.Api.csproj">
       <Project>{79b62103-6d47-4650-9868-5a22139cc750}</Project>
       <Name>Dargon.Hydar.Common.Api</Name>

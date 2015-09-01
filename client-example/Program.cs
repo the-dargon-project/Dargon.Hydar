@@ -1,20 +1,17 @@
 ﻿using Castle.DynamicProxy;
-using Dargon.Hydar;
-using Dargon.Hydar.Client;
+using Dargon.Hydar.Cache.Services;
+using Dargon.Hydar.Common;
+using Dargon.Hydar.Common.Utilities;
 using Dargon.Ryu;
 using Dargon.Services;
 using ItzWarty;
 using ItzWarty.Collections;
+using NLog;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Dargon.Hydar.Cache;
-using Dargon.Hydar.Cache.Services;
-using Dargon.Hydar.Common;
-using Dargon.Hydar.Common.Utilities;
-using NLog;
-using SCG = System.Collections.Generic;
+using Dargon.Hydar.Client;
 
 namespace client_example {
    public static class Program {

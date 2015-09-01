@@ -3,14 +3,20 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Dargon.Courier;
+using Dargon.Courier.Messaging;
 using Dargon.Hydar.Cache;
 using Dargon.Hydar.Cache.Messaging;
 using Dargon.Management;
 using Dargon.Management.Server;
 using Dargon.Nest.Egg;
+using Dargon.Platform.Accounts;
+using Dargon.PortableObjects;
 using Dargon.Ryu;
 using Dargon.Services;
+using Dargon.Zilean.Client;
+using ItzWarty;
 using ItzWarty.Networking;
+using NLog;
 
 namespace Dargon.Hydar {
    public class HydarEgg : INestApplicationEgg {
@@ -19,6 +25,7 @@ namespace Dargon.Hydar {
 
       public HydarEgg() {
          ryu = new RyuFactory().Create();
+         ((RyuContainerImpl)ryu).SetLoggerEnabled(true);
       }
 
       public NestResult Start(IEggParameters parameters) {
@@ -26,18 +33,14 @@ namespace Dargon.Hydar {
       }
 
       public NestResult Start(int servicePort, int managementPort) {
-         ryu.Setup();
-
-         var networkingProxy = ryu.Get<INetworkingProxy>();
+         ryu.Touch<ItzWartyProxiesRyuPackage>();
 
          // Dargon.Management
-         var managementServerEndpoint = networkingProxy.CreateAnyEndPoint(managementPort);
-         var managementFactory = ryu.Get<ManagementFactoryImpl>();
-         var localManagementServer = managementFactory.CreateServer(new ManagementServerConfiguration(managementServerEndpoint));
-         ryu.Set<ILocalManagementServer>(localManagementServer);
-         keepalive.Add(localManagementServer);
+         var managementServerEndpoint = ryu.Get<INetworkingProxy>().CreateAnyEndPoint(managementPort);
+         ryu.Set<IManagementServerConfiguration>(new ManagementServerConfiguration(managementServerEndpoint));
 
          // Dargon.Services for node-to-node networking
+         ryu.Touch<ServicesRyuPackage>();
          var clusteringConfiguration = new ClusteringConfiguration(servicePort, 1000, ClusteringRoleFlags.HostOnly);
          ryu.Set<IClusteringConfiguration>(clusteringConfiguration);
          var serviceClient = ryu.Get<IServiceClient>();
@@ -48,17 +51,25 @@ namespace Dargon.Hydar {
          var courierClientFactory = ryu.Get<CourierClientFactory>();
          var courierClient = courierClientFactory.CreateUdpCourierClient(courierPort);
          ryu.Set<CourierClient>(courierClient);
-         
-         // Dargon.Courier for clustered networking
-         Console.Title = "PID " + Process.GetCurrentProcess().Id + ": " + courierClient.Identifier.ToString("N");
+         ryu.Set<MessageRouter>(courierClient);
 
          // Initialize Hydar Cache
-         var cacheFactory = ryu.Get<CacheFactory>();
+         ryu.Touch<HydarRyuPackage>();
+         var cacheFactory = ryu.Get<CacheFactoryImpl>();
          cacheFactory.SetServicePort(servicePort);
-         var cacheDispatcher = new CacheDispatcher(courierClient.MessageRouter);
-         cacheDispatcher.Initialize();
-         cacheDispatcher.AddCache(cacheFactory.Create<int, int>("test-cache"));
-         cacheDispatcher.AddCache(cacheFactory.Create<int, string>("test-string-cache"));
+
+         ryu.Set<SystemState>(new PlatformSystemStateImpl());
+         ryu.Setup();
+         ryu.Touch<ZileanClientApiRyuPackage>();
+         ryu.Touch<DargonPlatformAccountsImplRyuPackage>();
+
+         Console.WriteLine("Initialized!");
+
+         // Dargon.Courier for clustered networking
+//         Console.Title = "PID " + Process.GetCurrentProcess().Id + ": " + courierClient.Identifier.ToString("N");
+
+//         cacheDispatcher.AddCache(cacheFactory.Create<int, int>("test-cache"));
+//         cacheDispatcher.AddCache(cacheFactory.Create<int, string>("test-string-cache"));
 
          new CountdownEvent(1).Wait();
          return NestResult.Success;

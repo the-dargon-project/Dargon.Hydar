@@ -1,5 +1,3 @@
-using System.Net;
-using System.Threading;
 using Dargon.Courier;
 using Dargon.Courier.Identities;
 using Dargon.Courier.Messaging;
@@ -16,9 +14,12 @@ using Dargon.PortableObjects;
 using Dargon.Services;
 using ItzWarty;
 using ItzWarty.Collections;
+using System.Net;
+using System.Threading;
+using Dargon.Management;
 
 namespace Dargon.Hydar.Cache {
-   public class CacheFactory {
+   public class CacheFactoryImpl : CacheFactory {
       private const string kCacheMobNamePrefix = "@Hydar.";
 
       private readonly GuidHelper guidHelper;
@@ -30,7 +31,7 @@ namespace Dargon.Hydar.Cache {
       private readonly IPofContext pofContext;
       private int servicePort;
 
-      public CacheFactory(GuidHelper guidHelper, IServiceClientFactory serviceClientFactory, IServiceClient serviceClient, CourierClient courierClient, ILocalManagementServer localManagementServer, ReceivedMessageFactory receivedMessageFactory, IPofContext pofContext) {
+      public CacheFactoryImpl(GuidHelper guidHelper, IServiceClientFactory serviceClientFactory, IServiceClient serviceClient, CourierClient courierClient, ILocalManagementServer localManagementServer, ReceivedMessageFactory receivedMessageFactory, IPofContext pofContext) {
          this.guidHelper = guidHelper;
          this.serviceClientFactory = serviceClientFactory;
          this.serviceClient = serviceClient;
@@ -66,15 +67,15 @@ namespace Dargon.Hydar.Cache {
          var keyspace = new Keyspace(1024, 1);
          var messenger = new Messenger<TKey, TValue>(cacheGuid, messageSender, cacheConfiguration);
          var phaseManager = new PhaseManagerImpl<TKey, TValue>();
-         var cacheRoot = new CacheRoot<TKey, TValue>(cacheName, cacheGuid, phaseManager);
          var blocks = Util.Generate(keyspace.BlockCount, blockId => new Block<TKey, TValue>(blockId));
          var blockTable = new EntryBlockTable<TKey, TValue>(keyspace, blocks);
          var cacheOperationsManager = new CacheOperationsManager<TKey, TValue>(keyspace, blockTable, remoteServiceContainer);
-         var phaseFactory = new PhaseFactory<TKey, TValue>(receivedMessageFactory, cacheGuid, localEndpoint.Identifier, keyspace, cacheConfiguration, cacheRoot, phaseManager, messenger, remoteServiceContainer, blockTable, cacheOperationsManager, peerRegistry);
+         var phaseFactory = new PhaseFactory<TKey, TValue>(receivedMessageFactory, cacheGuid, localEndpoint.Identifier, keyspace, cacheConfiguration, phaseManager, messenger, remoteServiceContainer, blockTable, cacheOperationsManager, peerRegistry);
          var cacheService = new CacheServiceImpl<TKey, TValue>(cacheOperationsManager);
          serviceClient.RegisterService(cacheService, typeof(CacheService<TKey, TValue>), cacheGuid);
          phaseManager.Transition(phaseFactory.Oblivious());
 
+//         localManagementServer.RegisterInstance(new TrashMob());
          localManagementServer.RegisterContext(new ManagementContext(new CacheMob<TKey, TValue>(cacheOperationsManager), cacheGuid, kCacheMobNamePrefix + cacheName, pofContext));
 
          new Thread(() => {
@@ -83,8 +84,13 @@ namespace Dargon.Hydar.Cache {
                Thread.Sleep(100);
             }
          }).Start();
-
-         return cacheRoot;
+         
+         return new CacheRootImpl<TKey, TValue>(cacheName, cacheGuid, phaseManager, cacheService);
       }
+   }
+
+   public class TrashMob {
+      [ManagedProperty]
+      public string HelloWorld { get; set; }
    }
 }
