@@ -1,5 +1,6 @@
 ﻿using System;
-using Dargon.Hydar.Cache.Phases.State;
+using Dargon.Hydar.Cache.Data.Partitioning;
+using Dargon.Hydar.Cache.Phases.States;
 using NLog;
 
 namespace Dargon.Hydar.Cache.Phases {

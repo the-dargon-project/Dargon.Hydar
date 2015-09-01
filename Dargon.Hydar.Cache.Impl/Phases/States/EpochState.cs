@@ -1,6 +1,7 @@
 ﻿using System;
+using Dargon.Hydar.Cache.Data.Partitioning;
 
-namespace Dargon.Hydar.Cache.Phases.State {
+namespace Dargon.Hydar.Cache.Phases.States {
    public class EpochState<TKey, TValue> {
       public Guid EpochId { get; set; }
       public Guid Leader { get; set; }

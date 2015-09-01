@@ -1,9 +1,10 @@
 using System.Threading.Tasks;
+using Dargon.Hydar.Cache.Data.Operations;
 using Dargon.Hydar.Common;
 using ItzWarty.Collections;
 using Nito.AsyncEx;
 
-namespace Dargon.Hydar.Cache.Data {
+namespace Dargon.Hydar.Cache.Data.Entries {
    public class CacheEntryContext<TKey, TValue> {
       private readonly IConcurrentQueue<ExecutableEntryOperation<TKey, TValue>> readOperationQueue = new ConcurrentQueue<ExecutableEntryOperation<TKey, TValue>>();
       private readonly IConcurrentQueue<ExecutableEntryOperation<TKey, TValue>> nonreadOperationQueue = new ConcurrentQueue<ExecutableEntryOperation<TKey, TValue>>();

@@ -1,7 +1,7 @@
-﻿using Dargon.Courier.Messaging;
-using ItzWarty.Collections;
-using System;
+﻿using System;
+using Dargon.Courier.Messaging;
 using Dargon.Hydar.Cache.PortableObjects;
+using ItzWarty.Collections;
 
 namespace Dargon.Hydar.Cache.Messaging {
    public class Messenger<TKey, TValue> {

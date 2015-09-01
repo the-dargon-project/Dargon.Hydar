@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Dargon.Hydar.Cache.PortableObjects;
 using ItzWarty.Collections;
 
-namespace Dargon.Hydar.Cache {
+namespace Dargon.Hydar.Cache.PortableObjects.Helpers {
    public interface PartitionBlockIntervalConverter {
       IUniqueIdentificationSet ConvertToUidSet(PartitionBlockInterval[] intervals);
       PartitionBlockInterval[] ConvertToPartitionBlockIntervals(IUniqueIdentificationSet set);

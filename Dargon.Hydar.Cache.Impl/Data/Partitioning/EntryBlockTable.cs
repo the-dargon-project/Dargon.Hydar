@@ -1,7 +1,9 @@
 ﻿using System.Threading.Tasks;
+using Dargon.Hydar.Cache.Data.Entries;
+using Dargon.Hydar.Cache.Data.Operations;
 using ItzWarty.Collections;
 
-namespace Dargon.Hydar.Cache.Data {
+namespace Dargon.Hydar.Cache.Data.Partitioning {
    public class EntryBlockTable<TKey, TValue> {
       private readonly Keyspace keyspace;
       private readonly System.Collections.Generic.IReadOnlyList<Block<TKey, TValue>> blocks;

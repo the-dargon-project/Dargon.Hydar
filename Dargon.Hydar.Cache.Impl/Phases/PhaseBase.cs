@@ -1,7 +1,7 @@
 ﻿using System;
 using Dargon.Courier.Messaging;
 using Dargon.Courier.Peering;
-using Dargon.Hydar.Cache.Data;
+using Dargon.Hydar.Cache.Data.Operations;
 using Dargon.Hydar.Cache.Messaging;
 using Dargon.Hydar.Cache.Services;
 

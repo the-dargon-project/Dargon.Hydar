@@ -1,5 +1,4 @@
 ﻿using Dargon.Courier.Messaging;
-using Dargon.Hydar.Cache.Phases;
 using Dargon.Hydar.Cache.PortableObjects;
 
 namespace Dargon.Hydar.Cache.Phases.Cohort {

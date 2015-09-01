@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Dargon.Hydar.Cache.Data.Partitioning;
 using Dargon.Hydar.Cache.Services;
 using Dargon.Hydar.Common;
 using Dargon.Services;
@@ -7,7 +8,7 @@ using ItzWarty;
 using Nito.AsyncEx;
 using SCG = System.Collections.Generic;
 
-namespace Dargon.Hydar.Cache.Data {
+namespace Dargon.Hydar.Cache.Data.Operations {
    public class CacheOperationsManager<TKey, TValue> {
       private readonly AsyncReaderWriterLock synchronization = new AsyncReaderWriterLock();
       private readonly AsyncManualResetEvent resumedLatch = new AsyncManualResetEvent(false);

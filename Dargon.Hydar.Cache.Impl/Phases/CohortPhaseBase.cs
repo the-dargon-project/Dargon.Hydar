@@ -1,6 +1,7 @@
-﻿using Dargon.Hydar.Cache.Data;
-using Dargon.Hydar.Cache.Phases.State;
+﻿using Dargon.Hydar.Cache.Data.Partitioning;
+using Dargon.Hydar.Cache.Phases.States;
 using Dargon.Hydar.Cache.PortableObjects;
+using Dargon.Hydar.Cache.PortableObjects.Helpers;
 
 namespace Dargon.Hydar.Cache.Phases {
    public abstract class CohortPhaseBase<TKey, TValue> : EpochPhaseBase<TKey, TValue> {

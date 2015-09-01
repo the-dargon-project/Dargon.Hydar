@@ -1,7 +1,8 @@
+using Dargon.Hydar.Cache.Data.Entries;
 using ItzWarty;
 using ItzWarty.Collections;
 
-namespace Dargon.Hydar.Cache.Data {
+namespace Dargon.Hydar.Cache.Data.Partitioning {
    public class Block<TKey, TValue> {
       private readonly IConcurrentDictionary<TKey, CacheEntryContext<TKey, TValue>> entryContextsByKey = new ConcurrentDictionary<TKey, CacheEntryContext<TKey, TValue>>();
 

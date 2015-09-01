@@ -1,6 +1,6 @@
 ﻿using Dargon.Hydar.Common;
 
-namespace Dargon.Hydar.Cache.Data {
+namespace Dargon.Hydar.Cache.Data.Entries {
    public class EntryImpl<TKey, TValue> : Entry<TKey, TValue> {
       private readonly TKey key;
       private readonly bool exists;

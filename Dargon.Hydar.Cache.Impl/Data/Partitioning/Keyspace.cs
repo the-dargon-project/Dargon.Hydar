@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using Dargon.Hydar.Cache.PortableObjects;
 
-namespace Dargon.Hydar.Cache {
+namespace Dargon.Hydar.Cache.Data.Partitioning {
    public class Keyspace {
       [ThreadStatic] private static Random random;
       private const long kTwoPow32 = 0x100000000L;

@@ -2,7 +2,6 @@
 using System.Net;
 using Dargon.Courier.Identities;
 using Dargon.Courier.Peering;
-using Dargon.Hydar.Cache.Messaging;
 using Dargon.Hydar.Cache.PortableObjects;
 using Dargon.Services;
 using ItzWarty.Collections;

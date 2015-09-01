@@ -1,6 +1,6 @@
 ﻿using System;
 using Dargon.Courier.Messaging;
-using Dargon.Hydar.Cache.Phases.State;
+using Dargon.Hydar.Cache.Phases.States;
 using ItzWarty.Collections;
 
 namespace Dargon.Hydar.Cache.Phases {

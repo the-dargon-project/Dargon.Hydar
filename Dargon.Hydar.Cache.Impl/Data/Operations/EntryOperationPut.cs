@@ -1,7 +1,7 @@
 using Dargon.Hydar.Common;
 using Dargon.PortableObjects;
 
-namespace Dargon.Hydar.Cache.Data {
+namespace Dargon.Hydar.Cache.Data.Operations {
    public class EntryOperationPut<TKey, TValue> : EntryOperationBase<TKey, TValue, bool> {
       private TValue value;
 

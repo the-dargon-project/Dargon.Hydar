@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Dargon.Hydar.Cache.Data;
+using Dargon.Hydar.Cache.Data.Operations;
 using Dargon.Hydar.Cache.PortableObjects;
 using Dargon.Hydar.Common;
 using NLog;

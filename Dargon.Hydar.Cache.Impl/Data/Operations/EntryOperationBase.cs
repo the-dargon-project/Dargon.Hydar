@@ -3,7 +3,7 @@ using Dargon.Hydar.Common;
 using Dargon.PortableObjects;
 using Nito.AsyncEx;
 
-namespace Dargon.Hydar.Cache.Data {
+namespace Dargon.Hydar.Cache.Data.Operations {
    public abstract class EntryOperationBase<TKey, TValue, TResult> : EntryOperation<TKey, TValue, TResult> {
       private readonly AsyncManualResetEvent completionLatch = new AsyncManualResetEvent();
       private EntryOperationType type;
