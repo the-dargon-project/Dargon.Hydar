@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Dargon.Hydar.Cache.Data.Operations;
+using Dargon.Hydar.Cache.Data.Storage;
 using Dargon.Hydar.Common;
 using ItzWarty.Collections;
 using Nito.AsyncEx;
@@ -10,11 +11,13 @@ namespace Dargon.Hydar.Cache.Data.Entries {
       private readonly IConcurrentQueue<ExecutableEntryOperation<TKey, TValue>> nonreadOperationQueue = new ConcurrentQueue<ExecutableEntryOperation<TKey, TValue>>();
       private readonly TKey key;
       private readonly AsyncSemaphore semaphore = new AsyncSemaphore(0);
+      private readonly CacheStrategy<TKey, TValue> cacheStrategy;
       private TValue value;
       private bool exists;
 
-      public CacheEntryContext(TKey key) {
+      public CacheEntryContext(TKey key, CacheStrategy<TKey, TValue> cacheStrategy) {
          this.key = key;
+         this.cacheStrategy = cacheStrategy;
       }
 
       public void Initialize() {
@@ -25,6 +28,10 @@ namespace Dargon.Hydar.Cache.Data.Entries {
          while (true) {
             await semaphore.WaitAsync();
             semaphore.Release();
+
+            if (!exists) {
+               exists = cacheStrategy.TryGet(key, out value);
+            }
 
             ExecutableEntryOperation<TKey, TValue> operation;
             var entry = new EntryImpl<TKey, TValue>(key, value, exists);
@@ -39,18 +46,30 @@ namespace Dargon.Hydar.Cache.Data.Entries {
                operation.Execute(entry);
                if (operation.Type == EntryOperationType.Put || 
                    operation.Type == EntryOperationType.Update ||
-                   (operation.Type == EntryOperationType.ConditionalUpdate && entry.IsDirty)) {
+                   (operation.Type == EntryOperationType.ConditionalUpdate && entry.IsDirty) || 
+                   operation.Type == EntryOperationType.Delete) {
                   // Set isUpdated so we update the cache context.
                   isUpdated = true;
+                  
+                  // Update exists if dirty and not deleted, reset dirty.
+                  if (entry.IsDirty) {
+                     entry.Exists = !entry.IsDeleted;
+                     entry.IsDirty = false;
+                  }
 
-                  // Unset Dirty flag for next execute operation.
-                  entry.IsDirty = false;
+                  // Default value if deleted and unset deleted for next operation.
+                  if (entry.IsDeleted) {
+                     entry.Value = default(TValue);
+                     entry.Exists = false;
+                     entry.IsDeleted = false;
+                  }
                }
             }
 
             if (isUpdated) {
                this.value = entry.Value;
-               this.exists = true;
+               this.exists = entry.Exists;
+               cacheStrategy.Updated(entry);
             }
          }
       }

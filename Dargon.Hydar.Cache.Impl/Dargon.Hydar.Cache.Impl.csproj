@@ -71,6 +71,10 @@
       <HintPath>..\packages\ItzWarty.Proxies.Api.0.1.1\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\ItzWarty.Proxies.Api.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MicroLite, Version=6.2.0.0, Culture=neutral, PublicKeyToken=08410e6798c4fa37, processorArchitecture=MSIL">
+      <HintPath>..\packages\MicroLite.6.2.4\lib\net45\MicroLite.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Nito.AsyncEx, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Nito.AsyncEx.3.0.0\lib\net45\Nito.AsyncEx.dll</HintPath>
       <Private>True</Private>
@@ -101,6 +105,7 @@
     <Compile Include="CacheDispatcherImpl.cs" />
     <Compile Include="CacheFactoryImpl.cs" />
     <Compile Include="Data\Operations\EntryOperationTryGet.cs" />
+    <Compile Include="Data\Storage\CacheStore.cs" />
     <Compile Include="Management\CacheMob.cs" />
     <Compile Include="Data\Partitioning\Block.cs" />
     <Compile Include="Data\Entries\CacheEntryContext.cs" />
