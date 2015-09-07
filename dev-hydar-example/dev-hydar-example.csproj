@@ -66,6 +66,9 @@
       <HintPath>..\packages\Dargon.Ryu.Api.0.0.4\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\Dargon.Ryu.Api.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Dargon.Ryu.Impl">
+      <HintPath>..\packages\Dargon.Ryu.Impl.0.1.4\lib\net45\Dargon.Ryu.Impl.dll</HintPath>
+    </Reference>
     <Reference Include="Dargon.Services.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dargon.Services.Api.0.5.0\lib\net45\Dargon.Services.Api.dll</HintPath>
       <Private>True</Private>
@@ -143,10 +146,6 @@
     <ProjectReference Include="..\..\Dargon.Courier\Dargon.Courier\Dargon.Courier.Api.csproj">
       <Project>{00a1da2f-d316-4387-8bd4-f1a47c05a402}</Project>
       <Name>Dargon.Courier.Api</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Dargon.Ryu\Dargon.Ryu.Impl\Dargon.Ryu.Impl.csproj">
-      <Project>{2ed5c703-8a91-4701-9ae9-da86aa93a169}</Project>
-      <Name>Dargon.Ryu.Impl</Name>
     </ProjectReference>
     <ProjectReference Include="..\Dargon.Hydar.Cache.Api\Dargon.Hydar.Cache.Api.csproj">
       <Project>{7c04d8de-120d-4cc1-9d2c-6b94175a594c}</Project>

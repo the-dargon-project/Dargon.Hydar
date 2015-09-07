@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using MicroLite;
 
-namespace Dargon.Hydar.Cache.Data.Storage {
+namespace Dargon.Hydar.Cache.Data.Storage.MicroLite {
    public class MicroLiteCacheStore<TKey, TValue> : CacheStore<TKey, TValue> 
       where TValue : class, new() {
       private readonly object synchronization = new object();

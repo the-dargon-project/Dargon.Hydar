@@ -104,7 +104,6 @@
     <Compile Include="CacheDispatcherImpl.cs" />
     <Compile Include="CacheFactoryImpl.cs" />
     <Compile Include="Data\Operations\EntryOperationTryGet.cs" />
-    <Compile Include="Data\Storage\MicroLiteCacheStore.cs" />
     <Compile Include="Data\Storage\NullCacheStore.cs" />
     <Compile Include="Data\Storage\WriteThroughCacheStorageStrategyImpl.cs" />
     <Compile Include="Management\CacheMob.cs" />
