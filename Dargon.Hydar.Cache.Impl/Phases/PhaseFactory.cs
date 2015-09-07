@@ -30,7 +30,7 @@ namespace Dargon.Hydar.Cache.Phases {
       private readonly Guid cacheId;
       private readonly Guid localIdentifier;
       private readonly Keyspace keyspace;
-      private readonly CacheConfiguration cacheConfiguration;
+      private readonly CacheConfiguration<TKey, TValue> cacheConfiguration;
       private readonly PhaseManager<TKey, TValue> phaseManager;
       private readonly Messenger<TKey, TValue> messenger;
       private readonly RemoteServiceContainer<TKey, TValue> remoteServiceContainer;
@@ -38,7 +38,7 @@ namespace Dargon.Hydar.Cache.Phases {
       private readonly CacheOperationsManager<TKey, TValue> cacheOperationsManager;
       private readonly ReadablePeerRegistry peerRegistry;
 
-      public PhaseFactory(ReceivedMessageFactory receivedMessageFactory, Guid cacheId, Guid localIdentifier, Keyspace keyspace, CacheConfiguration cacheConfiguration, PhaseManager<TKey, TValue> phaseManager, Messenger<TKey, TValue> messenger, RemoteServiceContainer<TKey, TValue> remoteServiceContainer, EntryBlockTable<TKey, TValue> blockTable, CacheOperationsManager<TKey, TValue> cacheOperationsManager, ReadablePeerRegistry peerRegistry) {
+      public PhaseFactory(ReceivedMessageFactory receivedMessageFactory, Guid cacheId, Guid localIdentifier, Keyspace keyspace, CacheConfiguration<TKey, TValue> cacheConfiguration, PhaseManager<TKey, TValue> phaseManager, Messenger<TKey, TValue> messenger, RemoteServiceContainer<TKey, TValue> remoteServiceContainer, EntryBlockTable<TKey, TValue> blockTable, CacheOperationsManager<TKey, TValue> cacheOperationsManager, ReadablePeerRegistry peerRegistry) {
          this.cacheId = cacheId;
          this.receivedMessageFactory = receivedMessageFactory;
          this.localIdentifier = localIdentifier;

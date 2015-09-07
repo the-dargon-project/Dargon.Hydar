@@ -17,7 +17,9 @@ namespace Dargon.Platform.Accounts.Hydar {
       public Cache<Guid, Account> Account => accountCache;
 
       public void Initialize() {
-         accountCache = cacheFactory.Create<Guid, Account>("account-cache");
+         accountCache = cacheFactory.Create(new CacheConfigurationImpl<Guid, Account> {
+            Name = "account-cache"
+         });
          cacheDispatcher.RegisterCache(accountCache);
       }
    }

@@ -7,9 +7,9 @@ namespace Dargon.Hydar.Cache.Messaging {
    public class Messenger<TKey, TValue> {
       private readonly Guid cacheId;
       private readonly MessageSender messageSender;
-      private readonly CacheConfiguration cacheConfiguration;
+      private readonly CacheConfiguration<TKey, TValue> cacheConfiguration;
 
-      public Messenger(Guid cacheId, MessageSender messageSender, CacheConfiguration cacheConfiguration) {
+      public Messenger(Guid cacheId, MessageSender messageSender, CacheConfiguration<TKey, TValue> cacheConfiguration) {
          this.cacheId = cacheId;
          this.messageSender = messageSender;
          this.cacheConfiguration = cacheConfiguration;

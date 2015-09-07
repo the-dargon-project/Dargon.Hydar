@@ -54,9 +54,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cache.cs" />
+    <Compile Include="CacheConfiguration.cs" />
     <Compile Include="CacheDispatcher.cs" />
     <Compile Include="CacheFactory.cs" />
     <Compile Include="CacheRoot.cs" />
+    <Compile Include="Data\Storage\CacheStore.cs" />
+    <Compile Include="Data\Storage\CacheStorageStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

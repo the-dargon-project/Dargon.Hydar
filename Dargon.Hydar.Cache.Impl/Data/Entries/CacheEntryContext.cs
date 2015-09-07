@@ -11,13 +11,13 @@ namespace Dargon.Hydar.Cache.Data.Entries {
       private readonly IConcurrentQueue<ExecutableEntryOperation<TKey, TValue>> nonreadOperationQueue = new ConcurrentQueue<ExecutableEntryOperation<TKey, TValue>>();
       private readonly TKey key;
       private readonly AsyncSemaphore semaphore = new AsyncSemaphore(0);
-      private readonly CacheStrategy<TKey, TValue> cacheStrategy;
+      private readonly CacheStorageStrategy<TKey, TValue> cacheStorageStrategy;
       private TValue value;
       private bool exists;
 
-      public CacheEntryContext(TKey key, CacheStrategy<TKey, TValue> cacheStrategy) {
+      public CacheEntryContext(TKey key, CacheStorageStrategy<TKey, TValue> cacheStorageStrategy) {
          this.key = key;
-         this.cacheStrategy = cacheStrategy;
+         this.cacheStorageStrategy = cacheStorageStrategy;
       }
 
       public void Initialize() {
@@ -30,7 +30,7 @@ namespace Dargon.Hydar.Cache.Data.Entries {
             semaphore.Release();
 
             if (!exists) {
-               exists = cacheStrategy.TryGet(key, out value);
+               exists = cacheStorageStrategy.TryGet(key, out value);
             }
 
             ExecutableEntryOperation<TKey, TValue> operation;
@@ -69,7 +69,7 @@ namespace Dargon.Hydar.Cache.Data.Entries {
             if (isUpdated) {
                this.value = entry.Value;
                this.exists = entry.Exists;
-               cacheStrategy.Updated(entry);
+               cacheStorageStrategy.Updated(entry);
             }
          }
       }

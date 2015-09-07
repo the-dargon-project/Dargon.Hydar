@@ -1,7 +1,7 @@
-using System;
 using Dargon.Courier.Messaging;
 using Dargon.Hydar.Cache.PortableObjects;
 using ItzWarty.Collections;
+using System;
 
 namespace Dargon.Hydar.Cache {
    public class CacheDispatcherImpl : CacheDispatcher {

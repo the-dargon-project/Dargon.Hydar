@@ -8,12 +8,12 @@ using ItzWarty.Collections;
 
 namespace Dargon.Hydar.Cache.Services {
    public class RemoteServiceContainer<TKey, TValue> {
-      private readonly CacheConfiguration cacheConfiguration;
+      private readonly CacheConfiguration<TKey, TValue> cacheConfiguration;
       private readonly IServiceClientFactory serviceClientFactory;
       private readonly ReadablePeerRegistry readablePeerRegistry;
       private readonly IConcurrentDictionary<IPEndPoint, IServiceClient> serviceClientsByOrigin;
 
-      public RemoteServiceContainer(CacheConfiguration cacheConfiguration, IServiceClientFactory serviceClientFactory, ReadablePeerRegistry readablePeerRegistry, IConcurrentDictionary<IPEndPoint, IServiceClient> serviceClientsByOrigin) {
+      public RemoteServiceContainer(CacheConfiguration<TKey, TValue> cacheConfiguration, IServiceClientFactory serviceClientFactory, ReadablePeerRegistry readablePeerRegistry, IConcurrentDictionary<IPEndPoint, IServiceClient> serviceClientsByOrigin) {
          this.cacheConfiguration = cacheConfiguration;
          this.serviceClientFactory = serviceClientFactory;
          this.readablePeerRegistry = readablePeerRegistry;
