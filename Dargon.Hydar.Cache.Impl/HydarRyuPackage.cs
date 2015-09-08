@@ -1,5 +1,6 @@
 ﻿using System;
 using Dargon.Courier.Messaging;
+using Dargon.Hydar.Cache.Data.Storage;
 using Dargon.Hydar.Common.Utilities;
 using Dargon.Ryu;
 
@@ -8,6 +9,7 @@ namespace Dargon.Hydar.Cache {
       public HydarRyuPackage() {
          Singleton<CacheFactory, CacheFactoryImpl>();
          Singleton<CacheDispatcher, CacheDispatcherImpl>();
+         Singleton<CacheStorageStrategyFactory, CacheStorageStrategyFactoryImpl>();
 
          PofContext<HydarCachePofContext>();
       }

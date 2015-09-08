@@ -3,7 +3,6 @@ using Dargon.Courier.Messaging;
 using Dargon.Hydar.Cache.Data.Operations;
 using Dargon.Hydar.Cache.Phases;
 using Dargon.Hydar.Cache.Services;
-using Dargon.Hydar.Client;
 using Dargon.Hydar.Common;
 
 namespace Dargon.Hydar.Cache {

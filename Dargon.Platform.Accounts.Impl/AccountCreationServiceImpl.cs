@@ -1,5 +1,5 @@
 using System;
-using Dargon.Hydar.Client;
+using Dargon.Hydar.Cache;
 using Dargon.Platform.Accounts.Domain;
 using Dargon.Platform.Accounts.Hydar.Processors;
 using Dargon.Zilean;

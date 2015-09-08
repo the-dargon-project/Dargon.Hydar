@@ -1,6 +1,6 @@
 ﻿using Dargon.Hydar.Common;
 
-namespace Dargon.Hydar.Client {
+namespace Dargon.Hydar.Cache {
    public interface Cache<TKey, TValue> {
       TResult Process<TResult>(TKey key, EntryProcessor<TKey, TValue, TResult> entryProcessor);
       TResult Process<TResult, TProcessor>(TKey key, params object[] args) where TProcessor : EntryProcessor<TKey, TValue, TResult>;

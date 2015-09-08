@@ -69,10 +69,10 @@ namespace Dargon.Hydar.Cache {
 
          var cacheGuid = cacheConfiguration.Guid;
 
-         if (cacheConfiguration.CacheStore == null) {
-            cacheConfiguration.CacheStore = new NullCacheStore<TKey, TValue>();
+         if (cacheConfiguration.Storage == null) {
+            cacheConfiguration.Storage = new NullCacheStore<TKey, TValue>();
          }
-         var cacheStore = cacheConfiguration.CacheStore;
+         var cacheStore = cacheConfiguration.Storage;
 
          var serviceClientsByOrigin = new ConcurrentDictionary<IPEndPoint, IServiceClient>();
          var remoteServiceContainer = new RemoteServiceContainer<TKey, TValue>(cacheConfiguration, serviceClientFactory, peerRegistry, serviceClientsByOrigin);

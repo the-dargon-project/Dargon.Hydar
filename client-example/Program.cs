@@ -11,7 +11,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Dargon.Hydar.Client;
+using Dargon.Hydar.Cache;
 
 namespace client_example {
    public static class Program {

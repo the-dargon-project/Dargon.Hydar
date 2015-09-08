@@ -35,6 +35,10 @@
       <HintPath>..\packages\Dargon.PortableObjects.0.2.0\lib\net45\Dargon.PortableObjects.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Dargon.Ryu.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Dargon.Ryu.Api.0.0.4\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\Dargon.Ryu.Api.dll</HintPath>
+    </Reference>
     <Reference Include="ItzWarty.Commons, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ItzWarty.Commons.0.1.1\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\ItzWarty.Commons.dll</HintPath>
       <Private>True</Private>
@@ -56,8 +60,11 @@
     <Compile Include="Cache.cs" />
     <Compile Include="CacheConfiguration.cs" />
     <Compile Include="CacheDispatcher.cs" />
+    <Compile Include="CacheInitializerFacade.cs" />
     <Compile Include="CacheFactory.cs" />
     <Compile Include="CacheRoot.cs" />
+    <Compile Include="CacheStorageStrategyType.cs" />
+    <Compile Include="DargonHydarCacheApiRyuPackage.cs" />
     <Compile Include="Data\Storage\CacheStore.cs" />
     <Compile Include="Data\Storage\CacheStorageStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

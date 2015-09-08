@@ -12,13 +12,14 @@ namespace Dargon.Hydar.Cache {
 
       int ServicePort { get; set; }
 
-      CacheStore<TKey, TValue> CacheStore { get; set; }
+      CacheStore<TKey, TValue> Storage { get; set; }
    }
 
    public class CacheConfigurationImpl<TKey, TValue> : CacheConfiguration<TKey, TValue> {
       public string Name { get; set; }
       public Guid Guid { get; set; }
       public int ServicePort { get; set; }
-      public CacheStore<TKey, TValue> CacheStore { get; set; }
+      public CacheStore<TKey, TValue> Storage { get; set; }
+      public CacheStorageStrategy StorageStrategy { get; set; }
    }
 }
