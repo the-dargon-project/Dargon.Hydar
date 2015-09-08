@@ -1,5 +1,6 @@
 ﻿using Dargon.Platform.Accounts.Hydar;
 using Dargon.Platform.Accounts.Hydar.Processors;
+using Dargon.Platform.Accounts.Management;
 using Dargon.Platform.Common.Cache;
 using Dargon.Ryu;
 using Dargon.Zilean;
@@ -27,6 +28,7 @@ namespace Dargon.Platform.Accounts {
          });
          LocalService<AccountService, AccountServiceProxyImpl>(RyuTypeFlags.None);
          PofContext<AccountsImplHydarPofContext>();
+         Mob<AccountsMob>(RyuTypeFlags.None);
       }
    }
 }

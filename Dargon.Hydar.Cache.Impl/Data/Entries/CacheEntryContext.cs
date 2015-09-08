@@ -30,13 +30,9 @@ namespace Dargon.Hydar.Cache.Data.Entries {
             await semaphore.WaitAsync();
             semaphore.Release();
 
-            Console.WriteLine("CEC: " + key + " " + exists + " " + value);
-
             if (!exists) {
                exists = cacheStorageStrategy.TryGet(key, out value);
             }
-
-            Console.WriteLine("CEC2: " + key + " " + exists + " " + value);
 
             ExecutableEntryOperation<TKey, TValue> operation;
             var entry = new EntryImpl<TKey, TValue>(key, value, exists);

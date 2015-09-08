@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="AccountAuthenticationService.cs" />
     <Compile Include="AccountCreationService.cs" />
+    <Compile Include="AccountLookupService.cs" />
     <Compile Include="UsernameTakenException.cs" />
     <Compile Include="AccountService.cs" />
     <Compile Include="Domain\AccountsApiDomainPofContext.cs" />

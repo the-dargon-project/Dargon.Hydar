@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Dargon.Hydar.Cache;
 using Dargon.Platform.Accounts.Domain;
 using MicroLite;
 using MicroLite.Builder;
 
 namespace Dargon.Platform.Accounts {
-   public interface AccountLookupService {
-      bool TryGetAccountIdByUsername(string name, out Guid accountId);
-   }
-
    public class AccountLookupServiceImpl : AccountLookupService {
       private readonly object synchronization = new object();
       private readonly ThreadLocal<ISession> session = new ThreadLocal<ISession>();
@@ -47,16 +39,13 @@ namespace Dargon.Platform.Accounts {
             return true;
          } else {
             var query = SqlBuilder.Select("*").From(typeof(Account)).Where("lower(username) = lower(@p0)", name).ToSqlQuery();
-            Console.WriteLine("QUERY: " + query.CommandText);
-            Console.WriteLine("QUERY: " + query.Arguments[0].Value);
             var account = Session.Single<Account>(query);
             if (account == null) {
-               Console.WriteLine("NULL");
                accountId = Guid.Empty;
                return false;
             } else {
-               Console.WriteLine("NOT NULL: " + account.Id);
                accountId = account.Id;
+               accountIdByUsernameCache.Put(name, accountId);
                return true;
             }
          }
