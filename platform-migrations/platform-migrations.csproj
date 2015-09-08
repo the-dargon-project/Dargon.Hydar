@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Migration001_AccountsTable_Create.cs" />
+    <Compile Include="Migration002_AccountsTable_UsernameUnique.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

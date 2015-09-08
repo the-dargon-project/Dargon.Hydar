@@ -8,12 +8,12 @@ using Dargon.Platform.Accounts.Domain;
 
 namespace Dargon.Platform.Accounts.Hydar.Processors {
    public interface AccountProcessorFactory {
-      EntryProcessor<Guid, Account, bool> CreateAccount(string username, string password);
+      EntryProcessor<Guid, Account, bool> Authenticate(string saltedPassword);
    }
 
    public class AccountProcessorFactoryImpl : AccountProcessorFactory {
-      public EntryProcessor<Guid, Account, bool> CreateAccount(string username, string password) {
-         return new AccountCreationProcessor(username, password);
+      public EntryProcessor<Guid, Account, bool> Authenticate(string saltedPassword) {
+         return new AccountAuthenticationProcessor(saltedPassword);
       }
    }
 }

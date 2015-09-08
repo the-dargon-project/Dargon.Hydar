@@ -44,6 +44,9 @@
       <HintPath>..\packages\Dargon.Ryu.Api.0.0.4\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\Dargon.Ryu.Api.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="MicroLite">
+      <HintPath>..\packages\MicroLite.6.2.4\lib\net45\MicroLite.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -54,8 +57,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccountAuthenticationService.cs" />
     <Compile Include="AccountCreationService.cs" />
-    <Compile Include="AccountIdTakenException.cs" />
+    <Compile Include="UsernameTakenException.cs" />
     <Compile Include="AccountService.cs" />
     <Compile Include="Domain\AccountsApiDomainPofContext.cs" />
     <Compile Include="DargonPlatformAccountsApiRyuPackage.cs" />

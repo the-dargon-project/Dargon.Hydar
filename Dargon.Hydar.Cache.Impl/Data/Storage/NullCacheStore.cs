@@ -13,6 +13,8 @@ namespace Dargon.Hydar.Cache.Data.Storage {
 
       public void Delete(TKey key) { }
 
+      public void Insert(TKey key, TValue value) { }
+
       public void Update(TKey key, TValue value) { }
    }
 }

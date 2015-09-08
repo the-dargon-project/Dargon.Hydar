@@ -1,13 +1,14 @@
 using System;
 using System.Threading;
 using MicroLite;
+using MicroLite.Builder;
 
 namespace Dargon.Hydar.Cache.Data.Storage.MicroLite {
    public class MicroLiteCacheStore<TKey, TValue> : CacheStore<TKey, TValue> 
       where TValue : class, new() {
       private readonly object synchronization = new object();
+      private readonly ThreadLocal<ISession> session = new ThreadLocal<ISession>();
       private readonly ISessionFactory sessionFactory;
-      private ThreadLocal<ISession> session;
 
       public MicroLiteCacheStore(ISessionFactory sessionFactory) {
          this.sessionFactory = sessionFactory;
@@ -39,6 +40,10 @@ namespace Dargon.Hydar.Cache.Data.Storage.MicroLite {
          if (!Session.Advanced.Delete(typeof(TValue), key)) {
             throw new InvalidOperationException($"Delete failed for key {key}.");
          }
+      }
+
+      public void Insert(TKey key, TValue value) {
+         Session.Insert(value);
       }
 
       public void Update(TKey key, TValue value) {

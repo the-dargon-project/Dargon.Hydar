@@ -12,7 +12,7 @@ namespace Dargon.Platform.Accounts.Hydar {
       private const int kBasePofId = 100500;
 
       public AccountsImplHydarPofContext() {
-         RegisterPortableObjectType(kBasePofId + 0, typeof(AccountCreationProcessor));
+         RegisterPortableObjectType(kBasePofId + 0, typeof(AccountAuthenticationProcessor));
       }
    }
 }

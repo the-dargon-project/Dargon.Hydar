@@ -29,6 +29,9 @@ namespace Dargon.Hydar {
 
          [Option('m', "ManagementPort", DefaultValue = 32002, HelpText = "Dedicated port for hydar cache service dmi.")]
          public int ManagementPort { get; set; }
+
+         [Option('c', "ConnectionString", DefaultValue = "Server=127.0.0.1;Port=5432;Database=dargon;User Id=dargon_development;Password=dargon;")]
+         public string ConnectionString { get; set; }
       }
 
       public static void Main(string[] args) {
@@ -38,7 +41,7 @@ namespace Dargon.Hydar {
          Console.Title = "PID " + Process.GetCurrentProcess().Id;
          var options = new Options();
          if (Parser.Default.ParseArgumentsStrict(args, options)) {
-            new HydarEgg().Start(options.ServicePort, options.ManagementPort);
+            new HydarEgg().Start(options.ServicePort, options.ManagementPort, options.ConnectionString);
          } else {
             Console.WriteLine("Failed to parse command line args.");
          }

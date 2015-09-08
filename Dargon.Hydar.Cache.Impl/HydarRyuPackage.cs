@@ -10,6 +10,7 @@ namespace Dargon.Hydar.Cache {
          Singleton<CacheFactory, CacheFactoryImpl>();
          Singleton<CacheDispatcher, CacheDispatcherImpl>();
          Singleton<CacheStorageStrategyFactory, CacheStorageStrategyFactoryImpl>();
+         Singleton<CacheInitializerFacade, CacheInitializerFacadeImpl>();
 
          PofContext<HydarCachePofContext>();
       }

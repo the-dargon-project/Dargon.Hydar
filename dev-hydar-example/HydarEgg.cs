@@ -10,12 +10,14 @@ using Dargon.Management;
 using Dargon.Management.Server;
 using Dargon.Nest.Egg;
 using Dargon.Platform.Accounts;
+using Dargon.Platform.Common.Cache;
 using Dargon.PortableObjects;
 using Dargon.Ryu;
 using Dargon.Services;
 using Dargon.Zilean.Client;
 using ItzWarty;
 using ItzWarty.Networking;
+using MicroLite.Configuration;
 using NLog;
 
 namespace Dargon.Hydar {
@@ -32,7 +34,15 @@ namespace Dargon.Hydar {
          throw new NotImplementedException();
       }
 
-      public NestResult Start(int servicePort, int managementPort) {
+      public NestResult Start(int servicePort, int managementPort, string connectionString) {
+         Configure.Extensions().WithAttributeBasedMapping();
+
+         ryu.Set<PlatformCacheConfiguration>(new PlatformCacheConfigurationImpl {
+            DatabaseSessionFactory = Configure.Fluently()
+               .ForPostgreSqlConnection("Dargon", connectionString, "Npgsql")
+               .CreateSessionFactory()
+         });
+
          ryu.Touch<ItzWartyProxiesRyuPackage>();
 
          // Dargon.Management
@@ -55,8 +65,8 @@ namespace Dargon.Hydar {
 
          // Initialize Hydar Cache
          ryu.Touch<HydarRyuPackage>();
-         var cacheFactory = ryu.Get<CacheFactoryImpl>();
-         cacheFactory.SetServicePort(servicePort);
+         var cacheInitializer = ryu.Get<CacheInitializerFacade>();
+         ((CacheInitializerFacadeImpl)cacheInitializer).SetServicePort(servicePort);
 
          ryu.Set<SystemState>(new PlatformSystemStateImpl());
          ryu.Setup();
@@ -65,11 +75,12 @@ namespace Dargon.Hydar {
 
          Console.WriteLine("Initialized!");
 
-         // Dargon.Courier for clustered networking
-//         Console.Title = "PID " + Process.GetCurrentProcess().Id + ": " + courierClient.Identifier.ToString("N");
-
-//         cacheDispatcher.AddCache(cacheFactory.Create<int, int>("test-cache"));
-//         cacheDispatcher.AddCache(cacheFactory.Create<int, string>("test-string-cache"));
+         var accountService = ryu.Get<AccountService>();
+         
+         var authenticationResult = accountService.TryAuthenticate("Warty", "test");
+         Console.WriteLine("Authentication result: " + authenticationResult);
+//         var accountId = accountService.CreateAccount("Warty", "test");
+//         Console.WriteLine("Created account " + accountId);
 
          new CountdownEvent(1).Wait();
          return NestResult.Success;

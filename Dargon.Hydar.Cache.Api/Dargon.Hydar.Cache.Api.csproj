@@ -64,7 +64,6 @@
     <Compile Include="CacheFactory.cs" />
     <Compile Include="CacheRoot.cs" />
     <Compile Include="CacheStorageStrategyType.cs" />
-    <Compile Include="DargonHydarCacheApiRyuPackage.cs" />
     <Compile Include="Data\Storage\CacheStore.cs" />
     <Compile Include="Data\Storage\CacheStorageStrategy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

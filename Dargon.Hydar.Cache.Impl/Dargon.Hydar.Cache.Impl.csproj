@@ -103,6 +103,7 @@
   <ItemGroup>
     <Compile Include="CacheDispatcherImpl.cs" />
     <Compile Include="CacheFactoryImpl.cs" />
+    <Compile Include="CacheInitializerFacadeImpl.cs" />
     <Compile Include="Data\Operations\EntryOperationTryGet.cs" />
     <Compile Include="Data\Storage\CacheStorageStrategyFactory.cs" />
     <Compile Include="Data\Storage\NullCacheStore.cs" />

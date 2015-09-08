@@ -55,14 +55,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccountAuthenticationServiceImpl.cs" />
     <Compile Include="AccountCreationServiceImpl.cs" />
+    <Compile Include="AccountLookupService.cs" />
     <Compile Include="AccountServiceProxyImpl.cs" />
     <Compile Include="DargonPlatformAccountsImplRyuPackage.cs" />
     <Compile Include="Hydar\AccountsImplHydarPofContext.cs" />
     <Compile Include="Hydar\Caches.cs" />
     <Compile Include="Hydar\Processors\AccountAuthenticationProcessor.cs" />
-    <Compile Include="Hydar\Processors\AccountCreationProcessor.cs" />
     <Compile Include="Hydar\Processors\AccountProcessorFactory.cs" />
+    <Compile Include="Management\AccountsMob.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

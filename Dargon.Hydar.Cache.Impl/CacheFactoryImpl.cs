@@ -31,7 +31,6 @@ namespace Dargon.Hydar.Cache {
       private readonly ILocalManagementServer localManagementServer;
       private readonly ReceivedMessageFactory receivedMessageFactory;
       private readonly IPofContext pofContext;
-      private int servicePort;
 
       public CacheFactoryImpl(GuidHelper guidHelper, IServiceClientFactory serviceClientFactory, IServiceClient serviceClient, CourierClient courierClient, ILocalManagementServer localManagementServer, ReceivedMessageFactory receivedMessageFactory, IPofContext pofContext) {
          this.guidHelper = guidHelper;
@@ -41,11 +40,6 @@ namespace Dargon.Hydar.Cache {
          this.localManagementServer = localManagementServer;
          this.receivedMessageFactory = receivedMessageFactory;
          this.pofContext = pofContext;
-      }
-
-      public void SetServicePort(int newServicePort) {
-         this.servicePort = newServicePort;
-         courierClient.SetProperty(new HydarServiceDescriptor { ServicePort = servicePort });
       }
 
       public CacheRoot<TKey, TValue> Create<TKey, TValue>(CacheConfiguration<TKey, TValue> cacheConfiguration) {

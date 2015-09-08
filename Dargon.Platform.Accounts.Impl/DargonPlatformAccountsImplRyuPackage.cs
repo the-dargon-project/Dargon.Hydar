@@ -1,5 +1,6 @@
 ﻿using Dargon.Platform.Accounts.Hydar;
 using Dargon.Platform.Accounts.Hydar.Processors;
+using Dargon.Platform.Common.Cache;
 using Dargon.Ryu;
 using Dargon.Zilean;
 
@@ -11,8 +12,18 @@ namespace Dargon.Platform.Accounts {
          Singleton<AccountCreationService>((ryu) => {
             var chronokeeperService = ryu.Get<ChronokeeperService>();
             var caches = ryu.Get<Caches>();
+            return new AccountCreationServiceImpl(chronokeeperService, caches.AccountCacheStore);
+         });
+         Singleton<AccountLookupService>((ryu) => {
+            var platformCacheConfiguration = ryu.Get<PlatformCacheConfiguration>();
+            var caches = ryu.Get<Caches>();
+            return new AccountLookupServiceImpl(caches.AccountIdByUsernameCache, platformCacheConfiguration.DatabaseSessionFactory);
+         });
+         Singleton<AccountAuthenticationService>((ryu) => {
+            var caches = ryu.Get<Caches>();
             var accountProcessorFactory = ryu.Get<AccountProcessorFactory>();
-            return new AccountCreationServiceImpl(chronokeeperService, caches.Account, accountProcessorFactory);
+            var accountLookupService = ryu.Get<AccountLookupService>();
+            return new AccountAuthenticationServiceImpl(caches.Account, accountProcessorFactory, accountLookupService);
          });
          LocalService<AccountService, AccountServiceProxyImpl>(RyuTypeFlags.None);
          PofContext<AccountsImplHydarPofContext>();
