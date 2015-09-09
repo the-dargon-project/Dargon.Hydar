@@ -27,7 +27,7 @@ namespace Dargon.Hydar {
 
       public HydarEgg() {
          ryu = new RyuFactory().Create();
-         ((RyuContainerImpl)ryu).SetLoggerEnabled(true);
+//         ((RyuContainerImpl)ryu).SetLoggerEnabled(true);
       }
 
       public NestResult Start(IEggParameters parameters) {
@@ -82,7 +82,6 @@ namespace Dargon.Hydar {
 //         var accountId = accountService.CreateAccount("Warty", "test");
 //         Console.WriteLine("Created account " + accountId);
 
-         new CountdownEvent(1).Wait();
          return NestResult.Success;
       }
 

@@ -42,6 +42,7 @@ namespace Dargon.Hydar {
          var options = new Options();
          if (Parser.Default.ParseArgumentsStrict(args, options)) {
             new HydarEgg().Start(options.ServicePort, options.ManagementPort, options.ConnectionString);
+            new CountdownEvent(1).Wait();
          } else {
             Console.WriteLine("Failed to parse command line args.");
          }
