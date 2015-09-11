@@ -61,7 +61,8 @@ namespace Dargon.Hydar {
          debuggerTarget = new AsyncTargetWrapper(debuggerTarget);
          consoleTarget = new AsyncTargetWrapper(consoleTarget);
 #else
-         AsyncTargetWrapper a; // Placeholder for optimizing imports
+         // Stops optimizing imports from breaking code.
+         new AsyncTargetWrapper().Wrap();
 #endif
 
          config.AddTarget("debugger", debuggerTarget);

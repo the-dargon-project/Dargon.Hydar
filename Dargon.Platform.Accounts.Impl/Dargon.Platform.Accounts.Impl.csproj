@@ -38,8 +38,8 @@
       <HintPath>..\packages\Dargon.PortableObjects.0.2.0\lib\net45\Dargon.PortableObjects.dll</HintPath>
     </Reference>
     <Reference Include="Dargon.Ryu.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Dargon.Ryu.Api.0.2.0\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\Dargon.Ryu.Api.dll</HintPath>
+      <HintPath>..\packages\Dargon.Ryu.Api.0.3.0\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\Dargon.Ryu.Api.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Dargon.Zilean.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dargon.Zilean.Api.0.0.0\lib\net45\Dargon.Zilean.Api.dll</HintPath>
@@ -91,7 +91,7 @@
       <Name>Dargon.Platform.Accounts.Api</Name>
     </ProjectReference>
     <ProjectReference Include="..\Dargon.Platform.Common.Cache.Api\Dargon.Platform.Common.Cache.Api.csproj">
-      <Project>{B7F8F32A-05DE-4E45-93FB-71B8C73754C4}</Project>
+      <Project>{b7f8f32a-05de-4e45-93fb-71b8c73754c4}</Project>
       <Name>Dargon.Platform.Common.Cache.Api</Name>
     </ProjectReference>
   </ItemGroup>

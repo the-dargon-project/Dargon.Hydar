@@ -48,12 +48,12 @@
       <HintPath>..\packages\Dargon.PortableObjects.Streams.0.3.0\lib\net45\Dargon.PortableObjects.Streams.dll</HintPath>
     </Reference>
     <Reference Include="Dargon.Ryu.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Dargon.Ryu.Api.0.2.0\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\Dargon.Ryu.Api.dll</HintPath>
+      <HintPath>..\packages\Dargon.Ryu.Api.0.3.0\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\Dargon.Ryu.Api.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Dargon.Ryu.Impl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Dargon.Ryu.Impl.0.2.0\lib\net45\Dargon.Ryu.Impl.dll</HintPath>
+      <HintPath>..\packages\Dargon.Ryu.Impl.0.3.0\lib\net45\Dargon.Ryu.Impl.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Dargon.Services.Api">
       <HintPath>..\packages\Dargon.Services.Api.0.5.0\lib\net45\Dargon.Services.Api.dll</HintPath>
@@ -107,6 +107,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Dargon.Platform.Accounts.WebApi\Dargon.Platform.Accounts.WebApi.csproj">
+      <Project>{75ab531c-dc4c-417f-90c4-5c923c7d0d2f}</Project>
+      <Name>Dargon.Platform.Accounts.WebApi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dargon.Platform.Webend.Api\Dargon.Platform.Webend.Api.csproj">
       <Project>{5A64E6EC-B36D-4FD5-ABC7-50463AD643BE}</Project>
       <Name>Dargon.Platform.Webend.Api</Name>

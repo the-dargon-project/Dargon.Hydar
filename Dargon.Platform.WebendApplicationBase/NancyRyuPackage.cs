@@ -125,16 +125,6 @@ namespace Dargon.Platform.FrontendApplicationBase {
          Singleton<CsrfApplicationStartup>(ryu => new CsrfApplicationStartup(ryu.Get<CryptographyConfiguration>(), ryu.Get<IObjectSerializer>(), ryu.Get<ICsrfTokenValidator>()));
          Singleton<RootPathApplicationStartup>(ryu => new RootPathApplicationStartup(ryu.Get<IRootPathProvider>()));
          Singleton<ViewEngineApplicationStartup>(ryu => new ViewEngineApplicationStartup(ryu.Find<IViewEngine>(), ryu.Get<IViewCache>(), ryu.Get<IViewLocator>()));
-
-         var moduleTypes = Assembly.GetExecutingAssembly().GetTypes().Where(FilterNancyModules);
-
-         foreach (var moduleType in moduleTypes) {
-            Singleton(moduleType, ryu => ryu.ForceConstruct(moduleType), RyuTypeFlags.Required);
-         }
-      }
-
-      private static bool FilterNancyModules(Type type) {
-         return !type.IsAbstract && typeof(NancyModule).IsAssignableFrom(type);
       }
    }
 }

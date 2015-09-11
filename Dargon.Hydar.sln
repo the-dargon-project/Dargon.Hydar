@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.22823.1
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dev-hydar-example", "dev-hydar-example\dev-hydar-example.csproj", "{17D7DB40-5A07-4B49-8523-C0E2F5655D13}"
 EndProject
@@ -22,8 +22,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Hydar.Cache.Api", "Dargon.Hydar.Cache.Api\Dargon.Hydar.Cache.Api.csproj", "{7C04D8DE-120D-4CC1-9D2C-6B94175A594C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Platform.Accounts.Impl", "Dargon.Platform.Accounts.Impl\Dargon.Platform.Accounts.Impl.csproj", "{E8C8322C-7E03-46D2-BEA1-1285ECFF8A63}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Ryu.Impl", "..\Dargon.Ryu\Dargon.Ryu.Impl\Dargon.Ryu.Impl.csproj", "{2ED5C703-8A91-4701-9AE9-DA86AA93A169}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "platform-migrations", "platform-migrations\platform-migrations.csproj", "{196D5DC6-FE11-4AFE-BD86-88A669C98F47}"
 EndProject
@@ -87,10 +85,6 @@ Global
 		{E8C8322C-7E03-46D2-BEA1-1285ECFF8A63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E8C8322C-7E03-46D2-BEA1-1285ECFF8A63}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E8C8322C-7E03-46D2-BEA1-1285ECFF8A63}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2ED5C703-8A91-4701-9AE9-DA86AA93A169}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2ED5C703-8A91-4701-9AE9-DA86AA93A169}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2ED5C703-8A91-4701-9AE9-DA86AA93A169}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2ED5C703-8A91-4701-9AE9-DA86AA93A169}.Release|Any CPU.Build.0 = Release|Any CPU
 		{196D5DC6-FE11-4AFE-BD86-88A669C98F47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{196D5DC6-FE11-4AFE-BD86-88A669C98F47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{196D5DC6-FE11-4AFE-BD86-88A669C98F47}.Release|Any CPU.ActiveCfg = Release|Any CPU
