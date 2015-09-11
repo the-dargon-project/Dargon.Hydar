@@ -7,6 +7,7 @@ namespace Dargon.Platform.Accounts.Hydar {
 
       public AccountsApiDomainPofContext() {
          RegisterPortableObjectType(kBasePofId + 0, typeof(Account));
+         RegisterPortableObjectType(kBasePofId + 1, typeof(UsernameTakenException));
       }
    }
 }

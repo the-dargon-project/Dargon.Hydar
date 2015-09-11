@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using Dargon.Ryu;
 using ItzWarty;
 using Nancy;
@@ -10,10 +6,11 @@ using Nancy.Conventions;
 using Nancy.Cryptography;
 using Nancy.Culture;
 using Nancy.Diagnostics;
-using Nancy.Diagnostics.Modules;
 using Nancy.ErrorHandling;
 using Nancy.Localization;
 using Nancy.ModelBinding;
+using Nancy.ModelBinding.DefaultBodyDeserializers;
+using Nancy.ModelBinding.DefaultConverters;
 using Nancy.Responses;
 using Nancy.Responses.Negotiation;
 using Nancy.Routing;
@@ -21,8 +18,11 @@ using Nancy.Routing.Constraints;
 using Nancy.Routing.Trie;
 using Nancy.Security;
 using Nancy.Validation;
+using Nancy.Validation.FluentValidation;
 using Nancy.ViewEngines;
 using Nancy.ViewEngines.SuperSimpleViewEngine;
+using System.Collections.Generic;
+using FluentValidation;
 
 namespace Dargon.Platform.FrontendApplicationBase {
    public class NancyRyuPackage : RyuPackageV1 {
@@ -50,7 +50,8 @@ namespace Dargon.Platform.FrontendApplicationBase {
          Singleton<IEnumerable<ISerializer>>(ryu => ryu.Find<ISerializer>());
          Singleton<IResponseFormatterFactory, DefaultResponseFormatterFactory>();
          Singleton<IModelBinderLocator>(ryu => ryu.Get<DefaultModelBinderLocator>());
-         Singleton<DefaultModelBinderLocator>(ryu => new DefaultModelBinderLocator(ryu.Find<IModelBinder>(), null));
+         Singleton<DefaultModelBinderLocator>(ryu => new DefaultModelBinderLocator(ryu.Find<IModelBinder>(), ryu.Get<IBinder>()));
+         Singleton<IBinder>(ryu => ryu.Get<DefaultBinder>());
          Singleton<IEnumerable<IModelValidatorFactory>>(ryu => ryu.Find<IModelValidatorFactory>());
          Singleton<IModelValidatorLocator, DefaultValidatorLocator>();
          Singleton<IRouteCache, RouteCache>();
@@ -98,8 +99,15 @@ namespace Dargon.Platform.FrontendApplicationBase {
          Singleton<IStaticContentProvider, DefaultStaticContentProvider>();
          Singleton<StaticContentsConventions>(ryu => new StaticContentsConventions(nancyConventions.StaticContentsConventions));
          Singleton<DefaultRouteCacheProvider>(ryu => new DefaultRouteCacheProvider(ryu.Get<IRouteCache>));
-         Singleton<DefaultBinder>(ryu => new DefaultBinder(ryu.Find<ITypeConverter>(), ryu.Find<IBodyDeserializer>(), ryu.Get<IFieldNameConverter>(), ryu.Get<BindingDefaults>()));
+         Singleton<JsonBodyDeserializer>(RyuTypeFlags.Required);
+         Singleton<XmlBodyDeserializer>(RyuTypeFlags.Required);
+         Singleton<CollectionConverter>(RyuTypeFlags.Required);
+         Singleton<DateTimeConverter>(RyuTypeFlags.Required);
+         Singleton<FallbackConverter>(RyuTypeFlags.Required);
+         Singleton<NumericConverter>(RyuTypeFlags.Required);
          Singleton<IFieldNameConverter>(ryu => new DefaultFieldNameConverter());
+         Singleton<BindingDefaults>();
+         Singleton<DefaultBinder>(ryu => new DefaultBinder(ryu.Find<ITypeConverter>(), ryu.Find<IBodyDeserializer>(), ryu.Get<IFieldNameConverter>(), ryu.Get<BindingDefaults>()), RyuTypeFlags.Required);
          Singleton<FileSystemViewLocationProvider>(ryu => new FileSystemViewLocationProvider(ryu.Get<IRootPathProvider>()));
          Singleton<IEncryptionProvider, RijndaelEncryptionProvider>();
          Singleton<IKeyGenerator, RandomKeyGenerator>();
@@ -125,6 +133,11 @@ namespace Dargon.Platform.FrontendApplicationBase {
          Singleton<CsrfApplicationStartup>(ryu => new CsrfApplicationStartup(ryu.Get<CryptographyConfiguration>(), ryu.Get<IObjectSerializer>(), ryu.Get<ICsrfTokenValidator>()));
          Singleton<RootPathApplicationStartup>(ryu => new RootPathApplicationStartup(ryu.Get<IRootPathProvider>()));
          Singleton<ViewEngineApplicationStartup>(ryu => new ViewEngineApplicationStartup(ryu.Find<IViewEngine>(), ryu.Get<IViewCache>(), ryu.Get<IViewLocator>()));
+
+         // Nancy.Validation.FluentValidation
+         Singleton<FluentValidationValidatorFactory>(ryu => new FluentValidationValidatorFactory(ryu.Get<IFluentAdapterFactory>(), ryu.Find<IValidator>()));
+         Singleton<IFluentAdapterFactory, DefaultFluentAdapterFactory>();
+         Singleton<DefaultFluentAdapterFactory>(ryu => new DefaultFluentAdapterFactory(ryu.Find<IFluentAdapter>()));
       }
    }
 }

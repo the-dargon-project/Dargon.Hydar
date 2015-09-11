@@ -1,6 +1,7 @@
 ﻿using System;
 using CommandLine;
 using System.Threading;
+using FluentValidation;
 using ItzWarty;
 using NLog;
 using NLog.Config;

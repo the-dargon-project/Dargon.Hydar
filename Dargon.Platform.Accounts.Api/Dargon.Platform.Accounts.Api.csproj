@@ -62,7 +62,7 @@
     <Compile Include="AccountLookupService.cs" />
     <Compile Include="UsernameTakenException.cs" />
     <Compile Include="AccountService.cs" />
-    <Compile Include="Domain\AccountsApiDomainPofContext.cs" />
+    <Compile Include="AccountsApiPofContext.cs" />
     <Compile Include="DargonPlatformAccountsApiRyuPackage.cs" />
     <Compile Include="Domain\Account.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

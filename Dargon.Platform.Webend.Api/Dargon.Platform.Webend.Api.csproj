@@ -50,7 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResponseCode.cs" />
     <Compile Include="WebendConfiguration.cs" />
     <Compile Include="WebendRyuPackageV1Extensions.cs" />
     <Compile Include="WebApiModuleV1.cs" />
