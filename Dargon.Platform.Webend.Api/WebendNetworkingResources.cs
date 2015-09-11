@@ -2,10 +2,10 @@
 
 namespace Dargon.Platform.Webend {
    public interface WebendNetworkingResources {
-      IServiceClient CorePlatform { get; }
+      ServiceClient CorePlatform { get; }
    }
 
    public class WebendNetworkingResourcesImpl : WebendNetworkingResources {
-      public IServiceClient CorePlatform { get; set; }
+      public ServiceClient CorePlatform { get; set; }
    }
 }

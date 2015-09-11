@@ -60,6 +60,7 @@ namespace Dargon.Hydar {
          ryu.Set<IManagementServerConfiguration>(new ManagementServerConfiguration(managementServerEndpoint));
 
          // Initialize Hydar Cache
+         ryu.Touch<ServicesRyuPackage>();
          ryu.Touch<HydarRyuPackage>();
          var cacheInitializer = ryu.Get<CacheInitializerFacade>();
 

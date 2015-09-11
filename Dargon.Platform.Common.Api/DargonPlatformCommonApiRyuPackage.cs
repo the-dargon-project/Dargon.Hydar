@@ -14,9 +14,8 @@ namespace Dargon.Platform.Common {
 
       private PlatformNetworkingResources ConstructPlatformNetworkingResources(RyuContainer ryu) {
          var configuration = ryu.Get<PlatformConfiguration>();
-         var serviceClientFactory = ryu.Get<IServiceClientFactory>();
-         var clusteringConfiguration = new ClusteringConfiguration(configuration.ServicePort, 1000, ClusteringRoleFlags.HostOnly);
-         var serviceClient = serviceClientFactory.CreateOrJoin(clusteringConfiguration);
+         var serviceClientFactory = ryu.Get<ServiceClientFactory>();
+         var serviceClient = serviceClientFactory.Local(configuration.ServicePort, ClusteringRole.HostOnly);
          return new PlatformNetworkingResourcesImpl {
             LocalServiceClient = serviceClient
          };

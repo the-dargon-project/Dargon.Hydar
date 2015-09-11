@@ -7,10 +7,10 @@ using Dargon.Services;
 
 namespace Dargon.Platform.Common {
    public interface PlatformNetworkingResources {
-      IServiceClient LocalServiceClient { get; }
+      ServiceClient LocalServiceClient { get; }
    }
 
    public class PlatformNetworkingResourcesImpl : PlatformNetworkingResources {
-      public IServiceClient LocalServiceClient { get; set; }
+      public ServiceClient LocalServiceClient { get; set; }
    }
 }

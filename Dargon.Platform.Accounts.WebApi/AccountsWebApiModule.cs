@@ -20,8 +20,7 @@ namespace Dargon.Platform.Accounts.WebApi {
          string username = "warty";
          string saltedPassword = "test";
          Guid accountId = Guid.Empty, accessToken = Guid.Empty;
-//         var authenticationResult = await Async(() => accountService.TryAuthenticate(username, saltedPassword, out accountId, out accessToken));
-         var authenticationResult = accountService.TryAuthenticate(username, saltedPassword, out accountId, out accessToken);
+         var authenticationResult = await Async(() => accountService.TryAuthenticate(username, saltedPassword, out accountId, out accessToken));
          return new { Success = authenticationResult, AccountId = accountId, AccessToken = accessToken };
       }
    }

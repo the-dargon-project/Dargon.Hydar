@@ -24,7 +24,7 @@ namespace Dargon.Hydar.Cache {
          var networkingResources = ryu.Get<HydarNetworkingResources>();
          return new CacheFactoryImpl(
             ryu.Get<GuidHelper>(),
-            ryu.Get<IServiceClientFactory>(),
+            ryu.Get<ServiceClientFactory>(),
             networkingResources.LocalServiceClient,
             networkingResources.LocalCourierClient,
             ryu.Get<ILocalManagementServer>(),
@@ -43,9 +43,8 @@ namespace Dargon.Hydar.Cache {
          var hydarConfiguration = ryu.Get<HydarConfiguration>();
 
          // Initialize Dargon.Services
-         var clusteringConfiguration = new ClusteringConfiguration(hydarConfiguration.ServicePort, 1000, ClusteringRoleFlags.HostOnly);
-         var serviceClientFactory = ryu.Get<IServiceClientFactory>();
-         var serviceClient = serviceClientFactory.CreateOrJoin(clusteringConfiguration);
+         var serviceClientFactory = ryu.Get<ServiceClientFactory>();
+         var serviceClient = serviceClientFactory.Local(hydarConfiguration.ServicePort, ClusteringRole.HostOnly);
 
          // Initialize Dargon.Courier
          var courierClientFactory = ryu.Get<CourierClientFactory>();

@@ -9,11 +9,11 @@ using ItzWarty.Collections;
 namespace Dargon.Hydar.Cache.Services {
    public class RemoteServiceContainer<TKey, TValue> {
       private readonly CacheConfiguration<TKey, TValue> cacheConfiguration;
-      private readonly IServiceClientFactory serviceClientFactory;
+      private readonly ServiceClientFactory serviceClientFactory;
       private readonly ReadablePeerRegistry readablePeerRegistry;
-      private readonly IConcurrentDictionary<IPEndPoint, IServiceClient> serviceClientsByOrigin;
+      private readonly IConcurrentDictionary<IPEndPoint, ServiceClient> serviceClientsByOrigin;
 
-      public RemoteServiceContainer(CacheConfiguration<TKey, TValue> cacheConfiguration, IServiceClientFactory serviceClientFactory, ReadablePeerRegistry readablePeerRegistry, IConcurrentDictionary<IPEndPoint, IServiceClient> serviceClientsByOrigin) {
+      public RemoteServiceContainer(CacheConfiguration<TKey, TValue> cacheConfiguration, ServiceClientFactory serviceClientFactory, ReadablePeerRegistry readablePeerRegistry, IConcurrentDictionary<IPEndPoint, ServiceClient> serviceClientsByOrigin) {
          this.cacheConfiguration = cacheConfiguration;
          this.serviceClientFactory = serviceClientFactory;
          this.readablePeerRegistry = readablePeerRegistry;
@@ -25,9 +25,8 @@ namespace Dargon.Hydar.Cache.Services {
          return serviceClient.GetService<CacheService<TKey, TValue>>(cacheConfiguration.Guid);
       }
 
-      private IServiceClient ConstructServiceClient(IPAddress address, int port) {
-         IClusteringConfiguration clusteringConfiguration = new ClusteringConfiguration(address, port, ClusteringRoleFlags.GuestOnly);
-         return serviceClientFactory.CreateOrJoin(clusteringConfiguration);
+      private ServiceClient ConstructServiceClient(IPAddress address, int port) {
+         return serviceClientFactory.Remote(address, port);
       }
 
       public CacheService<TKey, TValue> GetCacheService(Guid peerIdentifier) {

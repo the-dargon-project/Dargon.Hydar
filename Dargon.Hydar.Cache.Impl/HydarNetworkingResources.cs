@@ -3,12 +3,12 @@ using Dargon.Services;
 
 namespace Dargon.Hydar.Cache {
    public interface HydarNetworkingResources {
-      IServiceClient LocalServiceClient { get; }
+      ServiceClient LocalServiceClient { get; }
       CourierClient LocalCourierClient { get; }
    }
 
    public class HydarNetworkingResourcesImpl : HydarNetworkingResources {
       public CourierClient LocalCourierClient { get; set; }
-      public IServiceClient LocalServiceClient { get; set; }
+      public ServiceClient LocalServiceClient { get; set; }
    }
 }

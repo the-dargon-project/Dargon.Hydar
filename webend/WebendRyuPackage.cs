@@ -4,6 +4,8 @@ using Dargon.Platform.Accounts;
 using Dargon.Ryu;
 using Dargon.Services;
 using Dargon.Services.Clustering;
+using Dargon.Services.Clustering.Remote;
+using ItzWarty;
 using ItzWarty.Collections;
 
 namespace Dargon.Platform.Webend {
@@ -21,20 +23,12 @@ namespace Dargon.Platform.Webend {
       }
 
       private WebendNetworkingResources ConstructWebendServiceClients(RyuContainer ryu) {
+         var proxyGenerator = ryu.Get<ProxyGenerator>();
          var configuration = ryu.Get<WebendConfiguration>();
-         var serviceClientFactory = ryu.Get<IServiceClientFactory>();
-         
-         var initialRemoteServiceClientsByIpEndpoint = new ConcurrentDictionary<IPEndPoint, IServiceClient>();
-         foreach (var platformServiceEndpoint in configuration.PlatformServiceEndpoints) {
-            initialRemoteServiceClientsByIpEndpoint.GetOrAdd(
-               platformServiceEndpoint,
-               add => serviceClientFactory.CreateOrJoin(new ClusteringConfiguration(platformServiceEndpoint.Address, platformServiceEndpoint.Port, ClusteringRoleFlags.GuestOnly)));
-         }
-
-         var container = new RemoteClusterServiceProxyContainerImpl(
-            ryu.Get<ProxyGenerator>(),
-            initialRemoteServiceClientsByIpEndpoint);
-         var serviceClient = new RemoteClusterServiceClientImpl(container);
+         var serviceClientFactory = ryu.Get<ServiceClientFactory>();
+         var container = new RemoteServiceClientContainerImpl(serviceClientFactory);
+         configuration.PlatformServiceEndpoints.ForEach(container.AddEndPoint);
+         var serviceClient = new ServiceClientProxyImpl(new InvalidLocalServiceRegistryImpl(), new LoadBalancedRemoteServiceProxyContainerImpl(proxyGenerator, container));
 
          return new WebendNetworkingResourcesImpl {
             CorePlatform = serviceClient

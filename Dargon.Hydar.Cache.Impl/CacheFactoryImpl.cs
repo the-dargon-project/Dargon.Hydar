@@ -25,14 +25,14 @@ namespace Dargon.Hydar.Cache {
       private const string kCacheMobNamePrefix = "@Hydar.";
 
       private readonly GuidHelper guidHelper;
-      private readonly IServiceClientFactory serviceClientFactory;
-      private readonly IServiceClient serviceClient;
+      private readonly ServiceClientFactory serviceClientFactory;
+      private readonly ServiceClient serviceClient;
       private readonly CourierClient courierClient;
       private readonly ILocalManagementServer localManagementServer;
       private readonly ReceivedMessageFactory receivedMessageFactory;
       private readonly IPofContext pofContext;
 
-      public CacheFactoryImpl(GuidHelper guidHelper, IServiceClientFactory serviceClientFactory, IServiceClient serviceClient, CourierClient courierClient, ILocalManagementServer localManagementServer, ReceivedMessageFactory receivedMessageFactory, IPofContext pofContext) {
+      public CacheFactoryImpl(GuidHelper guidHelper, ServiceClientFactory serviceClientFactory, ServiceClient serviceClient, CourierClient courierClient, ILocalManagementServer localManagementServer, ReceivedMessageFactory receivedMessageFactory, IPofContext pofContext) {
          this.guidHelper = guidHelper;
          this.serviceClientFactory = serviceClientFactory;
          this.serviceClient = serviceClient;
@@ -68,7 +68,7 @@ namespace Dargon.Hydar.Cache {
          }
          var cacheStore = cacheConfiguration.Storage;
 
-         var serviceClientsByOrigin = new ConcurrentDictionary<IPEndPoint, IServiceClient>();
+         var serviceClientsByOrigin = new ConcurrentDictionary<IPEndPoint, ServiceClient>();
          var remoteServiceContainer = new RemoteServiceContainer<TKey, TValue>(cacheConfiguration, serviceClientFactory, peerRegistry, serviceClientsByOrigin);
 
          var keyspace = new Keyspace(1024, 1);
