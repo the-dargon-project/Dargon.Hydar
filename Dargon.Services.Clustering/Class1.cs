@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using Castle.DynamicProxy;
+using ItzWarty.Collections;
+using System;
 using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using Castle.DynamicProxy;
-using ItzWarty.Collections;
-using NLog;
 
 namespace Dargon.Services.Clustering {
    internal static class AttributeUtilities {
@@ -96,7 +91,6 @@ namespace Dargon.Services.Clustering {
    }
 
    public class RoundRobinServiceProxyInterceptorImpl<TService> : IInterceptor where TService : class {
-      private static Logger logger = LogManager.GetCurrentClassLogger();
       private readonly object updateSynchronization = new object();
       private readonly RemoteServiceClientsSource remoteServiceClientsSource;
       private readonly Guid serviceGuid;
