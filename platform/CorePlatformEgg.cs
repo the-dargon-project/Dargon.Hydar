@@ -1,25 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
-using Dargon.Courier;
-using Dargon.Courier.Messaging;
 using Dargon.Hydar.Cache;
-using Dargon.Hydar.Cache.Messaging;
-using Dargon.Management;
 using Dargon.Management.Server;
 using Dargon.Nest.Egg;
 using Dargon.Platform.Accounts;
 using Dargon.Platform.Common;
 using Dargon.Platform.Common.Cache;
-using Dargon.PortableObjects;
 using Dargon.Ryu;
-using Dargon.Services;
-using Dargon.Zilean.Client;
 using ItzWarty;
 using ItzWarty.Networking;
 using MicroLite.Configuration;
-using NLog;
+using System;
+using System.Collections.Generic;
 
 namespace Dargon.Hydar {
    public class CorePlatformEgg : INestApplicationEgg {
@@ -36,6 +26,9 @@ namespace Dargon.Hydar {
       }
 
       public NestResult Start(CorePlatformOptions corePlatformOptions) {
+         ryu.Touch<ItzWartyCommonsRyuPackage>();
+         ryu.Touch<ItzWartyProxiesRyuPackage>();
+
          Configure.Extensions().WithAttributeBasedMapping();
 
          ryu.Set<HydarConfiguration>(new HydarConfigurationImpl {
@@ -53,31 +46,21 @@ namespace Dargon.Hydar {
                .CreateSessionFactory()
          });
 
-         ryu.Touch<ItzWartyProxiesRyuPackage>();
+         ryu.Set<SystemState>(new PlatformSystemStateImpl());
 
          // Dargon.Management
          var managementServerEndpoint = ryu.Get<INetworkingProxy>().CreateAnyEndPoint(corePlatformOptions.ManagementPort);
          ryu.Set<IManagementServerConfiguration>(new ManagementServerConfiguration(managementServerEndpoint));
 
          // Initialize Hydar Cache
-         ryu.Touch<ServicesRyuPackage>();
-         ryu.Touch<HydarRyuPackage>();
-         var cacheInitializer = ryu.Get<CacheInitializerFacade>();
-
-         ryu.Set<SystemState>(new PlatformSystemStateImpl());
-         ryu.Setup();
-         ryu.Touch<ZileanClientApiRyuPackage>();
-         ryu.Touch<DargonPlatformAccountsImplRyuPackage>();
+         ((RyuContainerImpl)ryu).Setup(true);
 
          Console.WriteLine("Initialized!");
 
-         var accountService = ryu.Get<AccountService>();
-
-         Guid accountId, accessToken;
-         var authenticationResult = accountService.TryAuthenticate("Warty", "test", out accountId, out accessToken);
-         Console.WriteLine("Authentication result: " + authenticationResult + " accountId: " + accountId + " accessToken: " + accessToken);
-//         var accountId = accountService.CreateAccount("Warty", "test");
-//         Console.WriteLine("Created account " + accountId);
+//         var accountService = ryu.Get<AccountService>();
+//         Guid accountId, accessToken;
+//         var authenticationResult = accountService.TryAuthenticate("Warty", "test", out accountId, out accessToken);
+//         Console.WriteLine("Authentication result: " + authenticationResult + " accountId: " + accountId + " accessToken: " + accessToken);
 
          return NestResult.Success;
       }

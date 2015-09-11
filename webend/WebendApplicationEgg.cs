@@ -30,8 +30,7 @@ namespace Dargon.Platform.Webend {
          ryu.Set<WebendConfiguration>(new WebendConfigurationImpl {
             PlatformServiceEndpoints = ParseIpEndpoints(webendOptions.PlatformServiceEndpoints)
          });
-         ryu.Setup();
-         ForceLoadDirectoryAssemblies(ryu);
+         ((RyuContainerImpl)ryu).Setup(true);
          if (nancyHost == null) {
             var bootstrapper = new RyuNancyBootstrapper(ryu);
             nancyHost = new NancyHost(new Uri(baseUrl), bootstrapper);
@@ -43,22 +42,6 @@ namespace Dargon.Platform.Webend {
       public NestResult Shutdown() {
          nancyHost.Stop();
          return NestResult.Success;
-      }
-
-      /// <summary>
-      /// Assemblies seem to only be loaded when they are needed.
-      /// This forces the assemblies to be loaded immediately, so that ryu can
-      /// detect packages and nancy modules.
-      /// </summary>
-      private static void ForceLoadDirectoryAssemblies(RyuContainer ryu) {
-         var assemblies = Directory.EnumerateFiles(new FileInfo(Assembly.GetExecutingAssembly().Location).DirectoryName, "*.dll", SearchOption.AllDirectories);
-         foreach (var assemblyPath in assemblies) {
-            try {
-               var assembly = Assembly.LoadFrom(assemblyPath);
-               Console.WriteLine("Force load: " + assemblyPath);
-               ryu.Touch(assembly);
-            } catch (Exception) { }
-         }
       }
 
       private IPEndPoint[] ParseIpEndpoints(string input) {
