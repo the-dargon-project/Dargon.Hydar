@@ -14,7 +14,7 @@ namespace Dargon.Platform.Accounts {
 
       public Guid CreateAccount(string username, string saltedPassword) => accountCreationService.CreateAccount(username, saltedPassword);
 
-      public bool TryAuthenticate(string username, string saltedPassword) => accountAuthenticationService.TryAuthenticate(username, saltedPassword);
+      public bool TryAuthenticate(string username, string saltedPassword, out Guid accountId, out Guid accessToken) => accountAuthenticationService.TryAuthenticate(username, saltedPassword, out accountId, out accessToken);
 
       public bool TryGetAccountIdByUsername(string name, out Guid accountId) => accountLookupService.TryGetAccountIdByUsername(name, out accountId);
    }

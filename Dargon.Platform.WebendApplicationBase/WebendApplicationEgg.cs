@@ -15,7 +15,6 @@ namespace Dargon.Platform.FrontendApplicationBase {
 
       public WebendApplicationEgg() {
          this.ryu = new RyuFactory().Create();
-         WebApiModule.SetRyuContainer(ryu);
       }
 
       public NestResult Start(IEggParameters parameters) {

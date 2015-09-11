@@ -75,8 +75,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Dargon.Services.Impl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dargon.Services.Impl.0.5.1\lib\net45\Dargon.Services.Impl.dll</HintPath>
-      <Private>True</Private>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Dargon.Services.Impl.0.6.0\lib\net45\Dargon.Services.Impl.dll</HintPath>
     </Reference>
     <Reference Include="Dargon.SystemState.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dargon.SystemState.Api.0.1.1\lib\net45\Dargon.SystemState.Api.dll</HintPath>

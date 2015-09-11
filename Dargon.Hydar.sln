@@ -37,6 +37,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Platform.Frontend.Ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Platform.WebendApplicationBase", "Dargon.Platform.WebendApplicationBase\Dargon.Platform.WebendApplicationBase.csproj", "{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Platform.Webend.Api", "Dargon.Platform.Webend.Api\Dargon.Platform.Webend.Api.csproj", "{5A64E6EC-B36D-4FD5-ABC7-50463AD643BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Platform.Accounts.WebApi", "Dargon.Platform.Accounts.WebApi\Dargon.Platform.Accounts.WebApi.csproj", "{75AB531C-DC4C-417F-90C4-5C923C7D0D2F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +115,14 @@ Global
 		{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A64E6EC-B36D-4FD5-ABC7-50463AD643BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A64E6EC-B36D-4FD5-ABC7-50463AD643BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A64E6EC-B36D-4FD5-ABC7-50463AD643BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A64E6EC-B36D-4FD5-ABC7-50463AD643BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75AB531C-DC4C-417F-90C4-5C923C7D0D2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75AB531C-DC4C-417F-90C4-5C923C7D0D2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75AB531C-DC4C-417F-90C4-5C923C7D0D2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75AB531C-DC4C-417F-90C4-5C923C7D0D2F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

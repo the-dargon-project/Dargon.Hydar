@@ -24,7 +24,7 @@ namespace Dargon.Platform.Accounts {
             var caches = ryu.Get<Caches>();
             var accountProcessorFactory = ryu.Get<AccountProcessorFactory>();
             var accountLookupService = ryu.Get<AccountLookupService>();
-            return new AccountAuthenticationServiceImpl(caches.Account, accountProcessorFactory, accountLookupService);
+            return new AccountAuthenticationServiceImpl(caches.Account, caches.AccessTokenCache, accountProcessorFactory, accountLookupService);
          });
          LocalService<AccountService, AccountServiceProxyImpl>(RyuTypeFlags.None);
          PofContext<AccountsImplHydarPofContext>();

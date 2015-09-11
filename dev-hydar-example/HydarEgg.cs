@@ -76,9 +76,10 @@ namespace Dargon.Hydar {
          Console.WriteLine("Initialized!");
 
          var accountService = ryu.Get<AccountService>();
-         
-         var authenticationResult = accountService.TryAuthenticate("Warty", "test");
-         Console.WriteLine("Authentication result: " + authenticationResult);
+
+         Guid accountId, accessToken;
+         var authenticationResult = accountService.TryAuthenticate("Warty", "test", out accountId, out accessToken);
+         Console.WriteLine("Authentication result: " + authenticationResult + " accountId: " + accountId + " accessToken: " + accessToken);
 //         var accountId = accountService.CreateAccount("Warty", "test");
 //         Console.WriteLine("Created account " + accountId);
 
