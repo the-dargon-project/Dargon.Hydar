@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dev-hydar-example", "dev-hydar-example\dev-hydar-example.csproj", "{17D7DB40-5A07-4B49-8523-C0E2F5655D13}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Courier.Impl", "..\Dargon.Courier\Dargon.Courier.Impl\Dargon.Courier.Impl.csproj", "{648271D2-2A52-4496-A9D1-6E54353D1448}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Courier.Api", "..\Dargon.Courier\Dargon.Courier\Dargon.Courier.Api.csproj", "{00A1DA2F-D316-4387-8BD4-F1A47C05A402}"
@@ -33,11 +31,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Hydar.Cache.Data.Sto
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Platform.Frontend.Api", "Dargon.Platform.Frontend.Api\Dargon.Platform.Frontend.Api.csproj", "{6F4261B8-3FA0-4738-956A-22FB512930F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Platform.WebendApplicationBase", "Dargon.Platform.WebendApplicationBase\Dargon.Platform.WebendApplicationBase.csproj", "{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Platform.Webend.Api", "Dargon.Platform.Webend.Api\Dargon.Platform.Webend.Api.csproj", "{5A64E6EC-B36D-4FD5-ABC7-50463AD643BE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Platform.Accounts.WebApi", "Dargon.Platform.Accounts.WebApi\Dargon.Platform.Accounts.WebApi.csproj", "{75AB531C-DC4C-417F-90C4-5C923C7D0D2F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "platform", "platform\platform.csproj", "{17D7DB40-5A07-4B49-8523-C0E2F5655D13}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "webend", "webend\webend.csproj", "{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Services.Clustering", "Dargon.Services.Clustering\Dargon.Services.Clustering.csproj", "{A496D352-16CE-45C0-940C-790648D7FC71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Ryu.Impl", "..\Dargon.Ryu\Dargon.Ryu.Impl\Dargon.Ryu.Impl.csproj", "{2ED5C703-8A91-4701-9AE9-DA86AA93A169}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,10 +49,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{17D7DB40-5A07-4B49-8523-C0E2F5655D13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{17D7DB40-5A07-4B49-8523-C0E2F5655D13}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{17D7DB40-5A07-4B49-8523-C0E2F5655D13}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{17D7DB40-5A07-4B49-8523-C0E2F5655D13}.Release|Any CPU.Build.0 = Release|Any CPU
 		{648271D2-2A52-4496-A9D1-6E54353D1448}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{648271D2-2A52-4496-A9D1-6E54353D1448}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{648271D2-2A52-4496-A9D1-6E54353D1448}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -105,10 +105,6 @@ Global
 		{6F4261B8-3FA0-4738-956A-22FB512930F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F4261B8-3FA0-4738-956A-22FB512930F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F4261B8-3FA0-4738-956A-22FB512930F5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5A64E6EC-B36D-4FD5-ABC7-50463AD643BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5A64E6EC-B36D-4FD5-ABC7-50463AD643BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A64E6EC-B36D-4FD5-ABC7-50463AD643BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -117,6 +113,22 @@ Global
 		{75AB531C-DC4C-417F-90C4-5C923C7D0D2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75AB531C-DC4C-417F-90C4-5C923C7D0D2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75AB531C-DC4C-417F-90C4-5C923C7D0D2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17D7DB40-5A07-4B49-8523-C0E2F5655D13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17D7DB40-5A07-4B49-8523-C0E2F5655D13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17D7DB40-5A07-4B49-8523-C0E2F5655D13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17D7DB40-5A07-4B49-8523-C0E2F5655D13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A496D352-16CE-45C0-940C-790648D7FC71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A496D352-16CE-45C0-940C-790648D7FC71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A496D352-16CE-45C0-940C-790648D7FC71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A496D352-16CE-45C0-940C-790648D7FC71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2ED5C703-8A91-4701-9AE9-DA86AA93A169}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2ED5C703-8A91-4701-9AE9-DA86AA93A169}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2ED5C703-8A91-4701-9AE9-DA86AA93A169}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2ED5C703-8A91-4701-9AE9-DA86AA93A169}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

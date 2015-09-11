@@ -4,6 +4,7 @@ using Dargon.Platform.Accounts.Management;
 using Dargon.Platform.Common.Cache;
 using Dargon.Ryu;
 using Dargon.Zilean;
+using Dargon.Platform.Common;
 
 namespace Dargon.Platform.Accounts {
    public class DargonPlatformAccountsImplRyuPackage : RyuPackageV1 {
@@ -26,7 +27,7 @@ namespace Dargon.Platform.Accounts {
             var accountLookupService = ryu.Get<AccountLookupService>();
             return new AccountAuthenticationServiceImpl(caches.Account, caches.AccessTokenCache, accountProcessorFactory, accountLookupService);
          });
-         LocalService<AccountService, AccountServiceProxyImpl>(RyuTypeFlags.None);
+         this.LocalCorePlatformService<AccountService, AccountServiceProxyImpl>();
          PofContext<AccountsImplHydarPofContext>();
          Mob<AccountsMob>(RyuTypeFlags.None);
       }

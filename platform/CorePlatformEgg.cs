@@ -10,6 +10,7 @@ using Dargon.Management;
 using Dargon.Management.Server;
 using Dargon.Nest.Egg;
 using Dargon.Platform.Accounts;
+using Dargon.Platform.Common;
 using Dargon.Platform.Common.Cache;
 using Dargon.PortableObjects;
 using Dargon.Ryu;
@@ -21,11 +22,11 @@ using MicroLite.Configuration;
 using NLog;
 
 namespace Dargon.Hydar {
-   public class HydarEgg : INestApplicationEgg {
+   public class CorePlatformEgg : INestApplicationEgg {
       private readonly List<object> keepalive = new List<object>();
       private readonly RyuContainer ryu;
 
-      public HydarEgg() {
+      public CorePlatformEgg() {
          ryu = new RyuFactory().Create();
 //         ((RyuContainerImpl)ryu).SetLoggerEnabled(true);
       }
@@ -34,39 +35,33 @@ namespace Dargon.Hydar {
          throw new NotImplementedException();
       }
 
-      public NestResult Start(int servicePort, int managementPort, string connectionString) {
+      public NestResult Start(CorePlatformOptions corePlatformOptions) {
          Configure.Extensions().WithAttributeBasedMapping();
+
+         ryu.Set<HydarConfiguration>(new HydarConfigurationImpl {
+            ServicePort = corePlatformOptions.HydarServicePort,
+            CourierPort = corePlatformOptions.HydarCourierPort
+         });
+
+         ryu.Set<PlatformConfiguration>(new PlatformConfigurationImpl {
+            ServicePort = corePlatformOptions.ServicePort
+         });
 
          ryu.Set<PlatformCacheConfiguration>(new PlatformCacheConfigurationImpl {
             DatabaseSessionFactory = Configure.Fluently()
-               .ForPostgreSqlConnection("Dargon", connectionString, "Npgsql")
+               .ForPostgreSqlConnection("Dargon", corePlatformOptions.ConnectionString, "Npgsql")
                .CreateSessionFactory()
          });
 
          ryu.Touch<ItzWartyProxiesRyuPackage>();
 
          // Dargon.Management
-         var managementServerEndpoint = ryu.Get<INetworkingProxy>().CreateAnyEndPoint(managementPort);
+         var managementServerEndpoint = ryu.Get<INetworkingProxy>().CreateAnyEndPoint(corePlatformOptions.ManagementPort);
          ryu.Set<IManagementServerConfiguration>(new ManagementServerConfiguration(managementServerEndpoint));
-
-         // Dargon.Services for node-to-node networking
-         ryu.Touch<ServicesRyuPackage>();
-         var clusteringConfiguration = new ClusteringConfiguration(servicePort, 1000, ClusteringRoleFlags.HostOnly);
-         ryu.Set<IClusteringConfiguration>(clusteringConfiguration);
-         var serviceClient = ryu.Get<IServiceClient>();
-         keepalive.Add(serviceClient);
-
-         // Initialize Dargon.Courier
-         var courierPort = 50555;
-         var courierClientFactory = ryu.Get<CourierClientFactory>();
-         var courierClient = courierClientFactory.CreateUdpCourierClient(courierPort);
-         ryu.Set<CourierClient>(courierClient);
-         ryu.Set<MessageRouter>(courierClient);
 
          // Initialize Hydar Cache
          ryu.Touch<HydarRyuPackage>();
          var cacheInitializer = ryu.Get<CacheInitializerFacade>();
-         ((CacheInitializerFacadeImpl)cacheInitializer).SetServicePort(servicePort);
 
          ryu.Set<SystemState>(new PlatformSystemStateImpl());
          ryu.Setup();

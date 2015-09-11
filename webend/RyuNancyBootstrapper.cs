@@ -14,6 +14,8 @@ namespace Dargon.Platform.FrontendApplicationBase {
          this.ryu = ryu;
       }
 
+      protected override byte[] FavIcon => null;
+
       protected override IDiagnostics GetDiagnostics() {
          return ryu.Get<IDiagnostics>();
       }

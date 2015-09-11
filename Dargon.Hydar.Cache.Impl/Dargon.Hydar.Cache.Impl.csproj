@@ -108,6 +108,8 @@
     <Compile Include="Data\Storage\CacheStorageStrategyFactory.cs" />
     <Compile Include="Data\Storage\NullCacheStore.cs" />
     <Compile Include="Data\Storage\WriteThroughCacheStorageStrategyImpl.cs" />
+    <Compile Include="HydarConfiguration.cs" />
+    <Compile Include="HydarNetworkingResources.cs" />
     <Compile Include="Management\CacheMob.cs" />
     <Compile Include="Data\Partitioning\Block.cs" />
     <Compile Include="Data\Entries\CacheEntryContext.cs" />

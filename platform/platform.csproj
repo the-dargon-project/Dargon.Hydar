@@ -66,10 +66,6 @@
       <HintPath>..\packages\Dargon.Ryu.Api.0.3.0\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\Dargon.Ryu.Api.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Dargon.Ryu.Impl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dargon.Ryu.Impl.0.3.0\lib\net45\Dargon.Ryu.Impl.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Dargon.Services.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dargon.Services.Api.0.5.0\lib\net45\Dargon.Services.Api.dll</HintPath>
       <Private>True</Private>
@@ -139,7 +135,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HydarEgg.cs" />
+    <Compile Include="CorePlatformEgg.cs" />
+    <Compile Include="CorePlatformOptions.cs" />
     <Compile Include="PlatformSystemStateImpl.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -154,6 +151,10 @@
     <ProjectReference Include="..\..\Dargon.Courier\Dargon.Courier\Dargon.Courier.Api.csproj">
       <Project>{00a1da2f-d316-4387-8bd4-f1a47c05a402}</Project>
       <Name>Dargon.Courier.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Dargon.Ryu\Dargon.Ryu.Impl\Dargon.Ryu.Impl.csproj">
+      <Project>{2ed5c703-8a91-4701-9ae9-da86aa93a169}</Project>
+      <Name>Dargon.Ryu.Impl</Name>
     </ProjectReference>
     <ProjectReference Include="..\Dargon.Hydar.Cache.Api\Dargon.Hydar.Cache.Api.csproj">
       <Project>{7c04d8de-120d-4cc1-9d2c-6b94175a594c}</Project>
@@ -174,6 +175,10 @@
     <ProjectReference Include="..\Dargon.Platform.Accounts.Impl\Dargon.Platform.Accounts.Impl.csproj">
       <Project>{e8c8322c-7e03-46d2-bea1-1285ecff8a63}</Project>
       <Name>Dargon.Platform.Accounts.Impl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dargon.Platform.Common.Api\Dargon.Platform.Common.Api.csproj">
+      <Project>{38361FF3-7C91-4582-8016-248EC2DD7A58}</Project>
+      <Name>Dargon.Platform.Common.Api</Name>
     </ProjectReference>
     <ProjectReference Include="..\Dargon.Platform.Common.Cache.Api\Dargon.Platform.Common.Cache.Api.csproj">
       <Project>{B7F8F32A-05DE-4E45-93FB-71B8C73754C4}</Project>

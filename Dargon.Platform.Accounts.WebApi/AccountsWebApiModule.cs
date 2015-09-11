@@ -6,11 +6,11 @@ using static Dargon.Services.AsyncStatics;
 
 namespace Dargon.Platform.Accounts.WebApi {
    public class AccountsWebApiModule : WebApiModuleV1 {
-//      private readonly AccountService accountService;
+      private readonly AccountService accountService;
 
-//      public AccountsWebApiModule(AccountService accountService) {
-//         this.accountService = accountService;
-//      }
+      public AccountsWebApiModule(AccountService accountService) {
+         this.accountService = accountService;
+      }
 
       protected override void SetupRoutes() {
          Get["/authenticate", runAsync: true] = ProxyAsJson(Authenticate);
@@ -20,7 +20,7 @@ namespace Dargon.Platform.Accounts.WebApi {
          string username = "warty";
          string saltedPassword = "test";
          Guid accountId = Guid.Empty, accessToken = Guid.Empty;
-         var authenticationResult = true;//await Async(() => accountService.TryAuthenticate(username, saltedPassword, out accountId, out accessToken));
+         var authenticationResult = await Async(() => accountService.TryAuthenticate(username, saltedPassword, out accountId, out accessToken));
          return new { Success = authenticationResult, AccountId = accountId, AccessToken = accessToken };
       }
    }

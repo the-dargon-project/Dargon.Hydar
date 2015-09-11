@@ -1,14 +1,9 @@
 ﻿using Dargon.Nest.Egg;
+using Dargon.Ryu;
 using Nancy.Hosting.Self;
 using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using Dargon.Platform.Accounts.WebApi;
-using Dargon.Ryu;
-using ItzWarty;
-using Nancy;
-using Nancy.TinyIoc;
 
 namespace Dargon.Platform.FrontendApplicationBase {
    public class WebendApplicationEgg : INestApplicationEgg {
@@ -17,6 +12,7 @@ namespace Dargon.Platform.FrontendApplicationBase {
 
       public WebendApplicationEgg() {
          this.ryu = new RyuFactory().Create();
+         ((RyuContainerImpl)ryu).SetLoggerEnabled(true);
       }
 
       public NestResult Start(IEggParameters parameters) {
@@ -24,7 +20,6 @@ namespace Dargon.Platform.FrontendApplicationBase {
       }
 
       public NestResult Start(string baseUrl) {
-         ((RyuContainerImpl)ryu).SetLoggerEnabled(true);
          ryu.Setup();
          ForceLoadDirectoryAssemblies(ryu);
          if (nancyHost == null) {

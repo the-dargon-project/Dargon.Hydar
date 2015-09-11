@@ -90,6 +90,10 @@
       <Project>{5531CE02-C3D2-4690-B33B-0F64A317C72E}</Project>
       <Name>Dargon.Platform.Accounts.Api</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dargon.Platform.Common.Api\Dargon.Platform.Common.Api.csproj">
+      <Project>{38361FF3-7C91-4582-8016-248EC2DD7A58}</Project>
+      <Name>Dargon.Platform.Common.Api</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dargon.Platform.Common.Cache.Api\Dargon.Platform.Common.Cache.Api.csproj">
       <Project>{b7f8f32a-05de-4e45-93fb-71b8c73754c4}</Project>
       <Name>Dargon.Platform.Common.Cache.Api</Name>

@@ -132,10 +132,6 @@
       <Project>{79B62103-6D47-4650-9868-5A22139CC750}</Project>
       <Name>Dargon.Hydar.Common.Api</Name>
     </ProjectReference>
-    <ProjectReference Include="..\dev-hydar-example\dev-hydar-example.csproj">
-      <Project>{17d7db40-5a07-4b49-8523-c0e2f5655d13}</Project>
-      <Name>dev-hydar-example</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
