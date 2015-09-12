@@ -139,6 +139,14 @@
       <Project>{75ab531c-dc4c-417f-90c4-5c923c7d0d2f}</Project>
       <Name>Dargon.Platform.Accounts.WebApi</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Dargon.Platform.Feedback.Api\Dargon.Platform.Feedback.Api.csproj">
+      <Project>{6E8C5E38-1071-4D47-9C95-2687A28A7DA7}</Project>
+      <Name>Dargon.Platform.Feedback.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dargon.Platform.Feedback.WebApi\Dargon.Platform.Feedback.WebApi.csproj">
+      <Project>{95e5d45b-83d0-4254-bcaa-ce8fc9b022d9}</Project>
+      <Name>Dargon.Platform.Feedback.WebApi</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Dargon.Platform.Webend.Api\Dargon.Platform.Webend.Api.csproj">
       <Project>{5A64E6EC-B36D-4FD5-ABC7-50463AD643BE}</Project>
       <Name>Dargon.Platform.Webend.Api</Name>

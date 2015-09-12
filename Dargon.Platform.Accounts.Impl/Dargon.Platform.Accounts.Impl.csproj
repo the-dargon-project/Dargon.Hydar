@@ -42,7 +42,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Dargon.Zilean.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dargon.Zilean.Api.0.0.0\lib\net45\Dargon.Zilean.Api.dll</HintPath>
+      <HintPath>..\packages\Dargon.Zilean.Api.0.1.1\lib\net45\Dargon.Zilean.Api.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MicroLite">

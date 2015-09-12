@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5A64E6EC-B36D-4FD5-ABC7-50463AD643BE}</ProjectGuid>
+    <ProjectGuid>{6E8C5E38-1071-4D47-9C95-2687A28A7DA7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Dargon.Platform.Webend</RootNamespace>
-    <AssemblyName>Dargon.Platform.Webend.Api</AssemblyName>
+    <RootNamespace>Dargon.Platform.Feedback</RootNamespace>
+    <AssemblyName>Dargon.Platform.Feedback.Api</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,36 +34,18 @@
     <Reference Include="Dargon.PortableObjects">
       <HintPath>..\..\Dargon.Courier\packages\Dargon.PortableObjects.0.1.0\lib\net45\Dargon.PortableObjects.dll</HintPath>
     </Reference>
-    <Reference Include="Dargon.Ryu.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dargon.Ryu.Api.0.3.0\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\Dargon.Ryu.Api.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Dargon.Services.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dargon.Services.Api.1.0.0\lib\net45\Dargon.Services.Api.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Nancy">
-      <HintPath>..\packages\Nancy.1.2.0\lib\net40\Nancy.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApiResponse.cs" />
+    <Compile Include="ClientLogImportingService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResponseCode.cs" />
-    <Compile Include="WebendConfiguration.cs" />
-    <Compile Include="WebendRyuPackageV1Extensions.cs" />
-    <Compile Include="WebApiModuleV1.cs" />
-    <Compile Include="WebendNetworkingResources.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Dargon.Platform.Common.Api\Dargon.Platform.Common.Api.csproj">

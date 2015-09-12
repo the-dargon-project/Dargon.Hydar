@@ -83,7 +83,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Dargon.Zilean.Api, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Dargon.Zilean.Api.0.0.0\lib\net45\Dargon.Zilean.Api.dll</HintPath>
+      <HintPath>..\packages\Dargon.Zilean.Api.0.1.1\lib\net45\Dargon.Zilean.Api.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Dargon.Zilean.Client.Impl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -183,6 +183,10 @@
     <ProjectReference Include="..\Dargon.Platform.Common.Cache.Api\Dargon.Platform.Common.Cache.Api.csproj">
       <Project>{B7F8F32A-05DE-4E45-93FB-71B8C73754C4}</Project>
       <Name>Dargon.Platform.Common.Cache.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Dargon.Platform.Feedback.Impl\Dargon.Platform.Feedback.Impl.csproj">
+      <Project>{49ce03f5-14c0-444e-abb2-afaf8d8383af}</Project>
+      <Name>Dargon.Platform.Feedback.Impl</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Dargon.Platform.Common;
 using Nancy.ModelBinding;
 
 namespace Dargon.Platform.Webend {
@@ -12,6 +13,8 @@ namespace Dargon.Platform.Webend {
       private const string kApiBasePath = "api/" + kApiVersion;
 
       protected WebApiModuleV1(string pathOffset = null) : base(BuildPath(kApiBasePath, pathOffset)) { }
+
+      public ClientDescriptor ClientDescriptor => GetClientDescriptor();
 
       public void Initialize() {
          SetupRoutes();
@@ -88,6 +91,34 @@ namespace Dargon.Platform.Webend {
             accessToken = authorizationHeader.Substring(authorizationHeader.IndexOf(' ') + 1);
             return true;
          }
+      }
+
+      private ClientDescriptor GetClientDescriptor() {
+         var clientIdString = Request.Headers["X-Dargon-Client-Id"].FirstOrDefault();
+         var clientFullName = Request.Headers["X-Dargon-Client-Name"].FirstOrDefault();
+
+         Guid clientId;
+         if (!Guid.TryParse(clientIdString, out clientId)) {
+            clientId = Guid.Empty;
+         }
+
+         string clientName = null, clientVersion = null;
+         if (!string.IsNullOrWhiteSpace(clientFullName)) {
+            var clientFullNameFirstSpaceIndex = clientFullName.IndexOf(' ');
+            if (clientFullNameFirstSpaceIndex < 0) {
+               clientName = clientFullName;
+               clientVersion = "-";
+            } else {
+               clientName = clientFullName.Substring(0, clientFullNameFirstSpaceIndex).Trim();
+               clientVersion = clientFullName.Substring(clientFullNameFirstSpaceIndex + 1).Trim();
+            }
+         }
+
+         return new ClientDescriptor {
+            Id = clientId,
+            Name = clientName,
+            Version = clientVersion
+         };
       }
 
       private Response ConvertResponse<TResponse>(TResponse result) {

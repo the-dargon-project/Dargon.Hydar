@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Castle.DynamicProxy;
 using Dargon.Platform.Accounts;
+using Dargon.Platform.Feedback;
 using Dargon.Ryu;
 using Dargon.Services;
 using Dargon.Services.Clustering;
@@ -13,6 +14,7 @@ namespace Dargon.Platform.Webend {
       public WebendRyuPackage() {
          Singleton<WebendNetworkingResources>(ConstructWebendServiceClients);
          RemotePlatformService<AccountService>();
+         RemotePlatformService<ClientLogImportingService>();
       }
 
       private void RemotePlatformService<TService>() where TService : class {

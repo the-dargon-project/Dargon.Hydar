@@ -39,6 +39,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "platform", "platform\platfo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "webend", "webend\webend.csproj", "{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Platform.Feedback.Api", "Dargon.Platform.Feedback.Api\Dargon.Platform.Feedback.Api.csproj", "{6E8C5E38-1071-4D47-9C95-2687A28A7DA7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Platform.Feedback.Impl", "Dargon.Platform.Feedback.Impl\Dargon.Platform.Feedback.Impl.csproj", "{49CE03F5-14C0-444E-ABB2-AFAF8D8383AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dargon.Platform.Feedback.WebApi", "Dargon.Platform.Feedback.WebApi\Dargon.Platform.Feedback.WebApi.csproj", "{95E5D45B-83D0-4254-BCAA-CE8FC9B022D9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -189,6 +195,30 @@ Global
 		{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}.MonoRelease|Any CPU.Build.0 = Release|Any CPU
 		{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC2B07CA-7CB0-4452-9D87-38DF307C71D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6E8C5E38-1071-4D47-9C95-2687A28A7DA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E8C5E38-1071-4D47-9C95-2687A28A7DA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6E8C5E38-1071-4D47-9C95-2687A28A7DA7}.MonoDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6E8C5E38-1071-4D47-9C95-2687A28A7DA7}.MonoDebug|Any CPU.Build.0 = Debug|Any CPU
+		{6E8C5E38-1071-4D47-9C95-2687A28A7DA7}.MonoRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{6E8C5E38-1071-4D47-9C95-2687A28A7DA7}.MonoRelease|Any CPU.Build.0 = Release|Any CPU
+		{6E8C5E38-1071-4D47-9C95-2687A28A7DA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6E8C5E38-1071-4D47-9C95-2687A28A7DA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49CE03F5-14C0-444E-ABB2-AFAF8D8383AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49CE03F5-14C0-444E-ABB2-AFAF8D8383AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49CE03F5-14C0-444E-ABB2-AFAF8D8383AF}.MonoDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49CE03F5-14C0-444E-ABB2-AFAF8D8383AF}.MonoDebug|Any CPU.Build.0 = Debug|Any CPU
+		{49CE03F5-14C0-444E-ABB2-AFAF8D8383AF}.MonoRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{49CE03F5-14C0-444E-ABB2-AFAF8D8383AF}.MonoRelease|Any CPU.Build.0 = Release|Any CPU
+		{49CE03F5-14C0-444E-ABB2-AFAF8D8383AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49CE03F5-14C0-444E-ABB2-AFAF8D8383AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95E5D45B-83D0-4254-BCAA-CE8FC9B022D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95E5D45B-83D0-4254-BCAA-CE8FC9B022D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95E5D45B-83D0-4254-BCAA-CE8FC9B022D9}.MonoDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95E5D45B-83D0-4254-BCAA-CE8FC9B022D9}.MonoDebug|Any CPU.Build.0 = Debug|Any CPU
+		{95E5D45B-83D0-4254-BCAA-CE8FC9B022D9}.MonoRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{95E5D45B-83D0-4254-BCAA-CE8FC9B022D9}.MonoRelease|Any CPU.Build.0 = Release|Any CPU
+		{95E5D45B-83D0-4254-BCAA-CE8FC9B022D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95E5D45B-83D0-4254-BCAA-CE8FC9B022D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

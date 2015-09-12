@@ -10,6 +10,7 @@ namespace Dargon.Platform.Common {
    public class DargonPlatformCommonApiRyuPackage : RyuPackageV1 {
       public DargonPlatformCommonApiRyuPackage() {
          Singleton<PlatformNetworkingResources>(ConstructPlatformNetworkingResources);
+         PofContext<DargonPlatformCommonApiPofContext>();
       }
 
       private PlatformNetworkingResources ConstructPlatformNetworkingResources(RyuContainer ryu) {
