@@ -6,20 +6,20 @@ using Dargon.Platform.Accounts.Hydar.Processors;
 namespace Dargon.Platform.Accounts {
    public class AccountAuthenticationServiceImpl : AccountAuthenticationService {
       private readonly Cache<Guid, Account> accountCache;
-      private readonly Cache<Guid, Guid> accessTokenCache;
+      private readonly Cache<string, Guid> accessTokenCache;
       private readonly AccountProcessorFactory accountProcessorFactory;
       private readonly AccountLookupService accountLookupService;
 
-      public AccountAuthenticationServiceImpl(Cache<Guid, Account> accountCache, Cache<Guid, Guid> accessTokenCache, AccountProcessorFactory accountProcessorFactory, AccountLookupService accountLookupService) {
+      public AccountAuthenticationServiceImpl(Cache<Guid, Account> accountCache, Cache<string, Guid> accessTokenCache, AccountProcessorFactory accountProcessorFactory, AccountLookupService accountLookupService) {
          this.accountCache = accountCache;
          this.accessTokenCache = accessTokenCache;
          this.accountProcessorFactory = accountProcessorFactory;
          this.accountLookupService = accountLookupService;
       }
 
-      public bool TryAuthenticate(string username, string saltedPassword, out Guid accountId, out Guid accessToken) {
+      public bool TryAuthenticate(string username, string saltedPassword, out Guid accountId, out string accessToken) {
          if (!accountLookupService.TryGetAccountIdByUsername(username, out accountId)) {
-            accessToken = Guid.Empty;
+            accessToken = null;
             return false;
          } else {
             Console.WriteLine("TGAIBU: " + accountId);
@@ -27,10 +27,14 @@ namespace Dargon.Platform.Accounts {
             if (!authenticationSuccessful) {
                accountId = Guid.Empty;
             }
-            accessToken = Guid.NewGuid();
+            accessToken = Guid.NewGuid().ToString("n");
             accessTokenCache.Put(accessToken, accountId);
             return authenticationSuccessful;
          }
+      }
+
+      public bool TryValidateToken(string accessToken, out Guid accountId) {
+         return accessTokenCache.TryGetValue(accessToken, out accountId);
       }
    }
 }

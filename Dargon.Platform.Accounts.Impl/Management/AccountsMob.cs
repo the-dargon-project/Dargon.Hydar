@@ -21,9 +21,10 @@ namespace Dargon.Platform.Accounts.Management {
 
       [ManagedOperation]
       public string TryAuthenticateSalted(string username, string saltedPassword) {
-         Guid accountId, accessToken;
+         Guid accountId;
+         string accessToken;
          var result = accountService.TryAuthenticate(username, saltedPassword, out accountId, out accessToken);
-         return result + " " + accountId + " " + accessToken;
+         return result + " " + accountId + " " + (accessToken ?? "null");
       }
 
       [ManagedOperation]

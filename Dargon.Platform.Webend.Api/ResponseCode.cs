@@ -2,6 +2,8 @@
    public enum ResponseCode {
       Okay = 200,
       Failure = 400,
-      ValidationError = 401,
+      Unauthorized = 401,
+      ValidationError = 403,
+      TokenRequired = 499
    }
 }

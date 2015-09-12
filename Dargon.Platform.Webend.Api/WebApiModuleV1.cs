@@ -1,6 +1,7 @@
 using Nancy;
 using Nancy.Responses;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Nancy.ModelBinding;
@@ -28,15 +29,35 @@ namespace Dargon.Platform.Webend {
       }
 
       public Response Success(object result) {
-         return Success(ResponseCode.Okay, result);
+         return Success(result, ResponseCode.Okay);
       }
 
-      public Response Success(ResponseCode code, object result) {
+      public Response Success(object result, ResponseCode code) {
          return Response.AsJson(new ResultResponse { ResponseCode = code, Result = result });
       }
 
       public Response Failure(string message) {
-         return Response.AsJson(new ErrorResponse { ResponseCode = ResponseCode.Failure, Error = message});
+         return Failure(message, ResponseCode.Failure);
+      }
+
+      public Response Failure(string message, ResponseCode code) {
+         return Response.AsJson(new ErrorResponse { ResponseCode = code, Error = message });
+      }
+
+      public Response Failure(string message, ResponseCode code, HttpStatusCode httpStatusCode) {
+         return Response.AsJson(new ErrorResponse { ResponseCode = code, Error = message }, httpStatusCode);
+      }
+
+      public Response BadRequest(string message, ResponseCode code = ResponseCode.Failure) {
+         return Response.AsJson(new ErrorResponse { ResponseCode = code, Error = message }, HttpStatusCode.BadRequest);
+      }
+
+      public Response Unauthorized(string message, ResponseCode code = ResponseCode.Unauthorized) {
+         return Response.AsJson(new ErrorResponse { ResponseCode = code, Error = message }, HttpStatusCode.Unauthorized);
+      }
+
+      public Response InvalidToken() {
+         return Response.AsJson(new ErrorResponse { ResponseCode = ResponseCode.ValidationError, Error = "Invalid access token." }, HttpStatusCode.Unauthorized);
       }
 
       public Response ValidationFailure() {
@@ -56,6 +77,17 @@ namespace Dargon.Platform.Webend {
                return ConvertResponse(await func(parameters, token, x));
             });
          };
+      }
+
+      public bool TryGetAccessToken(out string accessToken) {
+         var authorizationHeader = Request.Headers["Authorization"].FirstOrDefault();
+         if (authorizationHeader == null || !authorizationHeader.StartsWith("bearer ")) {
+            accessToken = null;
+            return false;
+         } else {
+            accessToken = authorizationHeader.Substring(authorizationHeader.IndexOf(' ') + 1);
+            return true;
+         }
       }
 
       private Response ConvertResponse<TResponse>(TResponse result) {

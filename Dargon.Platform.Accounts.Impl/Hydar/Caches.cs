@@ -12,7 +12,7 @@ namespace Dargon.Platform.Accounts.Hydar {
       private CacheStore<Guid, Account> accountCacheStore;
       private Cache<Guid, Account> accountCache;
       private Cache<string, Guid> accountIdByUsernameCache;
-      private Cache<Guid, Guid> accessTokenCache;
+      private Cache<string, Guid> accessTokenCache;
 
       public Caches(PlatformCacheConfiguration platformCacheConfiguration, CacheInitializerFacade cacheInitializer) {
          this.platformCacheConfiguration = platformCacheConfiguration;
@@ -22,13 +22,13 @@ namespace Dargon.Platform.Accounts.Hydar {
       public CacheStore<Guid, Account> AccountCacheStore => accountCacheStore;
       public Cache<Guid, Account> Account => accountCache;
       public Cache<string, Guid> AccountIdByUsernameCache => accountIdByUsernameCache;
-      public Cache<Guid, Guid> AccessTokenCache => accessTokenCache;
+      public Cache<string, Guid> AccessTokenCache => accessTokenCache;
 
       public void Initialize() {
          accountCacheStore = new MicroLiteCacheStore<Guid, Account>(platformCacheConfiguration.DatabaseSessionFactory);
          accountCache = cacheInitializer.NearCache("account-cache", accountCacheStore);
          accountIdByUsernameCache = cacheInitializer.NearCache<string, Guid>("account-id-by-username-cache");
-         accessTokenCache = cacheInitializer.NearCache<Guid, Guid>("access-token-cache");
+         accessTokenCache = cacheInitializer.NearCache<string, Guid>("access-token-cache");
       }
    }
 }
