@@ -84,7 +84,7 @@ namespace Dargon.Platform.Webend {
 
       public bool TryGetAccessToken(out string accessToken) {
          var authorizationHeader = Request.Headers["Authorization"].FirstOrDefault();
-         if (authorizationHeader == null || !authorizationHeader.StartsWith("bearer ")) {
+         if (authorizationHeader == null || !authorizationHeader.StartsWith("bearer ", StringComparison.OrdinalIgnoreCase)) {
             accessToken = null;
             return false;
          } else {
@@ -95,7 +95,7 @@ namespace Dargon.Platform.Webend {
 
       private ClientDescriptor GetClientDescriptor() {
          var clientIdString = Request.Headers["X-Dargon-Client-Id"].FirstOrDefault();
-         var clientFullName = Request.Headers["X-Dargon-Client-Name"].FirstOrDefault();
+         var clientFullName = Request.Headers["X-Dargon-Client-Full-Name"].FirstOrDefault();
 
          Guid clientId;
          if (!Guid.TryParse(clientIdString, out clientId)) {

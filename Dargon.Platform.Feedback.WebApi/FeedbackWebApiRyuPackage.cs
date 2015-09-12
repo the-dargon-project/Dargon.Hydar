@@ -10,6 +10,7 @@ using Dargon.Ryu;
 using Dargon.Platform.Webend;
 using ItzWarty;
 using Nancy;
+using static Dargon.Services.AsyncStatics;
 
 namespace Dargon.Platform.Accounts.WebApi {
    public class FeedbackWebApiRyuPackage : RyuPackageV1 {
@@ -48,9 +49,7 @@ namespace Dargon.Platform.Accounts.WebApi {
          } else {
             var file = files.First();
 
-            if (file.ContentType != "application/zip" && file.ContentType != "application/octet-stream" && file.ContentType != "application/x-zip-compressed") {
-               return BadRequest("Invalid file - must specifiy zip archive.");
-            } else if (file.Value.Length > kMaximumCompressedLogArchiveSize) {
+            if (file.Value.Length > kMaximumCompressedLogArchiveSize) {
                return BadRequest($"Invalid file - compressed size was larger than {kMaximumCompressedLogArchiveSize} bytes.");
             }
 
@@ -72,7 +71,7 @@ namespace Dargon.Platform.Accounts.WebApi {
                return InvalidToken();
             }
 
-            clientLogImportingService.ImportUserLogs(ClientDescriptor, uploadedFileStream.ToArray());
+            await Async(() => clientLogImportingService.ImportUserLogs(ClientDescriptor, uploadedFileStream.ToArray()));
             return Success("Successfully uploaded logs.");
          }
       }

@@ -1,11 +1,8 @@
 ﻿using Dargon.Platform.Webend;
 using Dargon.Ryu;
 using FluentValidation;
-using ItzWarty;
 using Nancy;
 using System;
-using System.IO.Compression;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using static Dargon.Services.AsyncStatics;
@@ -38,7 +35,7 @@ namespace Dargon.Platform.Accounts.WebApi {
 
       private async Task<Response> CreateAccount(dynamic parameters, CancellationToken token, CreateAccountRequest x) {
          try {
-            var accountId = accountService.CreateAccount(x.Username, x.Password);
+            var accountId = await Async(() => accountService.CreateAccount(x.Username, x.Password));
             return Success(new { AccountId = accountId });
          } catch (UsernameTakenException ex) {
             return Failure(ex.Message);
