@@ -10,6 +10,9 @@ using NLog.Targets.Wrappers;
 
 namespace Dargon.Platform.Webend {
    public class WebendOptions {
+      [Option("BaseUrl", DefaultValue = "http://localhost:1234")]
+      public string BaseUrl { get; set; }
+
       [Option("PlatformServiceEndpoints", DefaultValue = "localhost:31337")]
       public string PlatformServiceEndpoints { get; set; }
    }
@@ -21,7 +24,7 @@ namespace Dargon.Platform.Webend {
          if (!Parser.Default.ParseArguments(args, webendOptions)) {
             throw new InvalidOperationException("Args parsing failed.");
          } else {
-            new WebendApplicationEgg().Start("http://localhost:1234", webendOptions);
+            new WebendApplicationEgg().Start(webendOptions);
             new AutoResetEvent(false).WaitOne();
          }
       }

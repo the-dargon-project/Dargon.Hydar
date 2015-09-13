@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using CommandLine;
 using Dargon.Nest.Egg;
 using Dargon.Platform.FrontendApplicationBase;
 using Dargon.Ryu;
@@ -21,10 +22,12 @@ namespace Dargon.Platform.Webend {
       }
 
       public NestResult Start(IEggParameters parameters) {
-         throw new NotImplementedException();
+         var options = new WebendOptions();
+         Parser.Default.ParseArguments(new string[0], options);
+         return Start(options);
       }
 
-      public NestResult Start(string baseUrl, WebendOptions webendOptions) {
+      public NestResult Start(WebendOptions webendOptions) {
          ryu.Touch<ItzWartyCommonsRyuPackage>();
          ryu.Touch<ItzWartyProxiesRyuPackage>();
          ryu.Set<WebendConfiguration>(new WebendConfigurationImpl {
@@ -33,7 +36,7 @@ namespace Dargon.Platform.Webend {
          ((RyuContainerImpl)ryu).Setup(true);
          if (nancyHost == null) {
             var bootstrapper = new RyuNancyBootstrapper(ryu);
-            nancyHost = new NancyHost(new Uri(baseUrl), bootstrapper);
+            nancyHost = new NancyHost(new Uri(webendOptions.BaseUrl), bootstrapper);
          }
          nancyHost.Start();
          return NestResult.Success;

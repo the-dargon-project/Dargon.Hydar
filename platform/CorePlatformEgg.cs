@@ -10,6 +10,7 @@ using ItzWarty.Networking;
 using MicroLite.Configuration;
 using System;
 using System.Collections.Generic;
+using CommandLine;
 
 namespace Dargon.Hydar {
    public class CorePlatformEgg : INestApplicationEgg {
@@ -22,7 +23,10 @@ namespace Dargon.Hydar {
       }
 
       public NestResult Start(IEggParameters parameters) {
-         throw new NotImplementedException();
+         var options = new CorePlatformOptions();
+         Parser.Default.ParseArguments(new string[0], options);
+
+         return Start(options);
       }
 
       public NestResult Start(CorePlatformOptions corePlatformOptions) {
@@ -56,11 +60,6 @@ namespace Dargon.Hydar {
          ((RyuContainerImpl)ryu).Setup(true);
 
          Console.WriteLine("Initialized!");
-
-//         var accountService = ryu.Get<AccountService>();
-//         Guid accountId, accessToken;
-//         var authenticationResult = accountService.TryAuthenticate("Warty", "test", out accountId, out accessToken);
-//         Console.WriteLine("Authentication result: " + authenticationResult + " accountId: " + accountId + " accessToken: " + accessToken);
 
          return NestResult.Success;
       }
