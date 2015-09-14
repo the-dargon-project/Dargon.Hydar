@@ -14,6 +14,7 @@ using Nancy.Hosting.Self;
 namespace Dargon.Platform.Webend {
    public class WebendApplicationEgg : INestApplicationEgg {
       private readonly RyuContainer ryu;
+      private IEggHost eggHost;
       private NancyHost nancyHost;
 
       public WebendApplicationEgg() {
@@ -22,6 +23,8 @@ namespace Dargon.Platform.Webend {
       }
 
       public NestResult Start(IEggParameters parameters) {
+         this.eggHost = parameters.Host;
+
          var options = new WebendOptions();
          Parser.Default.ParseArguments(new string[0], options);
          return Start(options);
@@ -44,6 +47,7 @@ namespace Dargon.Platform.Webend {
 
       public NestResult Shutdown() {
          nancyHost.Stop();
+         eggHost.Shutdown();
          return NestResult.Success;
       }
 

@@ -16,6 +16,7 @@ namespace Dargon.Hydar {
    public class CorePlatformEgg : INestApplicationEgg {
       private readonly List<object> keepalive = new List<object>();
       private readonly RyuContainer ryu;
+      private IEggHost host;
 
       public CorePlatformEgg() {
          ryu = new RyuFactory().Create();
@@ -23,6 +24,8 @@ namespace Dargon.Hydar {
       }
 
       public NestResult Start(IEggParameters parameters) {
+         this.host = parameters.Host;
+
          var options = new CorePlatformOptions();
          Parser.Default.ParseArguments(new string[0], options);
 
@@ -65,6 +68,7 @@ namespace Dargon.Hydar {
       }
 
       public NestResult Shutdown() {
+         host.Shutdown();
          return NestResult.Success;
       }
    }

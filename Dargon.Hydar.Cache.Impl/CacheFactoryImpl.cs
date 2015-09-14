@@ -91,7 +91,7 @@ namespace Dargon.Hydar.Cache {
                phaseManager.HandleTick();
                Thread.Sleep(100);
             }
-         }).Start();
+         }) { IsBackground = true }.Start();
          
          return new CacheRootImpl<TKey, TValue>(cacheName, cacheGuid, phaseManager, cacheService);
       }
