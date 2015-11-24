@@ -30,8 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MicroLite">
-      <HintPath>..\packages\MicroLite.6.2.4\lib\net45\MicroLite.dll</HintPath>
+    <Reference Include="MicroLite, Version=6.2.0.0, Culture=neutral, PublicKeyToken=08410e6798c4fa37, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\MicroLite.6.2.4\lib\net45\MicroLite.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
